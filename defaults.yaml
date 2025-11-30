@@ -1,0 +1,36 @@
+# ==============================================================================
+# defaults.yaml - Configurações padrão do Pandoc para Nota Técnica UnB/CCA/MQC
+# ==============================================================================
+
+# Data directory (para encontrar os partials)
+data-dir: .
+
+# Arquivos de entrada
+input-files:
+  - content/nota-tecnica.md
+
+# Metadados
+metadata-files:
+  - metadata.yaml
+
+# Template LaTeX personalizado
+template: template.tex
+
+# Variáveis globais
+variables:
+  documentclass: article
+  papersize: a4
+  fontsize: 12pt
+  lang: pt-BR
+
+# Processamento
+from: markdown+smart+citations
+standalone: true
+
+# Sumário
+toc: true
+toc-depth: 3
+
+# Bibliografia
+citeproc: true
+csl: associacao-brasileira-de-normas-tecnicas.csl

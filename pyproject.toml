@@ -1,0 +1,87 @@
+[project]
+name = "unb-cca-mqac"
+version = "0.1.0"
+description = "Análise CAPM - Nota Técnica MQC (Métodos Quantitativos em Contabilidade)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Estudante UnB", email = "estudante@unb.br"}
+]
+keywords = ["capm", "finance", "econometrics", "academic", "latex"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Financial Analysis",
+]
+
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "scipy>=1.10.0",
+    "statsmodels>=0.14.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "jupytext>=1.15.0",
+]
+science = [
+    "SciencePlots>=2.0.0",
+]
+all = [
+    "unb-cca-mqac[dev,science]",
+]
+
+[project.scripts]
+run-capm = "scripts.run_analysis:main"
+
+[project.urls]
+Homepage = "https://github.com/seu-usuario/unb-cca-mqac"
+Documentation = "https://github.com/seu-usuario/unb-cca-mqac#readme"
+Repository = "https://github.com/seu-usuario/unb-cca-mqac"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I", "N", "D", "UP"]
+ignore = ["D100", "D104"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=src --cov-report=term-missing"

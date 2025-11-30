@@ -1,0 +1,32 @@
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Métricas Fundamentalistas --- PETR4}
+\label{tab:metricas_fundamentalistas}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Dimensão} & \textbf{Métrica} & \textbf{Valor} & \textbf{Benchmark} & \textbf{Z-Score} \\
+\midrule
+\multirow{3}{*}{\textbf{Valor}}
+    & Earnings Yield & 18.66\% & 10.00\% & +1.73 \\
+    & EV/EBITDA & 1.97x & 4.50x & +1.69 \\
+    & P/VP & 0.99x & 1.20x & +0.52 \\
+\midrule
+\multirow{3}{*}{\textbf{Qualidade}}
+    & ROE & 8.75\% & 12.00\% & -0.54 \\
+    & ROACE & 15.09\% & 10.00\% & +1.27 \\
+    & Margem EBITDA & 43.79\% & 35.00\% & +0.88 \\
+\midrule
+\multirow{3}{*}{\textbf{Risco}}
+    & Beta & 1.40 & 1.00 & -1.33 \\
+    & Volatilidade & 45.78\% & 35.00\% & -1.08 \\
+    & EVS & -1.51\% & 0.00\% & -0.30 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item \textit{Fonte}: Elaboração própria com dados fundamentalistas da Brapi API (2025).
+\item \textit{Nota}: Z-Score calculado como $(X - \mu_{setor}) / \sigma_{setor}$. Benchmarks baseados em médias setoriais de empresas integradas de óleo e gás. EVS = Economic Value Spread (ROACE $-$ WACC).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

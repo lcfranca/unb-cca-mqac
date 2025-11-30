@@ -1,0 +1,51 @@
+%% ==============================================================================
+%% headings.tex - Partial para formatação de seções
+%% Configurações de H1, H2, H3, H4 conforme ABNT NBR 6024:2012
+%% ==============================================================================
+
+%% ==============================================================================
+%% HIERARQUIA VISUAL ABNT:
+%% Seção primária:      MAIÚSCULAS + NEGRITO (destaque máximo)
+%% Seção secundária:    MAIÚSCULAS + normal (sem negrito) OU minúsculas + negrito
+%% Seção terciária:     Minúsculas + negrito
+%% Seção quaternária:   Minúsculas + itálico ou normal
+%% ==============================================================================
+
+%% Configuração para quebra de página antes de seções primárias
+\newcommand{\sectionbreak}{\clearpage}
+
+%% H1: SEÇÃO PRIMÁRIA - MAIÚSCULAS NEGRITO + QUEBRA DE PÁGINA
+%% Espaçamento: 18pt antes, 12pt depois (uma linha em branco equivalente)
+\titleformat{\section}
+  {\sectionbreak\normalfont\fontsize{12pt}{14pt}\selectfont\bfseries\MakeUppercase}
+  {\thesection}
+  {0.5em}
+  {}
+\titlespacing*{\section}{0pt}{0pt}{12pt}
+
+%% H2: SEÇÃO SECUNDÁRIA - Minúsculas + Negrito
+%% Destaque menor que H1, mas ainda proeminente
+\titleformat{\subsection}
+  {\normalfont\fontsize{12pt}{14pt}\selectfont\bfseries}
+  {\thesubsection}
+  {0.5em}
+  {}
+\titlespacing*{\subsection}{0pt}{16pt}{10pt}
+
+%% H3: SEÇÃO TERCIÁRIA - Minúsculas + Negrito Itálico
+%% Diferenciação sutil em relação a H2
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12pt}{14pt}\selectfont\bfseries\itshape}
+  {\thesubsubsection}
+  {0.5em}
+  {}
+\titlespacing*{\subsubsection}{0pt}{14pt}{8pt}
+
+%% H4: SEÇÃO QUATERNÁRIA - Normal + Itálico
+%% Nível mais baixo de hierarquia
+\titleformat{\paragraph}[hang]
+  {\normalfont\fontsize{12pt}{14pt}\selectfont\itshape}
+  {\theparagraph}
+  {0.5em}
+  {}
+\titlespacing*{\paragraph}{0pt}{12pt}{6pt}

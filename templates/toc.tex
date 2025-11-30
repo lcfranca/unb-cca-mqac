@@ -1,0 +1,41 @@
+%% ==============================================================================
+%% toc.tex - Partial para configuração do sumário
+%% Formatação do Table of Contents conforme ABNT NBR 6027:2012
+%% ==============================================================================
+
+%% ==============================================================================
+%% TÍTULO DO SUMÁRIO - Centralizado, maiúsculas, negrito
+%% ==============================================================================
+\renewcommand{\cfttoctitlefont}{\hfill\fontsize{12pt}{14pt}\selectfont\bfseries\MakeUppercase}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{24pt}  % Espaço após título do sumário
+
+%% ==============================================================================
+%% ENTRADAS DO SUMÁRIO - Hierarquia visual consistente
+%% ==============================================================================
+
+%% Seções primárias: MAIÚSCULAS + negrito
+\renewcommand{\cftsecfont}{\fontsize{12pt}{14pt}\selectfont\bfseries}
+\renewcommand{\cftsecpagefont}{\fontsize{12pt}{14pt}\selectfont\bfseries}
+\setlength{\cftbeforesecskip}{6pt}  % Espaço antes de seções primárias
+
+%% Seções secundárias: normal
+\renewcommand{\cftsubsecfont}{\fontsize{12pt}{14pt}\selectfont}
+\renewcommand{\cftsubsecpagefont}{\fontsize{12pt}{14pt}\selectfont}
+\setlength{\cftsubsecindent}{0.5cm}  % Indentação
+
+%% Seções terciárias: normal
+\renewcommand{\cftsubsubsecfont}{\fontsize{12pt}{14pt}\selectfont}
+\renewcommand{\cftsubsubsecpagefont}{\fontsize{12pt}{14pt}\selectfont}
+\setlength{\cftsubsubsecindent}{1.0cm}  % Indentação progressiva
+
+%% ==============================================================================
+%% LINHAS PONTILHADAS - Conectando título à página
+%% ==============================================================================
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{\cftdotsep}}
+
+%% Espaçamento dos pontos
+\renewcommand{\cftdotsep}{1.5}

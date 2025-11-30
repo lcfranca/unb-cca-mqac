@@ -1,0 +1,131 @@
+%% ==============================================================================
+%% titlepage.tex - Partial para capa da Nota Técnica
+%% Este arquivo é processado pelo Pandoc - variáveis $var$ são substituídas
+%% Formatação seguindo padrões ABNT NBR 14724:2011
+%% ==============================================================================
+
+\begin{titlepage}
+\thispagestyle{empty}
+\setstretch{1.0}
+
+%% ============================================================================
+%% BLOCO SUPERIOR - Identificação Institucional
+%% ABNT: Nome da instituição em maiúsculas, centralizado
+%% ============================================================================
+
+\begin{center}
+
+%% Logo UnB - proporção adequada para identificação visual
+$if(logo)$
+\includegraphics[height=2.5cm]{$logo$}
+\vspace{1cm}
+$endif$
+
+%% Hierarquia institucional - ABNT recomenda maiúsculas para instituição
+%% Usando fonte serifada (Times) para formalidade acadêmica
+{%
+\fontsize{14pt}{18pt}\selectfont
+\textbf{UNIVERSIDADE DE BRASÍLIA}\\[0.3cm]
+}
+{%
+\fontsize{12pt}{16pt}\selectfont
+\MakeUppercase{Faculdade de Economia, Administração, Contabilidade}\\
+\MakeUppercase{e Gestão de Políticas Públicas}\\[0.2cm]
+\MakeUppercase{Departamento de Ciências Contábeis e Atuariais}\\[0.4cm]
+}
+
+%% Curso
+$if(curso)$
+{\fontsize{12pt}{14pt}\selectfont $curso$}
+$endif$
+
+\end{center}
+
+\vspace{1.5cm}
+
+%% ============================================================================
+%% IDENTIFICAÇÃO DO DOCUMENTO
+%% ============================================================================
+
+\noindent
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+{\fontsize{12pt}{14pt}\selectfont
+\textbf{Nota Técnica nº} $if(nota-tecnica-numero)$$nota-tecnica-numero$$else$\_\_\_\_$endif$%
+$if(disciplina-sigla)$/\textit{$disciplina-sigla$}$endif$}
+&
+{\fontsize{12pt}{14pt}\selectfont
+\textbf{Data:} $if(data)$$data$$else$\_\_\_/\_\_\_/\_\_\_\_\_$endif$}
+\end{tabular*}
+
+\vspace{2cm}
+
+%% ============================================================================
+%% TÍTULO - Elemento central e mais destacado
+%% ABNT: Centralizado, negrito, maiúsculas, fonte 12pt ou maior
+%% ============================================================================
+
+\begin{center}
+{%
+\fontsize{14pt}{20pt}\selectfont
+\bfseries
+\setstretch{1.5}
+$title$
+\par
+}
+\end{center}
+
+\vspace{2cm}
+
+%% ============================================================================
+%% INFORMAÇÕES DO TRABALHO - Dados da análise
+%% Formatação em bloco para alinhamento visual consistente
+%% ============================================================================
+
+\noindent
+\fontsize{12pt}{18pt}\selectfont
+\setstretch{1.5}
+
+\textbf{Empresa analisada:} $if(empresa)$$empresa$$else$\rule{8cm}{0.4pt}$endif$
+
+\vspace{0.4cm}
+
+\textbf{Setor:} $if(setor)$$setor$$else$\rule{10cm}{0.4pt}$endif$
+
+\vspace{0.4cm}
+
+\textbf{Período de análise:} $if(periodo)$$periodo$$else$\_\_\_\_\_\, a \,\_\_\_\_\_\, (frequência: mensal)$endif$
+
+\vspace{2.5cm}
+
+%% ============================================================================
+%% AUTORIA - Identificação do(s) autor(es)
+%% ABNT: Alinhamento à direita, espaçamento 1.5
+%% ============================================================================
+
+\begin{flushright}
+\fontsize{12pt}{18pt}\selectfont
+\setstretch{1.5}
+$if(author)$
+\textbf{Autor(es):}\\[0.4cm]
+$for(author)$
+$author$$sep$\\[0.2cm]
+$endfor$
+$else$
+\textbf{Autor:} \rule{6cm}{0.4pt}
+$endif$
+\end{flushright}
+
+\vfill
+
+%% ============================================================================
+%% BLOCO INFERIOR - Local e Ano
+%% ABNT: Centralizado, última informação da capa
+%% ============================================================================
+
+\begin{center}
+\fontsize{12pt}{16pt}\selectfont
+$if(local)$$local$$else$Brasília – DF$endif$\\[0.3cm]
+$if(ano)$$ano$$else$2025$endif$
+\end{center}
+
+\end{titlepage}

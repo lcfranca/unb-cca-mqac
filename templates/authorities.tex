@@ -1,0 +1,68 @@
+%% ==============================================================================
+%% authorities.tex - Partial para página de autoridades
+%% Este arquivo é processado pelo Pandoc - variáveis $var$ são substituídas
+%% Formatação seguindo padrões acadêmicos institucionais
+%% ==============================================================================
+
+\newpage
+\thispagestyle{empty}
+\setstretch{1.0}
+
+%% Empurra todo o conteúdo para o final da página
+\null
+\vfill
+
+\begin{center}
+\fontsize{11pt}{16pt}\selectfont
+
+$if(reitor)$
+{\bfseries $reitor$}\\
+{\small Reitora da Universidade de Brasília}
+
+\vspace{0.7cm}
+$endif$
+
+$if(vice-reitor)$
+{\bfseries $vice-reitor$}\\
+{\small Vice-Reitor da Universidade de Brasília}
+
+\vspace{0.7cm}
+$endif$
+
+$if(decano-graduacao)$
+{\bfseries $decano-graduacao$}\\
+{\small Decano de Ensino de Graduação}
+
+\vspace{0.7cm}
+$endif$
+
+$if(diretor-face)$
+{\bfseries $diretor-face$}\\
+{\small Diretor da Faculdade de Economia, Administração, Contabilidade}\\
+{\small e Gestão de Políticas Públicas}
+
+\vspace{0.7cm}
+$endif$
+
+$if(chefe-cca)$
+{\bfseries $chefe-cca$}\\
+{\small Chefe do Departamento de Ciências Contábeis e Atuariais}
+
+\vspace{0.7cm}
+$endif$
+
+$if(coordenador-diurno)$
+{\bfseries $coordenador-diurno$}\\
+{\small Coordenador de Graduação do curso de Ciências Contábeis – Diurno}
+
+\vspace{0.7cm}
+$endif$
+
+$if(coordenador-noturno)$
+{\bfseries $coordenador-noturno$}\\
+{\small Coordenador de Graduação do curso de Ciências Contábeis – Noturno}
+$endif$
+
+\end{center}
+
+\vspace{1.5cm}

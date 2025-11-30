@@ -1,0 +1,141 @@
+%% ==============================================================================
+%% preamble.tex - Partial para preâmbulo LaTeX
+%% Pacotes e configurações gerais - Padrão ABNT
+%% ==============================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+
+%% ==============================================================================
+%% TIPOGRAFIA - Padrão Acadêmico Brasileiro
+%% Times New Roman é o padrão ABNT; TeX Gyre Termes é equivalente em LaTeX
+%% ==============================================================================
+\usepackage{tgtermes}  % Times New Roman equivalente (padrão ABNT)
+\usepackage{tgheros}   % Helvética para sans-serif (títulos da capa)
+\usepackage{tgcursor}  % Courier para monospace
+
+%% Corpo do texto em Times (serifada) - padrão acadêmico
+\renewcommand{\rmdefault}{qtm}  % TeX Gyre Termes
+\renewcommand{\sfdefault}{qhv}  % TeX Gyre Heros (para capa)
+
+%% ==============================================================================
+%% MARGENS - ABNT NBR 14724:2011
+%% Superior e esquerda: 3cm | Inferior e direita: 2cm
+%% ==============================================================================
+\usepackage[
+  a4paper,
+  top=3cm,
+  bottom=2cm,
+  left=3cm,
+  right=2cm,
+  headheight=14.5pt,
+  headsep=0.8cm,
+  footskip=1.2cm
+]{geometry}
+
+%% ==============================================================================
+%% ESPAÇAMENTO - ABNT
+%% Texto: 1.5 | Citações longas, notas, referências: simples
+%% ==============================================================================
+\usepackage{setspace}
+
+%% Cabeçalhos e rodapés
+\usepackage{fancyhdr}
+
+%% Formatação de seções
+\usepackage{titlesec}
+
+%% Sumário
+\usepackage{tocloft}
+
+%% ==============================================================================
+%% HYPERLINKS - Configuração acadêmica
+%% ==============================================================================
+\usepackage[
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=black,
+  citecolor=black,
+  bookmarks=true,
+  bookmarksnumbered=true,
+  bookmarksopen=false,
+  pdfdisplaydoctitle=true
+]{hyperref}
+
+%% Listas - configuração ABNT
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=1.25cm}
+\setlist[itemize]{label={--}}
+\setlist[enumerate]{label={\arabic*.}}
+
+%% Citações
+\usepackage{csquotes}
+
+%% ==============================================================================
+%% GRÁFICOS E FIGURAS
+%% ==============================================================================
+\usepackage{graphicx}
+\graphicspath{{./images/}{./assets/figures/}{./}}
+\usepackage{float}  % Para posicionamento [H]
+\usepackage{placeins}  % Para \FloatBarrier
+
+%% Configuração de floats para evitar páginas de floats
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{6}
+
+%% ==============================================================================
+%% TABELAS - Configuração profissional
+%% ==============================================================================
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{threeparttable}  % Para notas de rodapé em tabelas
+\usepackage{tabularray}      % Tabelas modernas (estado da arte 2024-2025)
+\UseTblrLibrary{booktabs}    % Integração tabularray + booktabs
+
+%% Espaçamento em tabelas booktabs
+\setlength{\heavyrulewidth}{0.08em}
+\setlength{\lightrulewidth}{0.05em}
+\setlength{\cmidrulewidth}{0.03em}
+\setlength{\abovetopsep}{0pt}
+\setlength{\belowbottomsep}{0pt}
+
+%% Cores
+\usepackage{xcolor}
+
+%% ==============================================================================
+%% CONFIGURAÇÕES ADICIONAIS ABNT
+%% ==============================================================================
+
+%% Microtype para melhor tipografia
+\usepackage{microtype}
+
+%% Indentação do primeiro parágrafo após seção (padrão brasileiro)
+\usepackage{indentfirst}
+
+%% Notas de rodapé - numeração contínua
+\usepackage[bottom]{footmisc}
+
+%% Caption para figuras e tabelas
+\usepackage[font=small, labelfont=bf, labelsep=endash]{caption}
+
+%% ==============================================================================
+%% CONTROLE DE QUEBRAS DE PÁGINA
+%% ==============================================================================
+
+%% Evitar linhas órfãs e viúvas
+\widowpenalty=10000
+\clubpenalty=10000
+
+%% Espaçamento de floats
+\setlength{\floatsep}{12pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{20pt plus 2pt minus 4pt}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}

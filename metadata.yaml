@@ -1,0 +1,132 @@
+# ==============================================================================
+# metadata.yaml - Metadados do documento
+# Preencha os campos abaixo para personalizar o documento
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# CAPA - Informações básicas
+# ------------------------------------------------------------------------------
+
+# Título do trabalho (MAIÚSCULAS)
+title: "NOTA TÉCNICA - RECOMENDAÇÃO DE COMPRA DE AÇÃO VIA CAPM"
+
+# Autor(es)
+author:
+  - ""
+
+# Logo da UnB (caminho relativo)
+logo: images/logo-unb.png
+
+# Informações do curso
+curso: "Bacharelado em Ciências Contábeis"
+disciplina: "Métodos Quantitativos Aplicados à Contabilidade"
+disciplina-sigla: "MQC"
+
+# Nota técnica (deixe vazio para usar "___")
+nota-tecnica-numero: ""
+data: ""
+
+# Empresa analisada (campos sempre exibidos)
+empresa: ""
+setor: ""
+periodo: ""
+
+# Local e ano
+local: "Brasília – DF"
+ano: "2025"
+
+# ------------------------------------------------------------------------------
+# PÁGINA 2 - Autoridades UnB
+# (conforme template Word original)
+# ------------------------------------------------------------------------------
+
+reitor: "Professora Doutora Márcia Abrahão Moura"
+vice-reitor: "Professor Doutor Enrique Huelva Unternbäumen"
+decano-graduacao: "Professor Doutor Sérgio Antônio Andrade de Freitas"
+diretor-face: "Professor Doutor Eduardo Tadeu Vieira"
+chefe-cca: "Professor Doutor Paulo César de Melo Mendes"
+coordenador-diurno: "Professor Doutor Alex Laquis Resende"
+coordenador-noturno: "Professor Mestre Elivânio Geraldo de Andrade"
+
+# ------------------------------------------------------------------------------
+# RESUMO E PALAVRAS-CHAVE
+# ------------------------------------------------------------------------------
+
+abstract: |
+  Este trabalho desenvolve motor de scoring quantitativo (Q-VAL) para análise de 
+  comprabilidade de ativos, aplicando-o à Petrobras S.A. (PETR4) no contexto da 
+  autorização de exploração da Margem Equatorial brasileira. O modelo integra métricas 
+  de Valor, Qualidade e Risco, fundamentando-se no Capital Asset Pricing Model (CAPM) 
+  para estimação do custo de capital próprio. A partir de 2.462 observações diárias 
+  (2016--2025), estima-se beta de 1,40 e custo de capital de 16,60\%. Os resultados 
+  indicam score Q-VAL de 53,4 (faixa Neutra), com spread ICC-CAPM de +40 basis points, 
+  sugerindo precificação justa. A análise de cenários revela alta sensibilidade às 
+  premissas sobre preço do Brent e sucesso da Margem Equatorial, com scores variando 
+  de 43,0 (Venda) a 62,8 (Compra). Conclui-se que PETR4 não configura oportunidade 
+  clara de compra nem armadilha de valor evidente, com recomendação condicional ao 
+  perfil de risco e horizonte de investimento.
+
+keywords:
+  - CAPM
+  - Valuation
+  - Scoring Fundamentalista
+  - Petrobras
+  - Margem Equatorial
+  - Custo de Capital Implícito
+
+# ------------------------------------------------------------------------------
+# EPÍGRAFE
+# ------------------------------------------------------------------------------
+
+epigrafe:
+  texto: "Price is what you pay. Value is what you get."
+  autor: "Warren Buffett"
+
+# ------------------------------------------------------------------------------
+# LISTA DE ABREVIATURAS E SIGLAS
+# ------------------------------------------------------------------------------
+
+abbreviations:
+  - sigla: "CAPM"
+    descricao: "Capital Asset Pricing Model (Modelo de Precificação de Ativos de Capital)"
+  - sigla: "ICC"
+    descricao: "Implied Cost of Capital (Custo de Capital Implícito)"
+  - sigla: "DDM"
+    descricao: "Dividend Discount Model (Modelo de Desconto de Dividendos)"
+  - sigla: "EV"
+    descricao: "Enterprise Value (Valor da Empresa)"
+  - sigla: "EBITDA"
+    descricao: "Earnings Before Interest, Taxes, Depreciation and Amortization"
+  - sigla: "EVS"
+    descricao: "Economic Value Spread (Spread de Valor Econômico)"
+  - sigla: "P/L"
+    descricao: "Preço/Lucro"
+  - sigla: "P/VP"
+    descricao: "Preço/Valor Patrimonial"
+  - sigla: "ROE"
+    descricao: "Return on Equity (Retorno sobre Patrimônio Líquido)"
+  - sigla: "ROACE"
+    descricao: "Return on Average Capital Employed (Retorno sobre Capital Empregado Médio)"
+  - sigla: "WACC"
+    descricao: "Weighted Average Cost of Capital (Custo Médio Ponderado de Capital)"
+  - sigla: "ERP"
+    descricao: "Equity Risk Premium (Prêmio de Risco de Mercado)"
+  - sigla: "SML"
+    descricao: "Security Market Line (Linha de Mercado de Títulos)"
+  - sigla: "OLS"
+    descricao: "Ordinary Least Squares (Mínimos Quadrados Ordinários)"
+  - sigla: "bps"
+    descricao: "Basis Points (Pontos-base)"
+
+# ------------------------------------------------------------------------------
+# LISTAS DE FIGURAS E TABELAS
+# ------------------------------------------------------------------------------
+
+lof: true   # Lista de Figuras
+lot: true   # Lista de Tabelas
+
+# ------------------------------------------------------------------------------
+# Configurações
+# ------------------------------------------------------------------------------
+
+lang: pt-BR

@@ -1,0 +1,12 @@
+# =============================================================================
+# pdf.yaml - Configuração específica para compilação PDF
+# =============================================================================
+
+# input-files já definido em defaults.yaml (não duplicar!)
+
+output-file: output/nota-tecnica.pdf
+
+# metadata-files já definido em defaults.yaml (não duplicar!)
+
+bibliography:
+  - references.bib

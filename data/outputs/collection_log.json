@@ -1,0 +1,151 @@
+{
+  "collection_timestamp": "2025-11-30T18:24:51.987580",
+  "config": {
+    "ticker_principal": "PETR4",
+    "ticker_benchmark": "^BVSP",
+    "data_range": "10y",
+    "data_interval": "1d",
+    "data_inicio": "2016-01-01",
+    "brapi_base_url": "https://brapi.dev/api",
+    "sources": {
+      "petr4": "brapi.dev",
+      "ibov": "yahoo_finance",
+      "selic": "bcb.gov.br/SGS"
+    }
+  },
+  "artifacts": {
+    "external_brapi": [
+      {
+        "filename": "petr4_quote.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_quote.json",
+        "exists": true,
+        "size_bytes": 1035,
+        "size_formatted": "1.01 KB"
+      },
+      {
+        "filename": "petr4_historical.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_historical.json",
+        "exists": true,
+        "size_bytes": 534883,
+        "size_formatted": "522.35 KB"
+      },
+      {
+        "filename": "petr4_fundamental.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_fundamental.json",
+        "exists": true,
+        "size_bytes": 26355,
+        "size_formatted": "25.74 KB"
+      },
+      {
+        "filename": "petr4_financial_data.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_financial_data.json",
+        "exists": true,
+        "size_bytes": 5157,
+        "size_formatted": "5.04 KB"
+      },
+      {
+        "filename": "petr4_balance_sheet.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_balance_sheet.json",
+        "exists": true,
+        "size_bytes": 206218,
+        "size_formatted": "201.38 KB"
+      },
+      {
+        "filename": "petr4_income_statement.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_income_statement.json",
+        "exists": true,
+        "size_bytes": 174453,
+        "size_formatted": "170.36 KB"
+      },
+      {
+        "filename": "petr4_cashflow.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/brapi/petr4_cashflow.json",
+        "exists": true,
+        "size_bytes": 49079,
+        "size_formatted": "47.93 KB"
+      }
+    ],
+    "external_yfinance": [
+      {
+        "filename": "ibov_historical.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/yfinance/ibov_historical.json",
+        "exists": true,
+        "size_bytes": 257,
+        "size_formatted": "0.25 KB"
+      }
+    ],
+    "external_bcb": [
+      {
+        "filename": "selic_meta.json",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/external/bcb/selic_meta.json",
+        "exists": true,
+        "size_bytes": 230332,
+        "size_formatted": "224.93 KB"
+      }
+    ],
+    "processed": [
+      {
+        "filename": "petr4_prices.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/petr4_prices.csv",
+        "exists": true,
+        "size_bytes": 125549,
+        "size_formatted": "122.61 KB"
+      },
+      {
+        "filename": "petr4_dividends.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/petr4_dividends.csv",
+        "exists": true,
+        "size_bytes": 2031,
+        "size_formatted": "1.98 KB"
+      },
+      {
+        "filename": "petr4_balance_sheet.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/petr4_balance_sheet.csv",
+        "exists": true,
+        "size_bytes": 11285,
+        "size_formatted": "11.02 KB"
+      },
+      {
+        "filename": "petr4_income_statement.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/petr4_income_statement.csv",
+        "exists": true,
+        "size_bytes": 9259,
+        "size_formatted": "9.04 KB"
+      },
+      {
+        "filename": "petr4_cashflow.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/petr4_cashflow.csv",
+        "exists": true,
+        "size_bytes": 6297,
+        "size_formatted": "6.15 KB"
+      },
+      {
+        "filename": "ibov_prices.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/ibov_prices.csv",
+        "exists": true,
+        "size_bytes": 132059,
+        "size_formatted": "128.96 KB"
+      },
+      {
+        "filename": "selic.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/selic.csv",
+        "exists": true,
+        "size_bytes": 139242,
+        "size_formatted": "135.98 KB"
+      },
+      {
+        "filename": "returns.csv",
+        "path": "/home/subtilizer/Workspace/UNB/unb-cca-mqac/data/processed/returns.csv",
+        "exists": true,
+        "size_bytes": 320282,
+        "size_formatted": "312.78 KB"
+      }
+    ]
+  },
+  "summary": {
+    "total_expected": 17,
+    "total_found": 17,
+    "total_missing": 0,
+    "status": "SUCCESS"
+  }
+}

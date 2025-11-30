@@ -1,0 +1,53 @@
+# =============================================================================
+# Parâmetros do Modelo CAPM
+# =============================================================================
+# Arquivo de configuração para análise reproduzível
+# Todos os parâmetros do modelo devem ser definidos aqui.
+
+model:
+  # Taxa livre de risco (anual)
+  # Baseado na taxa Selic
+  rf: 0.0525
+  
+  # Retorno esperado do mercado (anual)
+  # Baseado no Ibovespa histórico
+  rm: 0.12
+  
+  # Beta verdadeiro do ativo (para simulação)
+  beta_true: 1.15
+
+data:
+  # Número de períodos (meses)
+  n_periods: 24
+  
+  # Semente para reprodutibilidade
+  seed: 42
+  
+  # Fonte dos dados
+  # Opções: "simulated", "yahoo", "bcb", "csv"
+  source: "simulated"
+  
+  # Ticker (para source: "yahoo")
+  ticker: null
+  
+  # Caminho para CSV (para source: "csv")
+  csv_path: null
+
+output:
+  # Formato de saída das figuras
+  figure_formats:
+    - pdf
+    - png
+  
+  # DPI para PNG
+  dpi: 300
+
+visualization:
+  # Estilo de plot
+  # Opções: "academic", "seaborn", "minimal"
+  style: "academic"
+  
+  # Tamanho padrão das figuras (polegadas)
+  figsize:
+    width: 6
+    height: 4
