@@ -1,99 +1,84 @@
 """
-Gerador de Tabela de Comparação de Modelos (Asset 3.3).
-
-Re-estima os modelos M0-M3 e gera uma tabela LaTeX formatada para a Nota Técnica.
-Inclui coeficientes, t-stats (entre parênteses), R2 Ajustado, AIC e BIC.
+Gera tabela LaTeX consolidada com métricas de todos os modelos (Naive + Dynamic).
 """
 
+import json
 import pandas as pd
-import statsmodels.api as sm
-import numpy as np
 from pathlib import Path
 from src.core.config import PROJECT_ROOT
 
-def gen_table_models():
+def run():
     # Caminhos
-    processed_dir = PROJECT_ROOT / "data" / "processed"
-    returns_path = processed_dir / "returns" / "returns.parquet"
-    qval_path = processed_dir / "qval" / "qval_timeseries.parquet"
+    naive_path = PROJECT_ROOT / "data" / "outputs" / "naive_metrics.json"
+    dynamic_path = PROJECT_ROOT / "data" / "outputs" / "dynamic_metrics.json"
+    output_path = PROJECT_ROOT / "data" / "outputs" / "tables" / "model_comparison.tex"
     
-    output_dir = PROJECT_ROOT / "data" / "outputs" / "tables"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / "comparacao_modelos.tex"
-
-    # 1. Carregar e Preparar Dados (Mesma lógica de estimate_models.py)
-    df_ret = pd.read_parquet(returns_path)
-    df_qval = pd.read_parquet(qval_path)
+    # Carregar dados
+    with open(naive_path, 'r') as f:
+        naive_metrics = json.load(f)
+        
+    with open(dynamic_path, 'r') as f:
+        dynamic_metrics = json.load(f)
+        
+    # Unificar dicionários
+    all_metrics = {**naive_metrics, **dynamic_metrics}
     
-    df_qval['available_date'] = pd.to_datetime(df_qval['quarter_end']) + pd.DateOffset(months=3)
-    qval_cols = ['available_date', 'z_earnings_yield', 'score_valor', 'score_qualidade', 'score_risco', 'qval_scaled']
-    df_qval_ready = df_qval[qval_cols].sort_values('available_date')
+    # Converter para DataFrame
+    df = pd.DataFrame(all_metrics).T
     
-    df_ret = df_ret.sort_values('date')
-    df_merged = pd.merge_asof(df_ret, df_qval_ready, left_on='date', right_on='available_date', direction='backward')
+    # Reordenar linhas
+    order = ['RW', 'HM', 'CAPM', 'Dynamic CAPM']
+    df = df.reindex(order)
     
-    required_cols = ['excess_ret_petr4', 'excess_ret_ibov', 'z_earnings_yield', 
-                     'score_valor', 'score_qualidade', 'score_risco', 'qval_scaled']
-    df_model = df_merged.dropna(subset=required_cols).copy()
-
-    # 2. Definir e Estimar Modelos
-    models_config = {
-        "M0 (CAPM)": ["excess_ret_ibov"],
-        "M1 (Fator Único)": ["excess_ret_ibov", "z_earnings_yield"],
-        "M2 (Multifator)": ["excess_ret_ibov", "score_valor", "score_qualidade", "score_risco"],
-        "M3 (Q-VAL)": ["excess_ret_ibov", "qval_scaled"]
-    }
-
-    results_list = []
-
-    for label, features in models_config.items():
-        y = df_model['excess_ret_petr4']
-        X = sm.add_constant(df_model[features])
-        model = sm.OLS(y, X).fit(cov_type='HC3')
-        
-        # Formatar resultados para a tabela
-        res_dict = {"Modelo": label}
-        
-        # Alpha
-        alpha = model.params['const']
-        alpha_t = model.tvalues['const']
-        res_dict["Alpha"] = f"{alpha:.4f} ({alpha_t:.2f})"
-        
-        # Beta (Mercado)
-        beta = model.params['excess_ret_ibov']
-        beta_t = model.tvalues['excess_ret_ibov']
-        res_dict["Beta (Rm)"] = f"{beta:.4f} ({beta_t:.2f})"
-        
-        # Outros coeficientes (agregados ou específicos)
-        # Para simplificar a tabela, vamos focar nas métricas de ajuste, 
-        # mas podemos listar coeficientes extras se necessário.
-        # Aqui vamos listar apenas se são significativos ou colocar "Sim"
-        
-        res_dict["Adj R2"] = f"{model.rsquared_adj:.4f}"
-        res_dict["AIC"] = f"{model.aic:.1f}"
-        res_dict["BIC"] = f"{model.bic:.1f}"
-        
-        results_list.append(res_dict)
-
-    # 3. Gerar DataFrame e LaTeX
-    df_table = pd.DataFrame(results_list)
+    # LaTeX Header
+    latex_content = [
+        "\\begin{table}[H]",
+        "\\centering",
+        "\\caption{Comparação de Performance Preditiva (Out-of-Sample)}",
+        "\\label{tab:model_comparison}",
+        "\\begin{tabular}{lrrrr}",
+        "\\toprule",
+        "Modelo & MSE ($10^{-4}$) & MAE & RMSE & $R^2_{OOS}$ (\\%) \\\\",
+        "\\midrule"
+    ]
     
-    latex_code = df_table.to_latex(
-        index=False,
-        caption="Comparação de Modelos de Precificação (M0 a M3)",
-        label="tab:model_comparison",
-        column_format="lccccc",
-        position="h"
-    )
+    # Encontrar o melhor R2 para destacar
+    best_r2 = df['R2_OOS'].max()
     
-    # Ajustes finos no LaTeX (opcional)
-    latex_code = latex_code.replace("toprule", "hline").replace("midrule", "hline").replace("bottomrule", "hline")
-
+    for model in order:
+        if model not in df.index: continue
+        
+        vals = df.loc[model]
+        mse_scaled = vals['MSE'] * 10000
+        mae = vals['MAE']
+        rmse = vals['RMSE']
+        r2_oos = vals['R2_OOS'] * 100
+        
+        # Formatação
+        r2_str = f"{r2_oos:.2f}"
+        
+        # Negrito para o melhor modelo (maior R2)
+        is_best = (vals['R2_OOS'] == best_r2)
+        
+        if is_best:
+            row = f"\\textbf{{{model}}} & \\textbf{{{mse_scaled:.4f}}} & \\textbf{{{mae:.4f}}} & \\textbf{{{rmse:.4f}}} & \\textbf{{{r2_str}}} \\\\"
+        else:
+            row = f"{model} & {mse_scaled:.4f} & {mae:.4f} & {rmse:.4f} & {r2_str} \\\\"
+            
+        latex_content.append(row)
+        
+    latex_content.extend([
+        "\\bottomrule",
+        "\\multicolumn{5}{l}{\\footnotesize *MSE escalado por $10^4$. $R^2_{OOS}$ relativo à Média Histórica.}",
+        "\\end{tabular}",
+        "\\end{table}"
+    ])
+    
+    # Salvar
     with open(output_path, 'w') as f:
-        f.write(latex_code)
-        
+        f.write("\n".join(latex_content))
+    
     print(f"Tabela salva em {output_path}")
-    print(df_table)
 
 if __name__ == "__main__":
-    gen_table_models()
+    run()

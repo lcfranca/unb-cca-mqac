@@ -1,0 +1,15 @@
+\begin{table}[H]
+\centering
+\caption{Comparação de Performance Preditiva (Out-of-Sample)}
+\label{tab:naive_metrics}
+\begin{tabular}{lrrrr}
+\toprule
+Modelo & MSE ($10^{-4}$) & MAE & RMSE & $R^2_{OOS}$ (\%) \\
+\midrule
+RW & 2.9603 & 0.0124 & 0.0172 & -0.07 \\
+HM & 2.9583 & 0.0124 & 0.0172 & 0.00 \\
+CAPM & 2.5936 & 0.0123 & 0.0161 & 12.33 \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize *MSE escalado por $10^4$. $R^2_{OOS}$ relativo à Média Histórica.}
+\end{tabular}
+\end{table}

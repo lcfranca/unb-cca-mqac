@@ -1,0 +1,18 @@
+\begin{table}[h]
+\centering
+\caption{Evolução da Eficiência Informacional (M0 a M4)}
+\label{tab:evolucao_r2}
+\begin{tabular}{lccccc}
+\toprule
+Modelo & $R^2$ Adj. & $\Delta R^2$ (vs M0) & AIC & $R^2_{OOS}$ & Info. Adicional \\
+\midrule
+M0 & 0.6041 & +0.0000 & -8634.1 & 0.1228 & Risco de Mercado \\
+M1 & 0.6038 & -0.0002 & -8632.2 & 0.1194 & + Valor (P/L, etc) \\
+M2 & 0.6046 & +0.0005 & -8635.4 & 0.1272 & + Qualidade (ROE, etc) \\
+M3 & 0.6039 & -0.0002 & -8632.2 & 0.1245 & + Score Agregado \\
+M4 & 0.6393 & +0.0352 & -8792.6 & 0.2353 & + Macro (Oil, FX, Risk) \\
+M5 & 0.6396 & +0.0355 & -8791.8 & 0.2408 & + Fatores (RMW, CMA) \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize $\Delta R^2$: Ganho sobre o CAPM. $R^2_{OOS}$: Performance fora da amostra (2023-2025).}
+\end{tabular}
+\end{table}

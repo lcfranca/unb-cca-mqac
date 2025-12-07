@@ -13,10 +13,10 @@ import seaborn as sns
 import statsmodels.api as sm
 from pathlib import Path
 from src.core.config import PROJECT_ROOT
-from src.core.style import setup_style
+from src.core.style import set_style, COLORS
 
 def gen_fig_information():
-    setup_style()
+    set_style()
     
     # Caminhos
     processed_dir = PROJECT_ROOT / "data" / "processed"
@@ -39,17 +39,31 @@ def gen_fig_information():
     required_cols = ['excess_ret_petr4', 'excess_ret_ibov', 'qval_scaled']
     df_model = df_merged.dropna(subset=required_cols).copy()
 
-    # --- Figura 1: Scatter Plot Q-VAL vs Retorno ---
-    plt.figure(figsize=(10, 6))
-    sns.regplot(x='qval_scaled', y='excess_ret_petr4', data=df_model, 
-                scatter_kws={'alpha':0.3, 's': 10}, line_kws={'color': 'red'})
-    plt.title('Relação entre Score Q-VAL e Retornos Diários de PETR4')
-    plt.xlabel('Score Q-VAL (Lagged)')
-    plt.ylabel('Retorno Excedente PETR4')
+    # --- Figura 1: Joint Plot Q-VAL vs Retorno (State of the Art) ---
+    # Substitui scatter simples por JointPlot com densidade KDE e Regressão
+    
+    # Calcular correlação para anotação
+    corr = df_model['qval_scaled'].corr(df_model['excess_ret_petr4'])
+    
+    g = sns.jointplot(x='qval_scaled', y='excess_ret_petr4', data=df_model,
+                  kind='reg', height=8, ratio=5, space=0.2,
+                  scatter_kws={'alpha': 0.15, 's': 10, 'color': COLORS['primary']},
+                  line_kws={'color': COLORS['secondary'], 'linewidth': 2})
+    
+    g.plot_joint(sns.kdeplot, color=COLORS['quaternary'], zorder=0, levels=6, alpha=0.5)
+    
+    g.fig.suptitle('Densidade Informacional: Score Q-VAL vs Retornos Futuros', fontsize=16, fontweight='bold', y=1.02)
+    g.set_axis_labels('Score Q-VAL (Lagged)', 'Retorno Excedente PETR4 (t+1)', fontsize=12)
+    
+    # Anotação Estatística
+    g.ax_joint.text(0.05, 0.95, f'Correlação de Pearson: {corr:.3f}', 
+                    transform=g.ax_joint.transAxes, fontsize=12, 
+                    bbox=dict(facecolor='white', alpha=0.8, edgecolor='lightgray'))
+    
     plt.tight_layout()
-    plt.savefig(output_dir / "scatter_qval_returns.png", dpi=300)
+    plt.savefig(output_dir / "scatter_qval_returns.png", dpi=300, bbox_inches='tight')
     plt.close()
-    print("Figura 1 salva.")
+    print("Figura 1 salva (JointPlot).")
 
     # --- Figura 2: Bar Chart Delta R2 ---
     # Carregar resultados do JSON se existirem, ou recalcular rápido

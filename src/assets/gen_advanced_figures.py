@@ -18,10 +18,10 @@ import statsmodels.api as sm
 from pathlib import Path
 from math import pi
 from src.core.config import PROJECT_ROOT
-from src.core.style import setup_style, COLORS
+from src.core.style import set_style, COLORS
 
 def gen_advanced_figures():
-    setup_style()
+    set_style()
     
     # Caminhos
     processed_dir = PROJECT_ROOT / "data" / "processed"
@@ -72,32 +72,57 @@ def gen_advanced_figures():
         returns.append(avg_ret)
         labels.append(label)
 
-    # Plot
-    plt.figure(figsize=(8, 6))
+    # Plot - State of the Art SML
+    plt.figure(figsize=(10, 7))
     
     # Linha SML Teórica (Rm médio do período todo)
     rm_avg = df_ret['excess_ret_ibov'].mean() * 252
-    x_sml = np.linspace(0, 2.0, 100)
+    x_sml = np.linspace(0, 2.2, 100)
     y_sml = x_sml * rm_avg
-    plt.plot(x_sml, y_sml, color='gray', linestyle='--', alpha=0.6, label='SML Teórica')
     
-    # Pontos
-    plt.scatter(betas, returns, color=COLORS['primary'], s=100, zorder=5)
+    # Área de "Alpha Positivo" (Acima da SML)
+    plt.fill_between(x_sml, y_sml, y_sml + 0.5, color=COLORS['positive'], alpha=0.05)
+    plt.fill_between(x_sml, y_sml - 0.5, y_sml, color=COLORS['negative'], alpha=0.05)
     
-    # Conectar pontos com setas
+    plt.plot(x_sml, y_sml, color='gray', linestyle='--', alpha=0.8, linewidth=1.5, label='SML Teórica (Equilíbrio)')
+    
+    # Trajetória com Gradiente de Cor (Tempo)
+    # Usar scatter com colormap para indicar evolução temporal
+    cmap = sns.color_palette("Blues", as_cmap=True)
+    norm = plt.Normalize(0, len(betas)-1)
+    
+    # Plotar linha de trajetória suave
+    plt.plot(betas, returns, color=COLORS['primary'], alpha=0.3, linewidth=3, zorder=2, linestyle='-')
+    
+    # Plotar pontos com cores evolutivas
+    sc = plt.scatter(betas, returns, c=range(len(betas)), cmap='Blues', s=200, zorder=5, edgecolors='black', linewidth=1.5)
+    
+    # Setas de direção entre pontos
     for i in range(len(betas)-1):
         plt.annotate('', xy=(betas[i+1], returns[i+1]), xytext=(betas[i], returns[i]),
-                     arrowprops=dict(arrowstyle='->', color=COLORS['secondary'], lw=1.5))
+                     arrowprops=dict(arrowstyle='->', color='black', lw=1.5, shrinkA=10, shrinkB=10), zorder=4)
     
-    # Labels
+    # Labels com caixas
     for i, txt in enumerate(labels):
-        plt.annotate(txt, (betas[i], returns[i]), xytext=(5, 5), 
-                     textcoords='offset points', fontsize=9, fontweight='bold')
+        # Calcular Alpha (Distância vertical)
+        alpha = returns[i] - (betas[i] * rm_avg)
+        alpha_txt = f"$\\alpha$: {alpha:.1%}"
         
-    plt.title('Dinâmica de Risco-Retorno: Migração na SML')
-    plt.xlabel('Beta (Risco Sistemático)')
-    plt.ylabel('Retorno em Excesso Anualizado')
-    plt.legend()
+        offset_y = 15 if i % 2 == 0 else -25
+        
+        plt.annotate(f"{txt}\n{alpha_txt}", (betas[i], returns[i]), xytext=(0, offset_y), 
+                     textcoords='offset points', fontsize=10, fontweight='bold', ha='center',
+                     bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="gray", alpha=0.9))
+        
+    plt.title('Dinâmica de Risco-Retorno: Migração na SML (2016-2025)', fontsize=16, fontweight='bold', pad=20)
+    plt.xlabel('Beta (Risco Sistemático)', fontsize=12)
+    plt.ylabel('Retorno em Excesso Anualizado', fontsize=12)
+    
+    # Anotação de Interpretação
+    plt.text(0.05, 0.95, "Região de Alpha Positivo\n(Retorno > Risco)", transform=plt.gca().transAxes, 
+             color=COLORS['positive'], fontweight='bold', fontsize=10)
+    
+    plt.legend(loc='lower right')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(output_dir / "sml_dynamic.pdf")
@@ -107,6 +132,7 @@ def gen_advanced_figures():
     # FIGURA 2.1: Radar Chart Multidimensional
     # ==========================================================================
     print("Gerando Radar Chart...")
+    from scipy.stats import norm
     
     # Pegar último trimestre disponível
     last_q = df_qval.iloc[-1]
@@ -115,11 +141,20 @@ def gen_advanced_figures():
     categories = ['Valor', 'Qualidade', 'Risco']
     N = len(categories)
     
-    # Valores (Normalizados 0-100)
-    values = [last_q['score_valor'], last_q['score_qualidade'], last_q['score_risco']]
+    # Converter Z-Scores para Percentil (0-100) para visualização no Radar
+    # Assumindo distribuição normal dos Z-Scores
+    def z_to_score(z):
+        if pd.isna(z): return 50
+        return norm.cdf(z) * 100
+
+    val_score = z_to_score(last_q['score_valor'])
+    qual_score = z_to_score(last_q['score_qualidade'])
+    risk_score = z_to_score(last_q['score_risco'])
+    
+    values = [val_score, qual_score, risk_score]
     values += values[:1] # Fechar o loop
     
-    # Benchmark (Média 50)
+    # Benchmark (Média 50 = Z-Score 0)
     benchmark = [50, 50, 50, 50]
     
     # Ângulos
@@ -130,9 +165,9 @@ def gen_advanced_figures():
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
     
     # Eixos
-    plt.xticks(angles[:-1], categories, color='black', size=10)
+    plt.xticks(angles[:-1], categories, color='black', size=12, fontweight='bold')
     ax.set_rlabel_position(0)
-    plt.yticks([20, 40, 60, 80], ["20", "40", "60", "80"], color="grey", size=7)
+    plt.yticks([20, 40, 60, 80], ["20", "40", "60", "80"], color="grey", size=8)
     plt.ylim(0, 100)
     
     # Plot PETR4
@@ -142,8 +177,8 @@ def gen_advanced_figures():
     # Plot Benchmark
     ax.plot(angles, benchmark, linewidth=1, linestyle='dashed', label='Média Histórica', color='gray')
     
-    plt.title(f"Perfil Multidimensional Q-VAL ({last_q['quarter_end'].date()})", y=1.08)
-    plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+    plt.title(f"Perfil Multidimensional Q-VAL ({last_q['quarter_end'].date()})", y=1.08, fontsize=14, fontweight='bold')
+    plt.legend(loc='upper right', bbox_to_anchor=(1.3, 0.1))
     plt.tight_layout()
     plt.savefig(output_dir / "radar_qval.pdf")
     plt.close()
