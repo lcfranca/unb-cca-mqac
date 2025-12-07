@@ -1,0 +1,17 @@
+\begin{table}[h]
+\centering
+\caption{Comparação de Performance: In-Sample vs Out-of-Sample}
+\label{tab:model_comparison}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{In-Sample (2016-2022)}} & \multicolumn{3}{c}{\textbf{Out-of-Sample (2023-2025)}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6}
+Modelo & $R^2$ & Adj. $R^2$ & $R^2_{OOS}$ & RMSE & MAE \\
+\midrule
+CAPM (1 Fator) & 0.604 & 0.603 & 0.123 & 0.0161 & 0.0123 \\
+Fama-French (3 Fatores) & 0.604 & 0.603 & 0.125 & 0.0161 & 0.0122 \\
+\bottomrule
+\end{tabular}
+\footnotesize
+Nota: $R^2_{OOS}$ calculado como $1 - \frac{\sum(y - \hat{y})^2}{\sum(y - \bar{y}_{train})^2}$. RMSE e MAE em escala decimal.
+\end{table}

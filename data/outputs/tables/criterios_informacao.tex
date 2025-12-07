@@ -1,0 +1,17 @@
+\begin{table}[h]
+\centering
+\caption{Seleção de Modelos via Critérios de Informação}
+\label{tab:aic_bic}
+\begin{tabular}{lccccc}
+\toprule
+Modelo & AIC & $\Delta$ AIC & BIC & $\Delta$ BIC & Adj. $R^2$ \\
+\midrule
+M2: CAPM + Valor + Qualidade + Risco & -12551.3 & \textbf{0.0} & -12522.2 & 16.2 & 0.5530 \\
+M1: CAPM + Earnings Yield & -12551.1 & 0.2 & -12533.6 & 4.8 & 0.5526 \\
+M0: CAPM & -12550.1 & 1.2 & -12538.5 & \textbf{0.0} & 0.5522 \\
+M3: CAPM + Q-VAL Score & -12549.4 & 1.9 & -12531.9 & 6.5 & 0.5523 \\
+\bottomrule
+\end{tabular}
+\footnotesize
+Nota: Menores valores de AIC/BIC indicam melhor trade-off entre ajuste e complexidade.
+\end{table}

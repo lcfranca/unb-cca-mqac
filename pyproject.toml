@@ -1,7 +1,7 @@
 [project]
 name = "unb-cca-mqac"
 version = "0.1.0"
-description = "Análise CAPM - Nota Técnica MQC (Métodos Quantitativos em Contabilidade)"
+description = "Pipeline pivotado para análise de eficiência informacional (Q-VAL / CAPM)"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -24,10 +24,13 @@ dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.0.0",
     "matplotlib>=3.7.0",
-    "seaborn>=0.12.0",
     "scipy>=1.10.0",
     "statsmodels>=0.14.0",
     "pyyaml>=6.0",
+    "seaborn>=0.12.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "pyarrow>=14.0.0",
 ]
 
 [project.optional-dependencies]
@@ -39,15 +42,9 @@ dev = [
     "mypy>=1.0.0",
     "jupytext>=1.15.0",
 ]
-science = [
-    "SciencePlots>=2.0.0",
-]
 all = [
-    "unb-cca-mqac[dev,science]",
+    "unb-cca-mqac[dev]",
 ]
-
-[project.scripts]
-run-capm = "scripts.run_analysis:main"
 
 [project.urls]
 Homepage = "https://github.com/seu-usuario/unb-cca-mqac"

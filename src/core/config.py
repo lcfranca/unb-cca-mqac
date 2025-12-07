@@ -11,6 +11,8 @@ Os módulos em src/ devem APENAS consumir configurações deste módulo.
 """
 
 import os
+import json
+import yaml
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
@@ -23,6 +25,7 @@ from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.resolve()
 load_dotenv(PROJECT_ROOT / ".env")
+ANALYSIS_OVERRIDE_PATH = PROJECT_ROOT / "configs" / "analysis_overrides.json"
 
 
 # =============================================================================
@@ -195,26 +198,26 @@ class AnalysisConfig:
     # -------------------------------------------------------------------------
     # PERÍODO DE ANÁLISE
     # -------------------------------------------------------------------------
-    data_inicio: str = "2020-01-01"              # Início da série
+    data_inicio: str = "2016-01-01"              # Início da série
     data_fim: str = "2025-11-30"                  # Fim da série
     janela_beta_meses: int = 60                   # Janela para estimação do beta
     
     # -------------------------------------------------------------------------
     # PARÂMETROS DE MERCADO
     # -------------------------------------------------------------------------
-    taxa_livre_risco: float = 0.1175             # Selic atual (11.75% a.a.)
-    premio_risco_mercado: float = 0.055          # ERP histórico Brasil
-    premio_risco_pais: float = 0.02              # CRP (EMBI+)
+    taxa_livre_risco: Optional[float] = None     # Deve ser obtido via API (CDI/Selic)
+    premio_risco_mercado: Optional[float] = None # Deve ser calculado (Rm - Rf)
+    premio_risco_pais: Optional[float] = None    # Deve ser obtido via API (EMBI+)
     
     # -------------------------------------------------------------------------
     # MÉTRICAS FUNDAMENTALISTAS (DADOS MANUAIS OU API)
     # -------------------------------------------------------------------------
-    roace_atual: float = 0.18                    # ROACE atual
-    pl_atual: float = 4.5                        # P/L atual
-    ev_ebitda_atual: float = 3.2                 # EV/EBITDA atual
-    dividend_yield: float = 0.15                 # DY atual
-    margem_ebitda: float = 0.45                  # Margem EBITDA
-    rp_ratio: float = 12.0                       # Reservas/Produção (anos)
+    roace_atual: Optional[float] = None          # Deve ser obtido via API
+    pl_atual: Optional[float] = None             # Deve ser obtido via API
+    ev_ebitda_atual: Optional[float] = None      # Deve ser obtido via API
+    dividend_yield: Optional[float] = None       # Deve ser obtido via API
+    margem_ebitda: Optional[float] = None        # Deve ser obtido via API
+    rp_ratio: Optional[float] = None             # Deve ser obtido via API
     
     # -------------------------------------------------------------------------
     # PONDERAÇÃO DO SCORE
@@ -284,6 +287,7 @@ class Config:
         self._paths = ProjectPaths()
         self._analysis = AnalysisConfig()
         self._paths.ensure_dirs()
+        self._load_analysis_overrides()
     
     @property
     def env(self) -> EnvConfig:
@@ -326,6 +330,23 @@ class Config:
         """Reseta para configurações default."""
         self._initialize()
 
+    def _load_analysis_overrides(self) -> None:
+        """Carrega overrides de análise a partir de arquivo JSON, se existir."""
+        if not ANALYSIS_OVERRIDE_PATH.exists():
+            return
+        try:
+            data = json.loads(ANALYSIS_OVERRIDE_PATH.read_text())
+            for key, value in data.items():
+                if hasattr(self._analysis, key):
+                    setattr(self._analysis, key, value)
+        except Exception:
+            pass
+
+    def save_analysis_overrides(self, data: Dict[str, Any]) -> None:
+        """Persiste overrides de análise para uso posterior."""
+        ANALYSIS_OVERRIDE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        ANALYSIS_OVERRIDE_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+
 
 # =============================================================================
 # FUNÇÕES DE CONVENIÊNCIA
@@ -344,3 +365,11 @@ def get_paths() -> ProjectPaths:
 def get_analysis() -> AnalysisConfig:
     """Atalho para obter configurações de análise."""
     return Config().analysis
+
+def load_params() -> Dict[str, Any]:
+    """Carrega parâmetros do arquivo params.yaml."""
+    path = PROJECT_ROOT / "configs" / "params.yaml"
+    if path.exists():
+        with open(path, 'r') as f:
+            return yaml.safe_load(f)
+    return {}

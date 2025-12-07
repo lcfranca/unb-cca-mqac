@@ -1,26 +1,31 @@
-\begin{table}[H]
+\begin{table}[h]
 \centering
-\begin{threeparttable}
-\caption{Score de Comprabilidade Q-VAL --- PETR4}
-\label{tab:score_comprabilidade}
-\begin{tabular}{lrrr}
+\caption{Decomposição do Score Q-VAL (Trimestre: 2025-09-30)}
+\label{tab:qval_score}
+\begin{tabular}{lccc}
 \toprule
-\textbf{Dimensão} & \textbf{Z-Score} & \textbf{Peso} & \textbf{Contribuição} \\
+Dimensão / Métrica & Z-Score & Peso & Contribuição \\
 \midrule
-Valor & +1.31 & 30\% & +0.39 \\
-Qualidade & +0.54 & 40\% & +0.21 \\
-Risco & -0.90 & 30\% & -0.27 \\
+\textbf{VALOR} & & \textbf{33.3\%} & \textbf{-0.01} \\
+\hspace{3mm} Earnings Yield & -0.04 & 25\% & -0.01 \\
+\hspace{3mm} EV/EBITDA & +0.13 & 25\% & +0.03 \\
+\hspace{3mm} P/VP & -0.14 & 25\% & -0.03 \\
+\hspace{3mm} Dividend Yield & +0.01 & 25\% & +0.00 \\
 \midrule
-\textbf{Score Raw} & & & \textbf{+0.34} \\
-\textbf{Score Final (0-100)} & & & \textbf{53.4} \\
+\textbf{QUALIDADE} & & \textbf{33.3\%} & \textbf{-0.16} \\
+\hspace{3mm} ROIC & +nan & 25\% & +nan \\
+\hspace{3mm} ROE & -0.16 & 25\% & -0.04 \\
+\hspace{3mm} Margem EBITDA & +nan & 25\% & +nan \\
+\hspace{3mm} EVS & +nan & 25\% & +nan \\
 \midrule
-\textbf{Recomendação} & \multicolumn{3}{c}{\textbf{Neutro}} \\
+\textbf{RISCO} & & \textbf{33.3\%} & \textbf{1.20} \\
+\hspace{3mm} Beta & +1.74 & 33\% & +0.58 \\
+\hspace{3mm} Volatilidade & +1.53 & 33\% & +0.51 \\
+\hspace{3mm} Dívida/PL & +0.33 & 33\% & +0.11 \\
+\midrule
+\midrule
+\textbf{SCORE FINAL (0-100)} & & & \textbf{53.43} \\
+\textbf{Recomendação} & & & \textbf{NEUTRO} \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\footnotesize
-\item \textit{Fonte}: Elaboração própria.
-\item \textit{Nota}: Score Final normalizado para escala 0--100 via transformação linear. Faixas de recomendação: Venda ($<$40), Neutro (40--60), Compra ($>$60). Pesos definidos conforme relevância teórica das dimensões.
-\end{tablenotes}
-\end{threeparttable}
 \end{table}

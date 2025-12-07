@@ -1,33 +1,22 @@
-\begin{table}[H]
+\begin{table}[h]
 \centering
-\begin{threeparttable}
-\caption{Estatísticas Descritivas dos Retornos Diários}
-\label{tab:estatisticas_descritivas}
-\begin{tabular}{lrr}
+\caption{Estatísticas Descritivas dos Retornos e Métricas Fundamentalistas}
+\label{tab:desc_stats}
+\begin{tabular}{lccccccc}
 \toprule
-\textbf{Estatística} & \textbf{PETR4} & \textbf{IBOVESPA} \\
+Variável & Média & Mediana & D.P. & Mín & Máx & Assim. & Curt. \\
 \midrule
-Observações & 2.462 & 2.462 \\
-Média diária (\%) & 0.0622 & 0.0540 \\
-Desvio-padrão diário (\%) & 2.8837 & 1.4806 \\
-Mínimo (\%) & -35.24 & -15.99 \\
-1º Quartil (\%) & -1.1257 & -0.6655 \\
-Mediana (\%) & 0.1037 & 0.0787 \\
-3º Quartil (\%) & 1.4220 & 0.8266 \\
-Máximo (\%) & 20.07 & 13.02 \\
-Assimetria & -1.4501 & -1.1737 \\
-Curtose (excesso) & 17.0468 & 17.8854 \\
+\multicolumn{8}{l}{\textit{Painel A: Retornos Diários}} \\
+PETR4 & 0.11\% & 0.13\% & 2.83\% & -35.24\% & 20.07\% & -1.39 & 18.10 \\
+Ibovespa & 0.05\% & 0.08\% & 1.48\% & -15.99\% & 13.02\% & -1.17 & 17.92 \\
 \midrule
-Retorno anualizado (\%) & 16.97 & 14.56 \\
-Volatilidade anualizada (\%) & 45.78 & 23.50 \\
-\midrule
-Correlação & \multicolumn{2}{c}{0.7188} \\
+\multicolumn{8}{l}{\textit{Painel B: Métricas Fundamentalistas (Trimestrais)}} \\
+Earnings Yield & 1.87\% & 1.04\% & 10.09\% & -34.91\% & 45.21\% & 0.33 & 7.85 \\
+EV/EBITDA & 133.97 & 9.06 & 970.11 & -137.27 & 7767.43 & 7.98 & 63.78 \\
+P/VP & 0.90 & 0.90 & 0.36 & 0.32 & 2.87 & 2.47 & 13.13 \\
+Dividend Yield & 1634.59\% & 1513.42\% & 1721.66\% & 0.19\% & 6494.63\% & 1.48 & 1.77 \\
+ROE & 2.84\% & 1.18\% & 8.76\% & -21.17\% & 39.18\% & 1.43 & 5.26 \\
 \bottomrule
+\multicolumn{8}{p{12cm}}{\footnotesize \textit{Nota:} Retornos diários logarítmicos. Métricas fundamentalistas calculadas trimestralmente. Período: 2016-2025.} \\
 \end{tabular}
-\begin{tablenotes}
-\footnotesize
-\item \textit{Fonte}: Elaboração própria com dados da Brapi API e Yahoo Finance (2025).
-\item \textit{Nota}: Período de 2016-01-05 a 2025-11-28. Retornos calculados em base logarítmica. Volatilidade anualizada calculada como $\sigma_{diário} \times \sqrt{252}$.
-\end{tablenotes}
-\end{threeparttable}
 \end{table}

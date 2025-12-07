@@ -1,4 +1,55 @@
-# UnB CCA - Métodos Quantitativos em Contabilidade (MQC)
+# UnB CCA - Projeto Pivotado (Q-VAL / Eficiência Informacional)
+
+Este repositório está em fase de pivotagem para implementar a análise descrita em `docs/ROTEIRO_PIVOT_INFORMACAO.md` e `docs/roteiro-resultados.md`, focando na eficiência informacional das métricas fundamentalistas (Q-VAL) para PETR4.
+
+## Estado atual
+- Artefatos legados e scripts de assets antigos foram removidos.
+- Diretórios vazios criados para o novo pipeline:
+  - `src/data`, `src/processing`, `src/models`, `src/analysis`, `src/outputs`.
+- `Makefile` é um stub com alvos `data`, `process`, `models`, `analysis`, `outputs` (a implementar).
+- Dependências atualizadas em `pyproject.toml` para uso de Parquet (`pyarrow`), requisições (`requests`), e variáveis de ambiente (`python-dotenv`).
+- Notebooks legados arquivados em `notebooks/legacy/`.
+
+## Estrutura (pivot)
+```
+unb-cca-mqac/
+├── content/                # Nota técnica (Markdown)
+├── configs/                # Parâmetros de execução
+├── data/                   # Interface entre módulos (camadas)
+│   ├── external/           # Coletas brutas (limpo no momento)
+│   ├── processed/          # Intermediários (.parquet/.json)
+│   ├── outputs/            # Tabelas/Figuras finais
+│   └── raw/                # Dados imutáveis (não alterar manualmente)
+├── docs/                   # Roteiros e especificações
+├── notebooks/legacy/       # Notebooks antigos (apenas referência)
+├── src/
+│   ├── data/               # Coleta (a criar)
+│   ├── processing/         # Processamento (a criar)
+│   ├── models/             # Estimação de modelos (a criar)
+│   ├── analysis/           # Análises derivadas (a criar)
+│   └── outputs/            # Geração de tabelas/figuras (a criar)
+├── templates/              # Templates LaTeX/ABNT (manter)
+├── Makefile                # Stub do novo pipeline
+├── pyproject.toml          # Dependências e metadata
+└── README.md
+```
+
+## Próximos passos (resumo do roteiro)
+1) Implementar coleta (`src/data/*`): preços PETR4, Ibovespa, CDI (BCB), fundamentals BRAPI.
+2) Implementar processamento (`src/processing/*`): retornos, métricas, z-score histórico, série Q-VAL.
+3) Modelos (`src/models/*`): CAPM (M0) e modelos M1–M3; comparação e testes.
+4) Análises (`src/analysis/*`): estatísticas descritivas, R² rolling, validação OOS.
+5) Outputs (`src/outputs/*`): tabelas e figuras da Seção 5.
+6) Atualizar `Makefile` com os novos alvos concretos quando os scripts estiverem prontos.
+
+## Como instalar dependências
+```bash
+pip install -e .
+```
+
+## Referências
+- `docs/ROTEIRO_PIVOT_INFORMACAO.md`
+- `docs/roteiro-resultados.md`# UnB CCA - Métodos Quantitativos em Contabilidade (MQC)
 
 Template para elaboração de **Nota Técnica** da disciplina MQC do Departamento de Ciências Contábeis e Atuariais da Universidade de Brasília.
 

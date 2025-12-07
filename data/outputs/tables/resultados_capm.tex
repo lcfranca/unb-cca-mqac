@@ -1,38 +1,19 @@
-\begin{table}[H]
+\begin{table}[h]
 \centering
-\begin{threeparttable}
-\caption{Resultados da Estimação CAPM --- PETR4}
-\label{tab:resultados_capm}
-\begin{tabular}{lr}
+\caption{Resultados da Estimação do Modelo CAPM (Modelo 0)}
+\label{tab:capm_results}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Parâmetro} & \textbf{Valor} \\
+Parâmetro & Estimativa & Erro-Padrão & Estatística t & p-valor \\
 \midrule
-\multicolumn{2}{l}{\textit{Parâmetros da Regressão}} \\
-Beta ($\beta$) & 1.4002 \\
-Erro-padrão do Beta & 0.0273 \\
-p-valor & 0.000000 \\
-Alfa ($\alpha$) anualizado & 0.26\% \\
-$R^2$ & 51.67\% \\
-Observações & 2.462 \\
+Alfa ($\alpha$) & 0.00053 & (0.00038) & 1.38 & 0.1673 \\
+Beta ($\beta$) & 1.4186*** & (0.0560) & 25.34 & $<$ 0.001 \\
 \midrule
-\multicolumn{2}{l}{\textit{Taxas de Retorno}} \\
-Taxa Livre de Risco ($R_f$) & 9.45\% a.a. \\
-Retorno de Mercado ($R_m$) & 14.56\% a.a. \\
-Prêmio de Mercado ($R_m - R_f$) & 5.11\% a.a. \\
-\midrule
-\multicolumn{2}{l}{\textit{Custo de Capital}} \\
-$K_e$ (CAPM) = $R_f + \beta(R_m - R_f)$ & 16.60\% a.a. \\
-Retorno Realizado (PETR4) & 16.97\% a.a. \\
-\textbf{Mispricing} ($r_{realizado} - K_e$) & \textbf{+0.37\%} \\
-\midrule
-\multicolumn{2}{l}{\textit{Risco}} \\
-Volatilidade Idiossincrática & 31.82\% a.a. \\
+Observações & 2462 & & & \\
+$R^2$ & 0.5524 & & & \\
+$R^2$ Ajustado & 0.5522 & & & \\
+Durbin-Watson & 2.0154 & & & \\
 \bottomrule
+\multicolumn{5}{p{10cm}}{\footnotesize \textit{Nota:} Erros-padrão robustos (HC3). *** p$<$0.01, ** p$<$0.05, * p$<$0.1.} \\
 \end{tabular}
-\begin{tablenotes}
-\footnotesize
-\item \textit{Fonte}: Elaboração própria com dados da Brapi API, Yahoo Finance e BCB (2025).
-\item \textit{Nota}: Regressão OLS dos retornos em excesso de PETR4 sobre os retornos em excesso do Ibovespa. Período de 2016-01-05 a 2025-11-28. Taxa livre de risco baseada na SELIC média do período.
-\end{tablenotes}
-\end{threeparttable}
 \end{table}

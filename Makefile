@@ -4,8 +4,8 @@
 #
 # Uso:
 #   make all        - Gera dados, análise, assets e PDF
-#   make data       - Gera dados simulados
-#   make analysis   - Executa análise CAPM
+#   make data       - Gera dados simulados (se necessário)
+#   make analysis   - Executa scripts de análise
 #   make figures    - Gera todas as figuras
 #   make tables     - Gera todas as tabelas
 #   make pdf        - Compila documento PDF
@@ -23,19 +23,26 @@ OUTPUT_DIR := $(DATA_DIR)/outputs
 FIGURES_DIR := $(OUTPUT_DIR)/figures
 TABLES_DIR := $(OUTPUT_DIR)/tables
 
-# Arquivos de dados intermediários
-RETURNS_CSV := $(PROCESSED_DIR)/returns.csv
-CAPM_JSON := $(PROCESSED_DIR)/capm_results.json
-STATS_JSON := $(PROCESSED_DIR)/statistics.json
+# Arquivos de dados intermediários (Inputs para os assets)
+RETURNS_PARQUET := $(PROCESSED_DIR)/returns/returns.parquet
+QVAL_PARQUET := $(PROCESSED_DIR)/qval/qval_timeseries.parquet
+METRICS_PARQUET := $(PROCESSED_DIR)/metrics/metrics.parquet
+OOS_RESULTS := $(OUTPUT_DIR)/oos_results.json
+ROLLING_R2 := $(OUTPUT_DIR)/rolling_r2.parquet
 
-# Arquivos de saída
-FIGURES := $(FIGURES_DIR)/regressao_beta.pdf \
-           $(FIGURES_DIR)/sml_capm.pdf \
-           $(FIGURES_DIR)/distribuicao_retornos.pdf \
-           $(FIGURES_DIR)/correlacao.pdf
+# Arquivos de saída (Assets)
+FIGURES := $(FIGURES_DIR)/sml_dynamic.pdf \
+           $(FIGURES_DIR)/radar_chart.pdf \
+           $(FIGURES_DIR)/learning_curve.pdf \
+           $(FIGURES_DIR)/rolling_r2.pdf \
+           $(FIGURES_DIR)/scatter_pred_actual.pdf \
+           $(FIGURES_DIR)/residuals_hist.pdf
 
 TABLES := $(TABLES_DIR)/estatisticas_descritivas.tex \
-          $(TABLES_DIR)/resultados_capm.tex
+          $(TABLES_DIR)/resultados_capm.tex \
+          $(TABLES_DIR)/score_comprabilidade.tex \
+          $(TABLES_DIR)/comparacao_modelos.tex \
+          $(TABLES_DIR)/criterios_informacao.tex
 
 PDF := output/nota-tecnica.pdf
 
@@ -51,11 +58,13 @@ all: pdf
 	@echo "✓ Pipeline completo executado com sucesso!"
 	@echo "  PDF gerado em: output/nota-tecnica.pdf"
 
-## data: Gera dados simulados
-data: $(RETURNS_CSV)
+## data: Verifica existência dos dados processados
+data:
+	@if [ ! -f $(RETURNS_PARQUET) ]; then echo "Erro: $(RETURNS_PARQUET) não encontrado. Execute os notebooks de ingestão."; exit 1; fi
+	@echo "✓ Dados processados encontrados."
 
-## analysis: Executa análise CAPM
-analysis: $(CAPM_JSON) $(STATS_JSON)
+## analysis: Executa scripts de análise (se necessário)
+analysis: $(OOS_RESULTS) $(ROLLING_R2)
 
 ## figures: Gera todas as figuras
 figures: $(FIGURES)
@@ -71,51 +80,53 @@ pdf: figures tables
 	@echo "✓ PDF gerado em: output/nota-tecnica.pdf"
 
 # ==============================================================================
-# GERADORES DE DADOS
+# REGRAS DE ANÁLISE
 # ==============================================================================
 
-# returns.csv é gerado pelo notebook 01_data_ingestion.ipynb
-# Não há target para gerá-lo via make, execute o notebook primeiro
+$(OOS_RESULTS):
+	@echo "Executando validação Out-of-Sample..."
+	$(PYTHON) -m src.analysis.oos_validation
 
-$(CAPM_JSON): $(RETURNS_CSV)
-	@echo "Executando análise CAPM..."
-	$(PYTHON) -m src.assets.gen_capm_analysis
-
-$(STATS_JSON): $(RETURNS_CSV)
-	@echo "Calculando estatísticas..."
-	$(PYTHON) -m src.assets.gen_table_statistics
+$(ROLLING_R2):
+	@echo "Calculando Rolling R2..."
+	$(PYTHON) -m src.analysis.rolling_r2
 
 # ==============================================================================
 # GERADORES DE FIGURAS
 # ==============================================================================
 
-$(FIGURES_DIR)/regressao_beta.pdf: $(CAPM_JSON)
-	@echo "Gerando figura: Regressão Beta..."
-	$(PYTHON) -m src.assets.gen_fig_regression
+# Agrupando figuras geradas pelo mesmo script para evitar múltiplas execuções
+$(FIGURES_DIR)/sml_dynamic.pdf $(FIGURES_DIR)/radar_chart.pdf $(FIGURES_DIR)/learning_curve.pdf:
+	@echo "Gerando figuras avançadas (SML, Radar, Learning Curve)..."
+	$(PYTHON) -m src.assets.gen_advanced_figures
 
-$(FIGURES_DIR)/sml_capm.pdf: $(CAPM_JSON)
-	@echo "Gerando figura: SML..."
-	$(PYTHON) -m src.assets.gen_fig_sml
-
-$(FIGURES_DIR)/distribuicao_retornos.pdf: $(RETURNS_CSV)
-	@echo "Gerando figura: Distribuição..."
-	$(PYTHON) -m src.assets.gen_fig_distribution
-
-$(FIGURES_DIR)/correlacao.pdf: $(RETURNS_CSV)
-	@echo "Gerando figura: Correlação..."
-	$(PYTHON) -m src.assets.gen_fig_correlation
+$(FIGURES_DIR)/rolling_r2.pdf $(FIGURES_DIR)/scatter_pred_actual.pdf $(FIGURES_DIR)/residuals_hist.pdf:
+	@echo "Gerando figuras de diagnóstico..."
+	$(PYTHON) -m src.assets.gen_fig_model_diagnostics
 
 # ==============================================================================
 # GERADORES DE TABELAS
 # ==============================================================================
 
-$(TABLES_DIR)/estatisticas_descritivas.tex: $(RETURNS_CSV)
-	@echo "Gerando tabela: Estatísticas..."
-	$(PYTHON) -m src.assets.gen_table_statistics
+$(TABLES_DIR)/estatisticas_descritivas.tex:
+	@echo "Gerando tabela: Estatísticas Descritivas..."
+	$(PYTHON) -m src.assets.gen_table_descriptive
 
-$(TABLES_DIR)/resultados_capm.tex: $(CAPM_JSON)
+$(TABLES_DIR)/resultados_capm.tex:
 	@echo "Gerando tabela: Resultados CAPM..."
-	$(PYTHON) -m src.assets.gen_table_results
+	$(PYTHON) -m src.assets.gen_table_capm
+
+$(TABLES_DIR)/score_comprabilidade.tex:
+	@echo "Gerando tabela: Score Q-VAL..."
+	$(PYTHON) -m src.assets.gen_table_qval_score
+
+$(TABLES_DIR)/comparacao_modelos.tex:
+	@echo "Gerando tabela: Comparação de Modelos..."
+	$(PYTHON) -m src.assets.gen_table_model_comparison
+
+$(TABLES_DIR)/criterios_informacao.tex:
+	@echo "Gerando tabela: Critérios de Informação..."
+	$(PYTHON) -m src.assets.gen_table_aic_bic
 
 # ==============================================================================
 # UTILITÁRIOS
@@ -124,7 +135,6 @@ $(TABLES_DIR)/resultados_capm.tex: $(CAPM_JSON)
 ## clean: Remove artefatos gerados
 clean:
 	@echo "Limpando artefatos..."
-	rm -rf $(PROCESSED_DIR)/*.csv $(PROCESSED_DIR)/*.json
 	rm -rf $(FIGURES_DIR)/*.pdf $(FIGURES_DIR)/*.png
 	rm -rf $(TABLES_DIR)/*.tex
 	rm -rf output/*.pdf
@@ -142,21 +152,8 @@ check:
 	@which $(PANDOC) > /dev/null && echo "✓ Pandoc: $(shell $(PANDOC) --version | head -1)" || echo "✗ Pandoc não encontrado"
 	@which pdflatex > /dev/null && echo "✓ pdflatex instalado" || echo "✗ pdflatex não encontrado"
 
-## reproduce: Limpa e reproduz tudo do zero
-reproduce: clean all
-
 ## help: Mostra esta ajuda
 help:
 	@echo "Comandos disponíveis:"
 	@echo ""
-	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## /  /'
-	@echo ""
-	@echo "Geradores individuais (run as Python modules):"
-	@echo "  python -m src.assets.gen_sample_data"
-	@echo "  python -m src.assets.gen_capm_analysis"
-	@echo "  python -m src.assets.gen_fig_regression"
-	@echo "  python -m src.assets.gen_fig_sml"
-	@echo "  python -m src.assets.gen_fig_distribution"
-	@echo "  python -m src.assets.gen_fig_correlation"
-	@echo "  python -m src.assets.gen_table_statistics"
-	@echo "  python -m src.assets.gen_table_results"
+	@grep -E "^## " $(MAKEFILE_LIST) | sed "s/## /  /"

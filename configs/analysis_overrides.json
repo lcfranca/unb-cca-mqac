@@ -1,0 +1,15 @@
+{
+  "ticker_principal": "PETR4.SA",
+  "ticker_mercado": "^BVSP",
+  "tickers_pares": [
+    "PRIO3.SA",
+    "CSAN3.SA",
+    "RECV3.SA"
+  ],
+  "data_inicio": "2016-01-01",
+  "data_fim": "2025-11-30",
+  "janela_beta_meses": 60,
+  "peso_valor": 0.3,
+  "peso_qualidade": 0.4,
+  "peso_risco": 0.3
+}
