@@ -53,26 +53,15 @@ coordenador-noturno: "Professor Mestre Elivânio Geraldo de Andrade"
 # ------------------------------------------------------------------------------
 
 abstract: |
-  Este trabalho desenvolve motor de scoring quantitativo (Q-VAL) para análise de 
-  comprabilidade de ativos, aplicando-o à Petrobras S.A. (PETR4) no contexto da 
-  autorização de exploração da Margem Equatorial brasileira. O modelo integra métricas 
-  de Valor, Qualidade e Risco, fundamentando-se no Capital Asset Pricing Model (CAPM) 
-  para estimação do custo de capital próprio. A partir de 2.462 observações diárias 
-  (2016--2025), estima-se beta de 1,40 e custo de capital de 16,60\%. Os resultados 
-  indicam score Q-VAL de 53,4 (faixa Neutra), com spread ICC-CAPM de +40 basis points, 
-  sugerindo precificação justa. A análise de cenários revela alta sensibilidade às 
-  premissas sobre preço do Brent e sucesso da Margem Equatorial, com scores variando 
-  de 43,0 (Venda) a 62,8 (Compra). Conclui-se que PETR4 não configura oportunidade 
-  clara de compra nem armadilha de valor evidente, com recomendação condicional ao 
-  perfil de risco e horizonte de investimento.
+  Este trabalho investiga a eficiência informacional do mercado brasileiro através de uma análise empírica da Petrobras S.A. (PETR4), testando se a incorporação de dados fundamentalistas granulares e variáveis macroeconômicas adiciona poder explicativo sobre os retornos do ativo. Utilizando uma abordagem de modelos aninhados (M0 a M5b), partindo de benchmarks ingênuos até algoritmos de Machine Learning (XGBoost), documentamos a evolução do $R^2$ Out-of-Sample de 12,28\% (CAPM Estático) para 33,40\% (M5b - ML Granular). Identificamos dois fenômenos críticos: (i) a "Armadilha da Linearidade", onde a agregação de métricas em um score único destrói informação relevante, resultando em performance inferior ao modelo macro; e (ii) o "Paradoxo da Explicação vs. Predição" (Shmueli, 2010), onde o modelo M5b maximiza a explicação da variância contemporânea mas falha na previsão direcional *ex-ante* ($R^2_{OOS} < 0$), corroborando a Hipótese dos Mercados Eficientes na forma semi-forte. Em resposta, desenvolvemos o Modelo M6 de Volatility Targeting, que abandona a previsão de retornos em favor da gestão dinâmica de risco, transformando o perfil do investimento. Os resultados sugerem que o mercado opera em um regime de eficiência assimétrica, onde a direção dos preços é imprevisível (Random Walk), mas a estrutura de risco é modelável, validando a perspectiva dos Mercados Adaptativos e da Economia da Complexidade.
 
 keywords:
-  - CAPM
-  - Valuation
-  - Scoring Fundamentalista
+  - Eficiência de Mercado
+  - Machine Learning
+  - CAPM Dinâmico
+  - Volatility Targeting
   - Petrobras
-  - Margem Equatorial
-  - Custo de Capital Implícito
+  - Economia da Complexidade
 
 # ------------------------------------------------------------------------------
 # EPÍGRAFE
@@ -107,6 +96,48 @@ abbreviations:
     descricao: "Return on Equity (Retorno sobre Patrimônio Líquido)"
   - sigla: "ROACE"
     descricao: "Return on Average Capital Employed (Retorno sobre Capital Empregado Médio)"
+  - sigla: "AIC"
+    descricao: "Akaike Information Criterion (Critério de Informação de Akaike)"
+  - sigla: "BIC"
+    descricao: "Bayesian Information Criterion (Critério de Informação Bayesiano)"
+  - sigla: "EMH"
+    descricao: "Efficient Market Hypothesis (Hipótese dos Mercados Eficientes)"
+  - sigla: "AMH"
+    descricao: "Adaptive Markets Hypothesis (Hipótese dos Mercados Adaptativos)"
+  - sigla: "CVM"
+    descricao: "Comissão de Valores Mobiliários"
+  - sigla: "B3"
+    descricao: "Brasil, Bolsa, Balcão"
+  - sigla: "ESG"
+    descricao: "Environmental, Social and Governance (Ambiental, Social e Governança)"
+  - sigla: "ROIC"
+    descricao: "Return on Invested Capital (Retorno sobre o Capital Investido)"
+  - sigla: "SMB"
+    descricao: "Small Minus Big (Fator de Tamanho)"
+  - sigla: "HML"
+    descricao: "High Minus Low (Fator de Valor)"
+  - sigla: "RMW"
+    descricao: "Robust Minus Weak (Fator de Lucratividade)"
+  - sigla: "CMA"
+    descricao: "Conservative Minus Aggressive (Fator de Investimento)"
+  - sigla: "MSE"
+    descricao: "Mean Squared Error (Erro Quadrático Médio)"
+  - sigla: "RMSE"
+    descricao: "Root Mean Squared Error (Raiz do Erro Quadrático Médio)"
+  - sigla: "MAE"
+    descricao: "Mean Absolute Error (Erro Absoluto Médio)"
+  - sigla: "CDI"
+    descricao: "Certificado de Depósito Interbancário"
+  - sigla: "IBAMA"
+    descricao: "Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis"
+  - sigla: "NYSE"
+    descricao: "New York Stock Exchange"
+  - sigla: "LLM"
+    descricao: "Large Language Models (Grandes Modelos de Linguagem)"
+  - sigla: "HFT"
+    descricao: "High-Frequency Trading (Negociação de Alta Frequência)"
+  - sigla: "EMBI"
+    descricao: "Emerging Markets Bond Index (Índice de Títulos de Mercados Emergentes)"
   - sigla: "WACC"
     descricao: "Weighted Average Cost of Capital (Custo Médio Ponderado de Capital)"
   - sigla: "ERP"

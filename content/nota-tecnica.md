@@ -235,6 +235,8 @@ O arcabouço teórico desenvolvido nesta seção pode ser sintetizado contrastan
 | **Grossman-Stiglitz** | Mercado como incentivo | Ineficiência necessária; análise é compensada por alfa |
 | **Complexidade** | Mercado como ecossistema | Eficiência variável; análise funciona em certos nichos/regimes |
 
+: Síntese das Visões Teóricas sobre Informação e Preços {#tbl:theoretical_synthesis}
+
 Estas visões não são mutuamente exclusivas.  A EMH pode aproximar-se da verdade para ativos líquidos em mercados desenvolvidos, enquanto a economia da complexidade melhor descreve mercados emergentes ou ativos ilíquidos.  O paradoxo de Grossman-Stiglitz opera em todos os contextos, estabelecendo limite inferior para ineficiência.  A intuição hayekiana permanece válida como descrição do *processo* — ainda que o *resultado* possa aproximar-se de eficiência em alguns casos e afastar-se em outros.
 
 Para o caso Petrobras, múltiplas considerações são relevantes.  Por um lado, trata-se de ativo extremamente líquido, com alta cobertura de analistas, sugerindo eficiência elevada. Por outro lado, a empresa está inserida em contexto de mercado emergente, sujeita a interferência estatal, exposta a incerteza estrutural (Margem Equatorial), e caracterizada por complexidade contábil do setor de óleo e gás — fatores que podem gerar fricções informacionais persistentes. 
@@ -304,6 +306,8 @@ A seleção de métricas segue critérios de relevância teórica, disponibilida
 | **P/VP** | $\frac{\text{Preço}}{\text{Valor Patrimonial por Ação}}$ | Relação entre valor de mercado e valor contábil |
 | **Dividend Yield (DY)** | $\frac{\text{Dividendos por Ação}}{\text{Preço}}$ | Retorno em dividendos |
 
+: Métricas da Dimensão de Valor {#tbl:metrics_value}
+
 O *Earnings Yield* é preferido ao P/L por conveniência matemática: valores mais altos indicam maior atratividade (inversamente ao P/L), facilitando agregação com outras métricas onde "maior é melhor".  O EV/EBITDA captura valor da firma inteira — incluindo dívida — sobre geração de caixa operacional, sendo particularmente relevante para empresas intensivas em capital como a Petrobras.
 
 #### Dimensão de Qualidade
@@ -315,6 +319,8 @@ O *Earnings Yield* é preferido ao P/L por conveniência matemática: valores ma
 | **Margem EBITDA** | $\frac{\text{EBITDA}}{\text{Receita Líquida}}$ | Eficiência operacional |
 | **EVS** | $\text{ROIC} - \text{WACC}$ | Economic Value Spread; criação de valor |
 
+: Métricas da Dimensão de Qualidade {#tbl:metrics_quality}
+
 O *Economic Value Spread* (EVS) merece destaque.  Conforme desenvolvido na seção de fundamentos teóricos, o EVS captura criação de valor em termos relativos ao custo de capital.  Valor positivo indica que a empresa gera retorno superior ao custo de oportunidade do capital empregado — condição necessária para criação sustentável de valor ao acionista.  Para empresas do setor de óleo e gás, onde ciclos de investimento são longos e intensivos em capital, o EVS oferece perspectiva mais informativa que métricas de rentabilidade brutas.
 
 #### Dimensão de Risco
@@ -325,6 +331,8 @@ O *Economic Value Spread* (EVS) merece destaque.  Conforme desenvolvido na seç�
 | **Volatilidade** | $\sigma_i = \sqrt{\text{Var}(R_i)}$ | Desvio-padrão dos retornos |
 | **Dívida/PL** | $\frac{\text{Dívida Total}}{\text{Patrimônio Líquido}}$ | Alavancagem financeira |
 | **Liquidez Corrente** | $\frac{\text{Ativo Circulante}}{\text{Passivo Circulante}}$ | Capacidade de pagamento de curto prazo |
+
+: Métricas da Dimensão de Risco {#tbl:metrics_risk}
 
 O beta, estimado via regressão conforme detalhado adiante, captura risco sistemático — a parcela do risco que não pode ser eliminada por diversificação. A volatilidade captura risco total.  A razão Dívida/PL indica exposição a risco financeiro — empresas alavancadas são mais sensíveis a choques de receita e taxa de juros. A liquidez corrente sinaliza risco de curto prazo — capacidade de honrar obrigações imediatas.
 
@@ -390,6 +398,8 @@ A hierarquia de modelos é definida da seguinte forma:
 | **M3** | **Fundamentos** | M2 + Vetor de Fundamentos (Valor, Qualidade, Risco) |
 | **M4** | **Macro & Fatores** | M3 + Variáveis Macro (Brent, Câmbio, Risco-País) e Fatores FF |
 | **M5** | **Síntese (Score)** | M2 + Score Agregado Q-VAL (Teste de eficiência da agregação) |
+
+: Hierarquia de Modelos Econométricos {#tbl:model_hierarchy}
 
 ### Detalhamento dos Modelos
 
