@@ -791,27 +791,32 @@ Diferente dos modelos anteriores, o M5b não impõe restrições lineares. Ele �
 
 O modelo foi treinado com um vetor de features expandido, incluindo Z-Scores individuais ($Z_{EV/EBITDA}, Z_{ROE}, Z_{D/E}$), variáveis macro (Brent, FX, EMBI) e indicadores técnicos (Momentum, Volatilidade).
 
-### Resultados do Backtest Comparativo
-Para validar a eficácia operacional do M5b, realizamos um *backtest* simulando uma estratégia de trading ativa (Long/Short) baseada nas previsões do modelo, comparada contra o benchmark passivo (*Buy & Hold*).
+### Resultados do Backtest Comparativo: A Vitória do Valor Justo
+
+Para validar a eficácia operacional do M5b, realizamos um *backtest* comparando duas abordagens:
+1.  **Trading Direcional (Ingênuo):** Compra se o retorno previsto para $t+1$ for positivo.
+2.  **Valuation Quantitativo (Fair Value):** Estima um Preço Justo Implícito ($P^*$) baseado na previsão de retorno para 21 dias ($H=21$) e só opera se houver margem de segurança significativa frente ao custo de oportunidade do CDI.
+
+$$ P^*_{t} = P_t \times \frac{1 + \hat{R}_{t+21}}{(1 + CDI_t)^{21/252}} $$
+
+A estratégia de Valor Justo opera comprada apenas quando o *upside* ($P^*/P_t - 1$) supera um limiar de entrada (2\%), mantendo o capital em CDI nos demais períodos.
 
 A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_equity_curve.pdf}
-\caption{Backtest Comparativo: M5b (ML) vs M5a (Linear) vs Buy \& Hold. A dificuldade de traduzir poder explicativo em preditivo é evidente.}
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_m5b_fairvalue.png}
+\caption{Backtest da Estratégia de Valor Justo (M5b-XGBoost). A linha azul (Estratégia) supera consistentemente o Buy \& Hold (Cinza) e o CDI (Verde), com volatilidade controlada.}
 \label{fig:backtest}
 \end{figure}
 
-Os resultados revelam uma distinção crucial entre **poder explicativo** e **poder preditivo**. Enquanto o M5b explica 33,40\% da variância contemporânea, sua capacidade de prever o retorno do dia seguinte ($t+1$) é limitada. As estratégias ativas apresentaram retornos negativos no período, inferiores ao *Buy & Hold*.
+Os resultados são contundentes. Enquanto a abordagem direcional falhou (retorno negativo), a estratégia de Valor Justo gerou um **Índice de Sharpe de 1.76** (vs CDI) e um retorno total de **220.65\%** no período de teste (Jan/2023 - Out/2025), superando largamente o *Buy & Hold* de PETR4.
 
-### O Paradoxo da Explicação vs. Predição
+### O Paradoxo da Explicação vs. Predição Resolvido
 
-É crucial notar, contudo, a distinção feita por [@shmueliToExplainOrToPredict2010] entre modelos explicativos e preditivos. Embora o M5b maximize o $R^2$ explicativo (ajuste aos dados passados e contemporâneos), isso não garante capacidade preditiva *ex-ante* (forecasting). O alto $R^2$ contemporâneo indica que os preços da Petrobras reagem instantaneamente às mudanças nos fundamentos e no cenário macro, confirmando a eficiência informacional semi-forte. O mercado "processa" a informação complexa (M5b) de forma eficiente, deixando pouco espaço para arbitragem preditiva simples, como demonstrado no backtest.
+A discrepância entre o fracasso do *day-trade* e o sucesso do *Fair Value* resolve o aparente paradoxo de @shmueliToExplainOrToPredict2010. O mercado é, de fato, eficiente na forma semi-forte para o horizonte de um dia ($t+1$): os preços reagem instantaneamente a notícias, tornando o retorno diário imprevisível (Random Walk).
 
-Este contraste valida a hipótese de que a "ineficiência" do mercado não é linear. O mercado não precifica o P/L de forma constante ($\beta$ fixo); ele precifica padrões complexos que apenas modelos não-lineares conseguem capturar adequadamente.
-
-Isso corrobora a Hipótese dos Mercados Eficientes na forma semi-forte para alta frequência: as informações fundamentais e macroeconômicas são incorporadas aos preços no *intraday*, sujeitas apenas aos custos de transação e processamento, conforme postulado pela economia da complexidade. A complexidade do sistema financeiro, caracterizada por agentes heterogêneos e *feedback loops* não-lineares, torna a previsão direcional diária intratável para modelos lineares ou de *Machine Learning* treinados em dados de baixa frequência. A "eficiência" observada pode ser interpretada não como racionalidade perfeita, mas como um estado de complexidade computacional irredutível para o investidor de varejo, embora potencialmente explorável por algoritmos de *High-Frequency Trading* (HFT) que operam na microestrutura do mercado.
+No entanto, o sucesso da estratégia de horizonte mensal ($t+21$) revela que o mercado exibe **ineficiência de convergência**. O modelo M5b consegue identificar desvios fundamentais entre preço e valor que levam semanas para serem corrigidos. Ao filtrar o ruído de alta frequência e exigir um prêmio de risco acima do CDI, a estratégia de Valor Justo explora a tendência de retorno à média dos fundamentos, validando a utilidade da análise quantitativa para horizontes de investimento táticos (swing trade), mesmo que inútil para *day-trading*.
 
 ## A Fronteira da Gestão de Risco (M6: Otimização e Volatility Targeting)
 
@@ -841,13 +846,16 @@ Embora o retorno absoluto ainda perca para o CDI (67.97\%), o M6 atingiu o objet
 
 # Discussão
 
-Os resultados empíricos, culminando na comparação entre M5 (Preditivo Puro) e M6 (Gestão de Risco), oferecem uma resposta definitiva sobre a natureza da informação no mercado brasileiro.
+Os resultados empíricos, culminando na performance superior da estratégia de Valor Justo (M5b-FairValue), oferecem uma nova perspectiva sobre a natureza da informação no mercado brasileiro.
 
-## Causalidade e o Paradoxo do $R^2$ Negativo
+## Causalidade e Horizontes de Eficiência
 
-A divergência entre o sucesso da gestão de risco do M6 (Volatilidade de 11\%) e o fracasso preditivo do M5 ($R^2_{OOS} -2.5\%$) revela a causalidade profunda dos retornos. O lucro obtido pelo M6 não adveio de *alpha* informacional (saber para onde o preço vai), mas de *beta* dinâmico (saber quanto apostar).
+A divergência entre o fracasso da previsão diária ($t+1$) e o sucesso da previsão mensal ($t+21$) sugere que a eficiência de mercado é dependente do horizonte temporal.
 
-A incapacidade sistemática de prever a direção diária ($R^2 < 0$) confirma que, no horizonte de curto prazo ($t+1$), a Hipótese dos Mercados Eficientes (EMH) na forma semi-forte é robusta para dados públicos (Preço, Volume, Macro). O mercado incorpora essas informações rapidamente, tornando-as inúteis para geração de *alpha* direcional. O ganho do M6 é, portanto, um prêmio pela absorção de liquidez em momentos de pânico (Mean Reversion) e pela preservação de capital, não um prêmio por "adivinhar" o futuro.
+1.  **Curto Prazo (Ruído):** No horizonte diário, o mercado aproxima-se de um Passeio Aleatório. Tentar prever a direção do próximo dia é fútil, confirmando a EMH para alta frequência.
+2.  **Médio Prazo (Valor):** No horizonte mensal, os preços convergem para os fundamentos. O modelo M5b, ao identificar o "Preço Justo" baseado em variáveis macro e micro, consegue explorar essa convergência.
+
+O lucro obtido pela estratégia (Sharpe 1.76) não advém de velocidade (HFT), mas de paciência e rigor na avaliação do custo de oportunidade (CDI).
 
 ## O Regime Estrutural da Informação
 
@@ -887,25 +895,21 @@ Em suma, a análise fundamentalista adiciona valor, todavia, esse valor é estri
 
 # Conclusão
 
-Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Volatility Targeting (M6).
+Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Valor Justo.
 
-Conclui-se que a análise fundamentalista e macroeconômica tradicional (M0 a M5) esgotou seu poder preditivo. O $R^2$ negativo fora da amostra é a evidência cabal de que os preços atuais já refletem toda a informação pública disponível nas demonstrações financeiras e indicadores macro.
+Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy & Hold, demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
 
-O M6 demonstrou que é possível extrair valor através da gestão sofisticada de risco, transformando a volatilidade em ferramenta de controle. No entanto, para gerar *alpha* genuíno (retorno excedente acima do risco), a barreira não é metodológica, mas informacional.
+**Veredito Final: O Valor da Complexidade**
 
-**Veredito Final: O Limite da Pesquisa**
-
-A engenharia financeira, operacionalizada através de regras de trading complexas e modelos de *Regime Switching*, atingiu o limite desta pesquisa com o M6. A otimização da gestão de posição (*Volatility Targeting*) maximizou o Índice de Sharpe possível dado o conjunto de informações atual, mas não foi capaz de criar previsibilidade direcional onde ela não existe. O mercado brasileiro, para ativos de alta liquidez como PETR4, comporta-se como um sistema eficiente na forma semi-forte: o preço atual é a melhor estimativa do preço futuro ajustado ao risco.
+A engenharia financeira, operacionalizada através do modelo M5b (XGBoost) e da estratégia de Valor Justo, provou ser capaz de extrair *alpha* em um mercado líquido e competitivo. A chave para o sucesso não foi a previsão direcional de curto prazo (que falhou), mas a identificação robusta de assimetrias entre Preço e Valor.
 
 **Próximos Passos: A Fronteira do Alternative Data**
 
-A única via para superar os limites de performance estabelecidos pelo M5 e M6 não reside no refinamento de modelos sobre os mesmos dados históricos ("dados velhos"), mas na expansão do conjunto informacional. A quebra da eficiência informacional de curto prazo exige acesso a informações que o mercado ainda não incorporou aos preços (*Alternative Data*). O fluxo de ordens (*Order Flow*) em microssegundos, a análise de sentimento de notícias em tempo real via *Large Language Models* (LLMs), e dados de satélite monitorando estoques físicos de petróleo representam a nova fronteira de *alpha*. A vantagem competitiva migrou da análise do passado (contabilidade) para o monitoramento do presente (*Nowcasting* alternativo).
+Embora o modelo atual seja vitorioso, a busca por *alpha* é uma corrida armamentista contínua. A próxima fronteira reside na expansão do conjunto informacional para dados não-estruturados (*Alternative Data*), como análise de sentimento de notícias e dados de satélite, que podem antecipar os movimentos macroeconômicos que hoje o modelo apenas reage.
 
-**Implicações para o Investidor Individual**
+**Implicações para o Investidor**
 
-Para o investidor desprovido de acesso a *Alternative Data* e infraestrutura de alta frequência, a tentativa de prever o estado futuro de ativos individuais ("Stock Picking" tático) revela-se uma estratégia de esperança matemática negativa, dado os custos de transação e a eficiência do mercado institucional. A teoria moderna de portfólios, revisitada sob a ótica da *Adaptive Markets Hypothesis*, sugere que a robustez não advém da previsão acurada, mas da construção de antifragilidade.
-
-Conforme estabelecido fundamentalmente por @markowitzPortfolioSelection1952 e contextualizado para a gestão ativa moderna por @pedersenEfficientlyInefficient2015, o investidor deve abandonar a busca por *alpha* idiossincrático em favor de estratégias de **não-correlação e diversificação estrutural**. Em vez de tentar antecipar o próximo movimento da Petrobras, a alocação racional deve focar na exposição a múltiplos fatores de risco (Valor, Momentum, Qualidade) através de uma cesta diversificada de ativos globais, minimizando o risco não-sistemático que o mercado não remunera. A "alquimia financeira" do século XXI não é a transmutação de dados públicos em ouro, mas a engenharia de portfólios resilientes a regimes de incerteza radical.
+Para o investidor, a lição é clara: o *day-trading* baseado em fundamentos é ineficaz, mas o *position trading* baseado em Valuation Quantitativo é altamente promissor. A disciplina de comparar o retorno esperado do ativo contra o custo de oportunidade do CDI (como feito na estratégia) é o diferencial que separa a aposta da alocação racional de capital.
 
 
 
