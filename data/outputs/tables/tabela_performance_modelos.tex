@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\caption{Performance Comparativa dos Modelos (Out-of-Sample)}
+\label{tab:model_performance}
+\begin{tabular}{lcccccc}
+\toprule
+Modelo & MSE ($10^{-4}$) & RMSE & MAE & $R^2_{OOS}$ (\%) & AIC & BIC \\
+\midrule
+M0 (Random Walk) & 2.96 & 0.0172 & 0.0124 & -0.11\% & -3854 & -3854 \\
+M0 (Média Hist.) & 2.96 & 0.0172 & 0.0124 & 0.00\% & -3853 & -3849 \\
+M1 (CAPM Estático) & 2.59 & 0.0161 & 0.0123 & 12.28\% & -3947 & -3937 \\
+M2 (CAPM Dinâmico) & 2.27 & 0.0151 & 0.0109 & 23.39\% & -4045 & -4036 \\
+M3 (Fundamentos) & 2.25 & 0.0150 & 0.0108 & 23.81\% & -4045 & -4027 \\
+M4 (Macro e Fatores) & 1.99 & 0.0141 & 0.0100 & 32.61\% & -4125 & -4083 \\
+M5 (Score Agregado) & 2.26 & 0.0150 & 0.0108 & 23.69\% & -4048 & -4039 \\
+\bottomrule
+\end{tabular}
+\footnotesize{Nota: MSE escalado por $10^4$. $R^2_{OOS}$ calculado em relação à média histórica do treino.}
+\end{table}

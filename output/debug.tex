@@ -25,6 +25,8 @@
 \usepackage[brazilian]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{calc}
+\newcommand{\real}[1]{#1}
 
 %% ==============================================================================
 %% TIPOGRAFIA - Padrão Acadêmico Brasileiro
@@ -117,8 +119,8 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{threeparttable}  % Para notas de rodapé em tabelas
-\usepackage{tabularray}      % Tabelas modernas (estado da arte 2024-2025)
-\UseTblrLibrary{booktabs}    % Integração tabularray + booktabs
+%\usepackage{tabularray}      % Tabelas modernas (estado da arte 2024-2025)
+%\UseTblrLibrary{booktabs}    % Integração tabularray + booktabs
 
 %% Espaçamento em tabelas booktabs
 \setlength{\heavyrulewidth}{0.08em}
@@ -158,6 +160,45 @@
 \setlength{\floatsep}{12pt plus 2pt minus 2pt}
 \setlength{\textfloatsep}{20pt plus 2pt minus 4pt}
 \setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+
 %% ==============================================================================
 %% DEFINIÇÕES PARA PANDOC
 %% ==============================================================================
@@ -178,6 +219,8 @@
 \newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\usepackage{natbib}
+\bibliographystyle{abntex2-alf}
 
 %% ==============================================================================
 %% CONFIGURAÇÕES DE ESPAÇAMENTO - ABNT
@@ -614,68 +657,61 @@ precificação de ativos, ou apenas replica conhecimento já incorporado
 pelo mecanismo de mercado?
 
 A tradição intelectual que informa esta investigação remonta ao ensaio
-seminal de (\textbf{hayekUseKnowledgeSociety1945?}), onde o sistema de
-preços é caracterizado como ``maravilha'' epistêmica --- mecanismo de
-telecomunicação que condensa informações dispersas e tácitas, o
-``conhecimento das circunstâncias particulares de tempo e lugar'', que
-nenhum agente central poderia reunir. Para Hayek, o mercado resolve
-problema computacional de complexidade intratável: agregar bilhões de
-fragmentos de conhecimento local em sinais de preço que coordenam
-decisões descentralizadas. A intuição hayekiana foi posteriormente
-formalizada por (\textbf{famaEfficientCapitalMarkets1970?}) na Hipótese
-dos Mercados Eficientes (EMH), segundo a qual os preços refletem toda
-informação disponível, tornando impossível a obtenção sistemática de
-retornos anormais através de análise de dados públicos.
+seminal de Hayek (1945), onde o sistema de preços é caracterizado como
+``maravilha'' epistêmica --- mecanismo de telecomunicação que condensa
+informações dispersas e tácitas, o ``conhecimento das circunstâncias
+particulares de tempo e lugar'', que nenhum agente central poderia
+reunir. Para Hayek, o mercado resolve problema computacional de
+complexidade intratável: agregar bilhões de fragmentos de conhecimento
+local em sinais de preço que coordenam decisões descentralizadas. A
+intuição hayekiana foi posteriormente formalizada por Fama (1970) na
+Hipótese dos Mercados Eficientes (EMH), segundo a qual os preços
+refletem toda informação disponível, tornando impossível a obtenção
+sistemática de retornos anormais através de análise de dados públicos.
 
 Contudo, a elegância teórica da EMH encontra obstáculo lógico
-identificado por
-(\textbf{grossmanImpossibilityInformationallyEfficient1980?}): se os
-preços refletissem perfeitamente toda informação, não haveria incentivo
-para incorrer nos custos de sua coleta e processamento. O paradoxo de
-Grossman-Stiglitz estabelece que mercados perfeitamente eficientes são
-impossíveis --- algum grau de ineficiência é necessário para compensar o
-custo da informação e garantir que agentes continuem a produzi-la. Este
-teorema fundamenta teoricamente a existência da análise fundamentalista:
+identificado por Grossman; Stiglitz (1980): se os preços refletissem
+perfeitamente toda informação, não haveria incentivo para incorrer nos
+custos de sua coleta e processamento. O paradoxo de Grossman-Stiglitz
+estabelece que mercados perfeitamente eficientes são impossíveis ---
+algum grau de ineficiência é necessário para compensar o custo da
+informação e garantir que agentes continuem a produzi-la. Este teorema
+fundamenta teoricamente a existência da análise fundamentalista:
 analistas calculam métricas, constroem modelos e emitem recomendações
 porque esperam ser compensados por esse esforço através de retornos
 superiores ao mercado.
 
 Desenvolvimentos recentes oferecem enquadramentos complementares. A
-Hipótese dos Mercados Adaptativos de
-(\textbf{loAdaptiveMarketsHypothesis2004?}), formalizada em
-(\textbf{loAdaptiveMarketsHypothesis2024?}), reconcilia eficiência e
-comportamento através de lente evolucionária: mercados não são
-eficientes \emph{ou} ineficientes, mas \emph{adaptativos}. A eficiência
-varia ao longo do tempo, dependendo do ambiente competitivo, da
-densidade de participantes informados, e da disponibilidade de
-oportunidades de arbitragem. Métricas fundamentalistas, nessa
-perspectiva, são estratégias adaptativas que funcionam em certos regimes
-e desaparecem quando o mercado se adapta a elas. A economia da
-complexidade, desenvolvida no Santa Fe Institute por
-(\textbf{arthurComplexityEconomy2014?}) e sintetizada em
-(\textbf{arthurComplexityEconomics2021?}), oferece enquadramento ainda
-mais radical: mercados são sistemas adaptativos complexos onde agentes
-heterogêneos com racionalidade limitada interagem em redes, produzindo
-dinâmicas emergentes não redutíveis a equilíbrio. Nessa visão,
-informação não é simplesmente ``refletida'' nos preços --- é criada,
-disseminada, distorcida e amplificada em processos que podem incluir
-herding, cascatas informacionais e bolhas.
+Hipótese dos Mercados Adaptativos de Lo (2004), formalizada em Lo; Zhang
+(2024), reconcilia eficiência e comportamento através de lente
+evolucionária: mercados não são eficientes \emph{ou} ineficientes, mas
+\emph{adaptativos}. A eficiência varia ao longo do tempo, dependendo do
+ambiente competitivo, da densidade de participantes informados, e da
+disponibilidade de oportunidades de arbitragem. Métricas
+fundamentalistas, nessa perspectiva, são estratégias adaptativas que
+funcionam em certos regimes e desaparecem quando o mercado se adapta a
+elas. A economia da complexidade, desenvolvida no Santa Fe Institute por
+Arthur (2014) e sintetizada em Arthur (2021), oferece enquadramento
+ainda mais radical: mercados são sistemas adaptativos complexos onde
+agentes heterogêneos com racionalidade limitada interagem em redes,
+produzindo dinâmicas emergentes não redutíveis a equilíbrio. Nessa
+visão, informação não é simplesmente ``refletida'' nos preços --- é
+criada, disseminada, distorcida e amplificada em processos que podem
+incluir herding, cascatas informacionais e bolhas.
 
-A contribuição pós-hayekiana de
-(\textbf{colinjaegerEfficientMarketHypothesis2020?}) elucida tensão
-metodológica entre tradições: enquanto Hayek concebia preços como sinais
-dentro de processo dinâmico de competição, onde conhecimento relevante é
-tácito e processual, a EMH de Fama trata preços como reflexos de
-informação em equilíbrio, onde conhecimento é proposicional e agregável.
-O trabalho de (\textbf{kucharCompetitionSociallyExtended2025?}) estende
-a perspectiva hayekiana para ciência cognitiva, propondo que mercados
-sejam entendidos como redes de cognição socialmente estendida --- não
-apenas mecanismos de alocação, mas sistemas de aprendizado coletivo onde
-preferências e conhecimento são formados, não apenas revelados. A
-implicação para análise fundamentalista é profunda: métricas não apenas
-``medem'' fundamentos --- participam do processo cognitivo coletivo que
-forma preços, podendo tornar-se profecias autorrealizáveis ou
-autofrustrantes.
+A contribuição pós-hayekiana de Colin-Jaeger; Delcey (2020) elucida
+tensão metodológica entre tradições: enquanto Hayek concebia preços como
+sinais dentro de processo dinâmico de competição, onde conhecimento
+relevante é tácito e processual, a EMH de Fama trata preços como
+reflexos de informação em equilíbrio, onde conhecimento é proposicional
+e agregável. O trabalho de Kuchar (2025) estende a perspectiva hayekiana
+para ciência cognitiva, propondo que mercados sejam entendidos como
+redes de cognição socialmente estendida --- não apenas mecanismos de
+alocação, mas sistemas de aprendizado coletivo onde preferências e
+conhecimento são formados, não apenas revelados. A implicação para
+análise fundamentalista é profunda: métricas não apenas ``medem''
+fundamentos --- participam do processo cognitivo coletivo que forma
+preços, podendo tornar-se profecias autorrealizáveis ou autofrustrantes.
 
 A pergunta central que orienta esta investigação pode ser formulada nos
 seguintes termos: considerando a Petrobras S.A. (PETR4) como caso
@@ -792,16 +828,16 @@ centrais à teoria financeira contemporânea.
 \subsubsection{A Contribuição Hayekiana: Conhecimento Disperso e
 Coordenação}\label{a-contribuiuxe7uxe3o-hayekiana-conhecimento-disperso-e-coordenauxe7uxe3o}}
 
-O ensaio seminal de (\textbf{hayekUseKnowledgeSociety1945?}) reformula o
-problema econômico fundamental. A questão não é, como supunham
-economistas anteriores, a alocação ótima de recursos \emph{dados} ---
-problema que, em princípio, admite solução técnica via programação
-linear ou métodos equivalentes. O problema genuíno é a utilização de
-conhecimento que \emph{não está dado} a ninguém em sua totalidade. O
-conhecimento relevante para decisões econômicas encontra-se disperso
-entre milhões de agentes, cada qual possuindo fragmentos únicos ---
-``conhecimento das circunstâncias particulares de tempo e lugar'' ---
-que nenhum mecanismo centralizador poderia reunir.
+O ensaio seminal de Hayek (1945) reformula o problema econômico
+fundamental. A questão não é, como supunham economistas anteriores, a
+alocação ótima de recursos \emph{dados} --- problema que, em princípio,
+admite solução técnica via programação linear ou métodos equivalentes. O
+problema genuíno é a utilização de conhecimento que \emph{não está dado}
+a ninguém em sua totalidade. O conhecimento relevante para decisões
+econômicas encontra-se disperso entre milhões de agentes, cada qual
+possuindo fragmentos únicos --- ``conhecimento das circunstâncias
+particulares de tempo e lugar'' --- que nenhum mecanismo centralizador
+poderia reunir.
 
 Esta dispersão não é acidental, mas constitutiva da realidade econômica.
 O comerciante local conhece o estado de seus estoques, as preferências
@@ -822,7 +858,7 @@ caracteriza-o como ``maravilha'' epistêmica:
 conhecimento com que opera, ou quão pouco os participantes individuais
 precisam saber para tomar a ação correta. Em forma abreviada, por uma
 espécie de símbolo, apenas a informação mais essencial é transmitida.''
-(\textbf{hayekUseKnowledgeSociety1945?})
+(Hayek, 1945, p. 527)
 \end{quote}
 
 O preço funciona como \emph{estatística suficiente} --- no sentido
@@ -847,15 +883,14 @@ na Hipótese dos Mercados Eficientes, tratou conhecimento como
 verdadeiras que podem, em princípio, ser listadas e incorporadas a
 modelos.
 
-(\textbf{colinjaegerEfficientMarketHypothesis2020?}) analisam esta
-transformação com rigor historiográfico. A EMH, argumentam,
-operacionalizou intuições hayekianas em forma testável, mas ao fazê-lo
-perdeu dimensões essenciais. Onde Hayek via processo dinâmico de
-descoberta --- competição como procedimento de exploração do
-desconhecido ---, Fama vê equilíbrio estático onde toda informação já
-foi descoberta e incorporada. A tensão entre estas concepções não é
-meramente acadêmica; implica visões distintas sobre a possibilidade e
-utilidade da análise fundamentalista.
+Colin-Jaeger; Delcey (2020) analisam esta transformação com rigor
+historiográfico. A EMH, argumentam, operacionalizou intuições hayekianas
+em forma testável, mas ao fazê-lo perdeu dimensões essenciais. Onde
+Hayek via processo dinâmico de descoberta --- competição como
+procedimento de exploração do desconhecido ---, Fama vê equilíbrio
+estático onde toda informação já foi descoberta e incorporada. A tensão
+entre estas concepções não é meramente acadêmica; implica visões
+distintas sobre a possibilidade e utilidade da análise fundamentalista.
 
 A implicação para o presente trabalho é direta. Se conhecimento
 relevante é proposicional e já incorporado aos preços (Fama), métricas
@@ -893,10 +928,9 @@ emergem quando o próprio aumento de preços é interpretado como sinal
 informativo, gerando feedback positivo que desacopla preços de
 fundamentos.
 
-A literatura sobre microestrutura de mercados, iniciada por
-(\textbf{glostenBidAskSpread1985?}) e desenvolvida por
-(\textbf{kyleInformedSpeculationImperfect1989?}), formaliza como
-informação é incorporada aos preços através do processo de negociação. O
+A literatura sobre microestrutura de mercados, iniciada por Glosten;
+Milgrom (1985) e desenvolvida por Kyle (1989), formaliza como informação
+é incorporada aos preços através do processo de negociação. O
 \emph{spread} bid-ask reflete, em parte, o custo que formadores de
 mercado incorrem ao negociar com agentes potencialmente informados. A
 velocidade de incorporação de informação depende da liquidez, da
@@ -919,11 +953,11 @@ Taxonomia}\label{a-hipuxf3tese-dos-mercados-eficientes-formulauxe7uxe3o-e-taxono
 A formalização da intuição hayekiana em teoria testável deve-se
 primordialmente a Eugene Fama, cuja tese de doutorado e trabalhos
 subsequentes estabeleceram o paradigma dominante em finanças acadêmicas
-por décadas. A Hipótese dos Mercados Eficientes, articulada em
-(\textbf{famaEfficientCapitalMarkets1970?}), postula que preços de
-ativos refletem toda informação relevante disponível, tornando
-impossível a obtenção sistemática de retornos anormais --- retornos
-superiores ao que seria justificado pelo risco assumido.
+por décadas. A Hipótese dos Mercados Eficientes, articulada em Fama
+(1970), postula que preços de ativos refletem toda informação relevante
+disponível, tornando impossível a obtenção sistemática de retornos
+anormais --- retornos superiores ao que seria justificado pelo risco
+assumido.
 
 Formalmente, um mercado é eficiente com respeito a um conjunto de
 informações \(\Phi_t\) se é impossível obter lucros econômicos
@@ -958,8 +992,8 @@ como ROE e ROIC, sendo públicos, já estariam incorporados aos preços.
 informação, pública e privada. Eficiência nesta forma implica que nem
 mesmo \emph{insiders} com acesso privilegiado poderiam obter retornos
 anormais. Esta forma é geralmente rejeitada empiricamente, dado que
-estudos documentam retornos anormais em negociações de insiders
-(\textbf{jaaborImpactInsiderTrading2004?}).
+estudos documentam retornos anormais em negociações de insiders (Jaffe,
+1974).
 
 \hypertarget{eviduxeancia-empuxedrica-anomalias-e-pruxeamios-de-fatores}{%
 \subsubsection{Evidência Empírica: Anomalias e Prêmios de
@@ -972,13 +1006,13 @@ pesquisa em anomalias de mercado constitui um dos mais extensos da
 literatura financeira, documentando centenas de variáveis com aparente
 poder preditivo sobre retornos.
 
-(\textbf{fama1998MarketEfficiencyLongterm?}) oferece defesa sofisticada
-da EMH frente às anomalias. Argumenta que aparentes retornos anormais
-frequentemente (i) desaparecem quando custos de transação realistas são
-considerados, (ii) são artefatos de \emph{data snooping} ---
-pesquisadores testando múltiplas hipóteses até encontrar significância
-estatística ---, ou (iii) representam compensação por risco não
-capturado pelo modelo de precificação utilizado.
+Fama (1998) oferece defesa sofisticada da EMH frente às anomalias.
+Argumenta que aparentes retornos anormais frequentemente (i) desaparecem
+quando custos de transação realistas são considerados, (ii) são
+artefatos de \emph{data snooping} --- pesquisadores testando múltiplas
+hipóteses até encontrar significância estatística ---, ou (iii)
+representam compensação por risco não capturado pelo modelo de
+precificação utilizado.
 
 O terceiro argumento é particularmente relevante para o presente
 trabalho. Se o CAPM unifatorial é especificação incompleta --- se
@@ -987,21 +1021,19 @@ parece ``alfa'' (retorno anormal) pode ser apenas ``beta'' (compensação
 por risco) em dimensão não modelada. Esta lógica motivou a extensão do
 CAPM para modelos multifatoriais.
 
-(\textbf{famaCommonRiskFactors1993?}) propuseram modelo trifatorial,
-adicionando ao fator de mercado dois fatores empiricamente motivados:
-SMB (\emph{Small Minus Big}), capturando o prêmio de tamanho ---
-empresas pequenas tendem a gerar retornos superiores ---, e HML
-(\emph{High Minus Low}), capturando o prêmio de valor --- empresas com
-alto índice book-to-market tendem a superar aquelas com baixo índice. O
-modelo explica parcela substancial da variação transversal de retornos
-que o CAPM deixava inexplicada.
+Fama; French (1993) propuseram modelo trifatorial, adicionando ao fator
+de mercado dois fatores empiricamente motivados: SMB (\emph{Small Minus
+Big}), capturando o prêmio de tamanho --- empresas pequenas tendem a
+gerar retornos superiores ---, e HML (\emph{High Minus Low}), capturando
+o prêmio de valor --- empresas com alto índice book-to-market tendem a
+superar aquelas com baixo índice. O modelo explica parcela substancial
+da variação transversal de retornos que o CAPM deixava inexplicada.
 
-Extensões subsequentes adicionaram fatores de momentum
-(\textbf{jegadeeshReturnsBuyingWinners1993?}), lucratividade e
-investimento (\textbf{famaFivefactorAssetPricing2015?}), e qualidade
-(\textbf{asnessSizeValueQuality2014?}). O modelo de cinco fatores de
-Fama-French representa, atualmente, especificação padrão para controle
-de risco em estudos de anomalias:
+Extensões subsequentes adicionaram fatores de momentum (Jegadeesh;
+Titman, 1993), lucratividade e investimento (Fama; French, 2015), e
+qualidade (Asness; Frazzini; Pedersen, 2019a). O modelo de cinco fatores
+de Fama-French representa, atualmente, especificação padrão para
+controle de risco em estudos de anomalias:
 
 \[R_{i,t} - R_{f,t} = \alpha_i + \beta_{i,MKT}(R_{m,t} - R_{f,t}) + \beta_{i,SMB}SMB_t + \beta_{i,HML}HML_t + \beta_{i,RMW}RMW_t + \beta_{i,CMA}CMA_t + \varepsilon_{i,t}\]
 
@@ -1010,12 +1042,11 @@ lucratividade e \(CMA\) (\emph{Conservative Minus Aggressive}) captura o
 prêmio de conservadorismo em investimentos.
 
 A proliferação de fatores gerou preocupação com \emph{overfitting}.
-(\textbf{harveyReplicationCrossSection2016?}) documentam mais de 300
-fatores publicados na literatura acadêmica --- o ``zoológico de
-fatores'' --- e argumentam que a maioria representa artefatos
-estatísticos. Propõem ajuste de múltiplos testes via controle de
-\emph{false discovery rate}, elevando substancialmente o limiar para
-significância estatística.
+Harvey; Liu; Zhu (2016) documentam mais de 300 fatores publicados na
+literatura acadêmica --- o ``zoológico de fatores'' --- e argumentam que
+a maioria representa artefatos estatísticos. Propõem ajuste de múltiplos
+testes via controle de \emph{false discovery rate}, elevando
+substancialmente o limiar para significância estatística.
 
 \hypertarget{a-hipuxf3tese-dos-mercados-adaptativos}{%
 \subsubsection{A Hipótese dos Mercados
@@ -1023,9 +1054,8 @@ Adaptativos}\label{a-hipuxf3tese-dos-mercados-adaptativos}}
 
 A tensão entre eficiência teórica e anomalias empíricas motivou
 formulações alternativas. A contribuição mais influente é a Hipótese dos
-Mercados Adaptativos (AMH), proposta por
-(\textbf{loAdaptiveMarketsHypothesis2004?}) e formalizada extensivamente
-em (\textbf{loAdaptiveMarketsHypothesis2024?}).
+Mercados Adaptativos (AMH), proposta por Lo (2004) e formalizada
+extensivamente em Lo; Zhang (2024).
 
 A AMH reconcilia eficiência e comportamento através de lente
 evolucionária. Mercados não são eficientes \emph{ou} ineficientes de
@@ -1062,18 +1092,18 @@ risco e comprimido quando capital abundante persegue a estratégia.
 \textbf{Estratégias têm ``meia-vida'':} Anomalias descobertas tendem a
 desaparecer conforme participantes ajustam comportamento em resposta à
 informação. A publicação acadêmica de uma anomalia pode, paradoxalmente,
-eliminar sua lucratividade --- fenômeno documentado por
-(\textbf{mcleanDoesAcademicResearch2016?}).
+eliminar sua lucratividade --- fenômeno documentado por McLean; Pontiff
+(2016).
 
 \textbf{Inovação cria novas oportunidades:} Mudanças estruturais ---
 novos instrumentos, novas tecnologias, novos regulamentos --- criam
 nichos ecológicos onde ineficiências temporárias emergem antes que o
 mercado se adapte.
 
-(\textbf{hirshleifer2023SocialContagion?}) estendem a análise para
-incluir dinâmicas de contágio social. Demonstram que vieses
-comportamentais não necessariamente desaparecem sob pressão competitiva;
-podem, ao contrário, persistir e até se amplificar quando transmitidos
+Hirshleifer; Lo; Zhang (2023) estendem a análise para incluir dinâmicas
+de contágio social. Demonstram que vieses comportamentais não
+necessariamente desaparecem sob pressão competitiva; podem, ao
+contrário, persistir e até se amplificar quando transmitidos
 socialmente. A diversidade de estilos de investimento --- valor,
 crescimento, momentum, qualidade --- coexiste porque diferentes
 estratégias exploram nichos distintos, com desempenho relativo variando
@@ -1138,9 +1168,8 @@ investimentos seriam desperdício --- seus retornos seriam nulos.
 
 Mas se ninguém investisse em coleta de informação --- racionalmente
 antecipando retornos nulos ---, como a informação seria incorporada aos
-preços? O paradoxo foi formalizado por
-(\textbf{grossmanImpossibilityInformationallyEfficient1980?}) em teorema
-que permanece central à teoria financeira:
+preços? O paradoxo foi formalizado por Grossman; Stiglitz (1980) em
+teorema que permanece central à teoria financeira:
 
 \begin{quote}
 ``Como não poderia haver lucros na coleta de informação, deveria haver
@@ -1148,8 +1177,7 @@ pouco motivo para negociar e pouco motivo para que mercados existissem.
 Demonstramos que quando a obtenção de informação é custosa, os preços
 não podem refletir perfeitamente a informação disponível, pois se assim
 fosse, aqueles que gastaram recursos para obtê-la não receberiam
-compensação.''
-(\textbf{grossmanImpossibilityInformationallyEfficient1980?})
+compensação.'' (Grossman; Stiglitz, 1980, p. 405)
 \end{quote}
 
 O teorema estabelece que mercados perfeitamente eficientes são
@@ -1196,42 +1224,39 @@ precisão com que preços revelam informação.
 Empírica}\label{extensuxf5es-contemporuxe2neas-e-eviduxeancia-empuxedrica}}
 
 A literatura subsequente estendeu o paradigma Grossman-Stiglitz em
-múltiplas direções.
-(\textbf{verrecchiaInformationAcquisitionCapital1982?}) endogeniza a
-quantidade de informação adquirida, mostrando que agentes investem em
-precisão até o ponto onde benefício marginal iguala custo marginal.
-(\textbf{hellwigAggregatingInformationPredict2009?}) estende a análise
-para mercados com múltiplos ativos e informação heterogênea,
-demonstrando condições sob as quais a agregação de informação é mais ou
-menos eficiente.
+múltiplas direções. Verrecchia (1982) endogeniza a quantidade de
+informação adquirida, mostrando que agentes investem em precisão até o
+ponto onde benefício marginal iguala custo marginal. Hellwig; Veldkamp
+(2009) estende a análise para mercados com múltiplos ativos e informação
+heterogênea, demonstrando condições sob as quais a agregação de
+informação é mais ou menos eficiente.
 
-(\textbf{stiglitzKosenkoEconomicsInformation2024?}) oferecem atualização
-abrangente do paradigma da economia da informação. Argumentam que
-desenvolvimentos nas décadas desde o trabalho original reforçam, mais
-que enfraquecem, a centralidade das fricções informacionais. A revolução
-digital não eliminou assimetrias de informação; em muitos casos,
-exacerbou-as, criando novas formas de informação privada (dados
-alternativos, \emph{high-frequency trading}) e novas fontes de ruído
-(desinformação, manipulação algorítmica).
+Stiglitz; Kosenko (2024) oferecem atualização abrangente do paradigma da
+economia da informação. Argumentam que desenvolvimentos nas décadas
+desde o trabalho original reforçam, mais que enfraquecem, a centralidade
+das fricções informacionais. A revolução digital não eliminou
+assimetrias de informação; em muitos casos, exacerbou-as, criando novas
+formas de informação privada (dados alternativos, \emph{high-frequency
+trading}) e novas fontes de ruído (desinformação, manipulação
+algorítmica).
 
-(\textbf{pastushkovEvolutionaryModelFinancial2024?}) aplicam modelagem
-evolucionária ao problema. Demonstram resultado contra-intuitivo:
-reduzir custos de informação não necessariamente aumenta eficiência de
-preços. Quando informação se torna muito barata, a vantagem competitiva
-de ser informado diminui, potencialmente levando a equilíbrio onde a
-maioria permanece desinformada --- \emph{free-riding} na informação
-produzida por poucos. Apenas quando custos são moderados observa-se
-equilíbrio com fração substancial de informados e preços relativamente
-eficientes.
+Pastushkov (2024) aplicam modelagem evolucionária ao problema.
+Demonstram resultado contra-intuitivo: reduzir custos de informação não
+necessariamente aumenta eficiência de preços. Quando informação se torna
+muito barata, a vantagem competitiva de ser informado diminui,
+potencialmente levando a equilíbrio onde a maioria permanece
+desinformada --- \emph{free-riding} na informação produzida por poucos.
+Apenas quando custos são moderados observa-se equilíbrio com fração
+substancial de informados e preços relativamente eficientes.
 
 A evidência empírica oferece suporte misto ao paradigma. Por um lado, a
 existência de fundos de investimento ativamente gerenciados --- que
 cobram taxas substanciais para produzir análise --- sugere que
 investidores acreditam haver valor na informação. Por outro lado, a
 maioria dos fundos ativos não supera benchmarks passivos após taxas
-(\textbf{gruberAnotherPuzzleGrowth1996?}), sugerindo que a competição
-por alfa é intensa e que a maior parte do retorno à informação é
-capturada pelos próprios analistas, não pelos investidores finais.
+(Gruber, 1996), sugerindo que a competição por alfa é intensa e que a
+maior parte do retorno à informação é capturada pelos próprios
+analistas, não pelos investidores finais.
 
 \hypertarget{o-motor-q-val-como-custo-da-informauxe7uxe3o}{%
 \subsubsection{O Motor Q-VAL como ``Custo da
@@ -1274,12 +1299,11 @@ Complexos}\label{mercados-como-sistemas-adaptativos-complexos}}
 
 A economia da complexidade oferece enquadramento radicalmente distinto
 tanto da visão hayekiana quanto da EMH. Desenvolvida primordialmente no
-Santa Fe Institute, com contribuições seminais de
-(\textbf{arthurComplexityEconomy2014?}) e sintetizada em
-(\textbf{arthurComplexityEconomics2021?}), esta tradição rejeita a
-metáfora do mercado como mecanismo de equilíbrio --- seja este estático
-(EMH) ou dinâmico-convergente (Hayek) --- em favor da metáfora do
-mercado como \emph{sistema adaptativo complexo}.
+Santa Fe Institute, com contribuições seminais de Arthur (2014) e
+sintetizada em Arthur (2021), esta tradição rejeita a metáfora do
+mercado como mecanismo de equilíbrio --- seja este estático (EMH) ou
+dinâmico-convergente (Hayek) --- em favor da metáfora do mercado como
+\emph{sistema adaptativo complexo}.
 
 Sistemas adaptativos complexos exibem propriedades que os distinguem
 tanto de sistemas mecânicos simples quanto de sistemas aleatórios puros:
@@ -1325,25 +1349,23 @@ valor esperado condicional a toda informação disponível. Na economia da
 complexidade, preços \emph{emergem} de interações que podem tanto
 agregar quanto distorcer informação.
 
-(\textbf{arthurBoundedRationalityElArol1994?}) desenvolvem modelo
-seminal --- o Bar Problem --- demonstrando como agentes com
-racionalidade limitada, usando heurísticas heterogêneas, podem atingir
-coordenação eficiente em média, mas com flutuações persistentes que não
-convergem a equilíbrio. Aplicado a mercados, o modelo sugere que preços
-oscilam perpetuamente em torno de ``valor fundamental'' sem jamais
-estabilizar --- não por choques exógenos, mas por dinâmica endógena do
-sistema.
+Arthur (1994) desenvolvem modelo seminal --- o Bar Problem ---
+demonstrando como agentes com racionalidade limitada, usando heurísticas
+heterogêneas, podem atingir coordenação eficiente em média, mas com
+flutuações persistentes que não convergem a equilíbrio. Aplicado a
+mercados, o modelo sugere que preços oscilam perpetuamente em torno de
+``valor fundamental'' sem jamais estabilizar --- não por choques
+exógenos, mas por dinâmica endógena do sistema.
 
-O modelo de mercado artificial do Santa Fe Institute
-(\textbf{leBaron2006AgentBasedComputational?}) simula mercados com
-agentes heterogêneos que usam regras de decisão evolucionárias. Os
-resultados reproduzem ``fatos estilizados'' observados em mercados reais
---- caudas gordas nas distribuições de retornos, volatilidade
-clustering, correlação serial de volatilidade --- que modelos de
-equilíbrio não capturam. Crucialmente, a eficiência informacional do
-mercado simulado varia: em certos parâmetros, preços rastreiam
-fundamentos eficientemente; em outros, bolhas e crashes emergem
-endogenamente.
+O modelo de mercado artificial do Santa Fe Institute (LeBaron, 2006)
+simula mercados com agentes heterogêneos que usam regras de decisão
+evolucionárias. Os resultados reproduzem ``fatos estilizados''
+observados em mercados reais --- caudas gordas nas distribuições de
+retornos, volatilidade clustering, correlação serial de volatilidade ---
+que modelos de equilíbrio não capturam. Crucialmente, a eficiência
+informacional do mercado simulado varia: em certos parâmetros, preços
+rastreiam fundamentos eficientemente; em outros, bolhas e crashes
+emergem endogenamente.
 
 \hypertarget{herding-cascatas-e-amplificauxe7uxe3o-de-ruuxeddo}{%
 \subsubsection{Herding, Cascatas e Amplificação de
@@ -1359,8 +1381,8 @@ outros. Se muitos agentes precedentes compraram um ativo, o agente
 seguinte pode inferir que eles possuíam informação favorável, e comprar
 mesmo que sua própria informação seja desfavorável. O resultado é
 cascata informacional onde informação privada é perdida e o grupo
-converge para decisão potencialmente errada
-(\textbf{bikhchandaniTheoryFadsCustom1992?}).
+converge para decisão potencialmente errada (Bikhchandani; Hirshleifer;
+Welch, 1992).
 
 \textbf{Feedback positivo:} Se o aumento de preço de um ativo atrai
 compradores adicionais --- seja porque interpretam o aumento como sinal
@@ -1369,20 +1391,19 @@ movimento de preço gera demanda adicional, desacoplando preços de
 fundamentos. Bolhas especulativas são manifestação extrema deste
 mecanismo.
 
-\textbf{Reflexividade:} Conceito desenvolvido por
-(\textbf{sorosAlchemyFinance1987?}), a reflexividade descreve o fenômeno
-pelo qual expectativas afetam a realidade que pretendem prever. Se
-analistas acreditam que uma empresa é sólida, concedem crédito a termos
-favoráveis, atraem talentos, geram cobertura positiva --- tornando a
-empresa efetivamente mais sólida. Preços não apenas refletem
-fundamentos; influenciam-nos.
+\textbf{Reflexividade:} Conceito desenvolvido por Soros (1987), a
+reflexividade descreve o fenômeno pelo qual expectativas afetam a
+realidade que pretendem prever. Se analistas acreditam que uma empresa é
+sólida, concedem crédito a termos favoráveis, atraem talentos, geram
+cobertura positiva --- tornando a empresa efetivamente mais sólida.
+Preços não apenas refletem fundamentos; influenciam-nos.
 
 \textbf{Contágio informacional:} Informação --- e desinformação ---
 propaga-se através de redes sociais de modo que pode amplificar certos
-sinais e suprimir outros. (\textbf{shimirovichSocialMediaStock2011?})
-documentam correlação entre sentimento em redes sociais e retornos
-subsequentes, sugerindo que ``informação'' incorporada a preços pode
-incluir ruído social sistematicamente enviesado.
+sinais e suprimir outros. Bollen; Mao; Zeng (2011) documentam correlação
+entre sentimento em redes sociais e retornos subsequentes, sugerindo que
+``informação'' incorporada a preços pode incluir ruído social
+sistematicamente enviesado.
 
 \hypertarget{implicauxe7uxf5es-para-o-motor-q-val}{%
 \subsubsection{Implicações para o Motor
@@ -1418,9 +1439,9 @@ propostas na metodologia --- podem capturar apenas parcela das relações.
 Interações não-lineares entre métricas, efeitos de limiar
 (\emph{threshold effects}), e dinâmicas de feedback podem requerer
 especificações mais flexíveis. A literatura recente em machine learning
-para precificação de ativos (\textbf{guEmpiricalAssetPricing2020?})
-documenta ganhos substanciais com métodos não-lineares, sugerindo que
-especificações lineares subestimam o conteúdo informacional de métricas
+para precificação de ativos (Gu; Kelly; Xiu, 2020) documenta ganhos
+substanciais com métodos não-lineares, sugerindo que especificações
+lineares subestimam o conteúdo informacional de métricas
 fundamentalistas.
 
 \hypertarget{suxedntese-quatro-visuxf5es-sobre-informauxe7uxe3o-e-preuxe7os}{%
@@ -1623,11 +1644,10 @@ Fundamentalista}\label{o-motor-q-val-como-vetor-de-informauxe7uxe3o-fundamentali
 O motor Q-VAL (\emph{Quantitative Value}) constitui sistema de
 \emph{scoring} fundamentalista que integra múltiplas dimensões de
 avaliação em índice sintético. A denominação remete à tradição de
-\emph{Quantitative Value Investing} sistematizada por
-(\textbf{grayQuantitativeValuePractitioners2012?}), que propõe
-automatização de princípios de análise fundamentalista clássica ---
-originários de (\textbf{grahamSecurityAnalysis1934?}) --- via algoritmos
-computacionais que eliminam vieses comportamentais e garantem
+\emph{Quantitative Value Investing} sistematizada por Gray; Carlisle
+(2012), que propõe automatização de princípios de análise
+fundamentalista clássica --- originários de Graham; Dodd (1934) --- via
+algoritmos computacionais que eliminam vieses comportamentais e garantem
 consistência metodológica.
 
 A arquitetura do motor organiza-se em três dimensões canônicas:
@@ -1639,19 +1659,17 @@ fundamentos contábeis. Métricas de valor respondem à pergunta:
 subavaliação --- o mercado atribui ao ativo preço inferior ao que seus
 fundamentos justificariam. A literatura documenta \emph{value premium}
 persistente: ativos ``baratos'' tendem, em média, a superar ativos
-``caros'' em horizontes de médio prazo
-(\textbf{famaCommonRiskFactors1993?};
-\textbf{asnesValueMomentumEverywhere2013?}).
+``caros'' em horizontes de médio prazo (Asness; Moskowitz; Pedersen,
+2013; Fama; French, 1993).
 
 \textbf{Dimensão de Qualidade:} Avalia a eficiência operacional e
 sustentabilidade dos resultados. Métricas de qualidade respondem à
 pergunta: \emph{quão eficientemente a empresa converte capital em
 retorno? } Valores elevados (ROE alto, margens robustas, crescimento
 consistente) indicam vantagens competitivas que tendem a persistir.
-(\textbf{novy-marxOtherSideValue2013?}) documenta que lucratividade
-possui poder preditivo comparável ao de métricas de valor, enquanto
-(\textbf{asnessSizeValueQuality2019?}) formalizam ``qualidade'' como
-fator distinto com prêmio próprio.
+Novy-Marx (2013) documenta que lucratividade possui poder preditivo
+comparável ao de métricas de valor, enquanto Asness; Frazzini; Pedersen
+(2019b) formalizam ``qualidade'' como fator distinto com prêmio próprio.
 
 \textbf{Dimensão de Risco:} Incorpora indicadores de alavancagem,
 liquidez e volatilidade. Métricas de risco respondem à pergunta:
@@ -2351,9 +2369,9 @@ Computacional}\label{reprodutibilidade-computacional}}
 
 A reprodutibilidade constitui princípio metodológico central deste
 trabalho. Seguindo o paradigma de pesquisa computacional reproduzível
-(\textbf{buckheitWaveLab1995?}), todos os dados, procedimentos
-analíticos e rotinas de geração de resultados estão disponíveis em
-repositório público:
+(Buckheit; Donoho, 1995), todos os dados, procedimentos analíticos e
+rotinas de geração de resultados estão disponíveis em repositório
+público:
 
 \begin{quote}
 \textbf{Repositório:}
@@ -2369,20 +2387,20 @@ responsabilidades:
 
 \begin{verbatim}
 unb-cca-mqac/
-├── data/
-│   ├── raw/              # Dados brutos (não processados)
-│   ├── processed/        # Dados processados
-│   └── outputs/          # Resultados gerados
-│       ├── tables/       # Tabelas em formato LaTeX
-│       └── figures/      # Figuras em formato PDF
-├── src/                  # Código-fonte Python
-│   ├── gen_capm.py       # Estimação CAPM
-│   ├── gen_qval_scoring.py    # Motor Q-VAL
-│   ├── gen_regression_analysis.py  # Análise de regressões
-│   └── utils/            # Funções auxiliares
-├── content/              # Conteúdo textual (Markdown/LaTeX)
-├── notebooks/            # Jupyter notebooks exploratórios
-└── Makefile              # Automação de execução
++-- data/
+|   +-- raw/              # Dados brutos (não processados)
+|   +-- processed/        # Dados processados
+|   +-- outputs/          # Resultados gerados
+|       +-- tables/       # Tabelas em formato LaTeX
+|       +-- figures/      # Figuras em formato PDF
++-- src/                  # Código-fonte Python
+|   +-- gen_capm.py       # Estimação CAPM
+|   +-- gen_qval_scoring.py    # Motor Q-VAL
+|   +-- gen_regression_analysis.py  # Análise de regressões
+|   +-- utils/            # Funções auxiliares
++-- content/              # Conteúdo textual (Markdown/LaTeX)
++-- notebooks/            # Jupyter notebooks exploratórios
++-- Makefile              # Automação de execução
 \end{verbatim}
 
 \hypertarget{princuxedpios-de-reprodutibilidade}{%
@@ -2453,25 +2471,25 @@ preços? } --- em procedimento empírico testável. O diagrama abaixo
 sintetiza o fluxo analítico:
 
 \begin{verbatim}
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Dados Brutos   │────▶│   Processamento  │────▶│  Motor Q-VAL    │
-│  (Preços, DFs)  │     │  (Normalização)  │     │  (Score 0-100)  │
-└─────────────────┘     └──────────────────┘     └────────┬────────┘
-                                                         │
-                                                         ▼
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Comparação    │◀────│    Regressões    │◀────│ Série Temporal  │
-│   de Modelos    │     │   (M0→M1→M2→M3)  │     │   de Scores     │
-└────────┬────────┘     └──────────────────┘     └─────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Métricas de Avaliação                        │
-│  • ΔR² (contribuição informacional)                             │
-│  • AIC/BIC (parcimônia vs. explicação)                         │
-│  • Testes F/t (significância estatística)                       │
-│  • R² out-of-sample (poder preditivo genuíno)                  │
-└─────────────────────────────────────────────────────────────────┘
++-----------------+     +------------------+     +-----------------+
+|  Dados Brutos   |---->|   Processamento  |---->|  Motor Q-VAL    |
+|  (Preços, DFs)  |     |  (Normalização)  |     |  (Score 0-100)  |
++-----------------+     +------------------+     +--------+--------+
+                                                         |
+                                                         V
++-----------------+     +------------------+     +-----------------+
+|   Comparação    |<----|    Regressões    |<----| Série Temporal  |
+|   de Modelos    |     |   (M0->M1->M2->M3)|     |   de Scores     |
++--------+--------+     +------------------+     +-----------------+
+         |
+         V
++-----------------------------------------------------------------+
+|                    Métricas de Avaliação                        |
+|  * Delta R2 (contribuição informacional)                        |
+|  * AIC/BIC (parcimônia vs. explicação)                          |
+|  * Testes F/t (significância estatística)                       |
+|  * R2 out-of-sample (poder preditivo genuíno)                   |
++-----------------------------------------------------------------+
 \end{verbatim}
 
 Os resultados desta análise permitirão conclusões sobre:
@@ -2502,25 +2520,542 @@ fundamentalista pública --- contribuindo para o debate entre visões
 hayekiana, EMH, Grossman-Stiglitz e mercados adaptativos, com foco
 empírico no caso Petrobras.
 
-\hypertarget{resultados}{%
-\section{Resultados}\label{resultados}}
+\hypertarget{resultados-empuxedricos}{%
+\section{4. Resultados Empíricos}\label{resultados-empuxedricos}}
+
+A análise empírica revela uma estrutura informacional complexa e
+dinâmica para as ações da Petrobras (PETR4). Os resultados são
+apresentados seguindo uma lógica incremental: partindo do diagnóstico
+estatístico básico (4.1), avançando para modelos lineares de
+precificação (4.2), analisando a dinâmica temporal da informação (4.3),
+e culminando em abordagens não-lineares e adaptativas (4.4 e 4.5).
+
+\hypertarget{diagnuxf3stico-inicial-e-estatuxedsticas-descritivas}{%
+\subsection{4.1. Diagnóstico Inicial e Estatísticas
+Descritivas}\label{diagnuxf3stico-inicial-e-estatuxedsticas-descritivas}}
+
+A Tabela \ref{tab:desc_stats} apresenta as estatísticas descritivas dos
+retornos diários e das métricas fundamentalistas. Observa-se que a
+distribuição dos retornos da PETR4 exibe desvios significativos da
+normalidade, com curtose excessiva (18.10) e assimetria negativa
+(-1.39). Este padrão de ``caudas gordas'' sugere que modelos baseados em
+premissas gaussianas estritas podem subestimar a probabilidade de
+eventos extremos, justificando a exploração posterior de modelos de
+mudança de regime.
+
+\input{data/outputs/tables/estatisticas_descritivas.tex}
+
+Adicionalmente, a análise dinâmica do risco sistemático (Figura
+\ref{fig:beta_evolution}) revela que o Beta do ativo não é um parâmetro
+estrutural fixo. A flutuação do coeficiente ao longo do tempo ---
+oscilando entre regimes de alta e baixa correlação com o índice de
+mercado --- corrobora a crítica à estacionariedade implícita no CAPM
+incondicional.
+
+\begin{figure}
+\hypertarget{fig:beta_evolution}{%
+\centering
+\includegraphics{images/beta_evolution.pdf}
+\caption{Evolução Dinâmica do Beta (Janela Móvel de 252
+dias).}\label{fig:beta_evolution}
+}
+\end{figure}
+
+\hypertarget{eficiuxeancia-linear-e-o-valor-da-informauxe7uxe3o-fundamentalista}{%
+\subsection{4.2. Eficiência Linear e o Valor da Informação
+Fundamentalista}\label{eficiuxeancia-linear-e-o-valor-da-informauxe7uxe3o-fundamentalista}}
+
+A investigação sobre a eficiência informacional inicia-se com o teste da
+Hipótese dos Mercados Eficientes na forma semi-forte. A Tabela
+\ref{tab:capm_results} reporta a estimação do modelo base (M0 - CAPM). O
+coeficiente de determinação (\(R^2\)) de 0.55 indica que aproximadamente
+45\% da variância dos retornos permanece inexplicada pelo fator de
+mercado, abrindo espaço teórico para fatores adicionais. O Alfa de
+Jensen estimado não é estatisticamente distinto de zero, sugerindo que,
+na média incondicional, não há retornos anormais inexplicados pelo risco
+sistemático.
+
+\input{data/outputs/tables/resultados_capm.tex}
+
+A introdução de vetores de informação fundamentalista (Modelos M1 a M3)
+visa capturar essa variância residual. A Tabela \ref{tab:aic_bic}
+compara os modelos via critérios de informação. Observa-se que o Modelo
+M2 (Multifatorial Desagregado) minimiza o critério AIC, sugerindo que a
+decomposição dos fundamentos em dimensões de Valor, Qualidade e Risco
+adiciona conteúdo informacional relevante. Contudo, o critério BIC, que
+penaliza mais severamente a complexidade, favorece o modelo parcimonioso
+(M0), indicando que o sinal fundamentalista, embora presente, compete
+com um nível elevado de ruído estocástico.
+
+\input{data/outputs/tables/criterios_informacao.tex}
+
+A Tabela \ref{tab:model_comparison} confronta a performance
+\emph{in-sample} com a capacidade preditiva \emph{out-of-sample}. A
+degradação do \(R^2\) no período de teste (de \textasciitilde0.60 para
+\textasciitilde0.12) é consistente com a literatura de previsibilidade
+de retornos: relações estatísticas tendem a enfraquecer fora da amostra
+de treinamento, evidenciando a natureza adaptativa e não-estacionária do
+processo gerador de dados.
+
+\input{data/outputs/tables/comparacao_modelos.tex}
+
+\hypertarget{dinuxe2mica-temporal-e-decaimento-do-sinal}{%
+\subsection{4.3. Dinâmica Temporal e Decaimento do
+Sinal}\label{dinuxe2mica-temporal-e-decaimento-do-sinal}}
+
+A eficácia da informação fundamentalista não é uniforme no tempo. A
+Figura \ref{fig:decay} e a Tabela \ref{tab:decay} ilustram o decaimento
+do \emph{Information Coefficient} (IC) após a divulgação dos
+demonstrativos financeiros. O poder preditivo é máximo na janela
+imediata (0-5 dias), com IC de 61\%, e decai rapidamente nas semanas
+subsequentes. Este perfil de decaimento corrobora a visão hayekiana de
+que o mercado é um mecanismo processual de descoberta de preços: a
+incorporação da informação não é instantânea, mas ocorre através de um
+processo de arbitragem que consome a vantagem informacional ao longo do
+tempo.
+
+\begin{figure}
+\hypertarget{fig:decay}{%
+\centering
+\includegraphics{images/information_decay_curve.pdf}
+\caption{Curva de Decaimento Informacional: Persistência do Sinal
+Fundamentalista.}\label{fig:decay}
+}
+\end{figure}
+
+\input{data/outputs/tables/tab_decaimento_informacional.tex}
+
+\hypertarget{a-fronteira-nuxe3o-linear-e-adaptativa-m4-e-m5}{%
+\subsection{4.4. A Fronteira Não-Linear e Adaptativa (M4 e
+M5)}\label{a-fronteira-nuxe3o-linear-e-adaptativa-m4-e-m5}}
+
+A limitação dos modelos lineares em capturar a complexidade do processo
+de precificação motiva a adoção de abordagens não-lineares. A aplicação
+de técnicas de \emph{Machine Learning} e modelagem de regimes permite
+relaxar as restrições de linearidade e estacionariedade.
+
+\hypertarget{determinantes-nuxe3o-lineares-xgboost}{%
+\subsubsection{4.4.1. Determinantes Não-Lineares
+(XGBoost)}\label{determinantes-nuxe3o-lineares-xgboost}}
+
+Para capturar não-linearidades, utilizamos um modelo de \emph{Gradient
+Boosting} (XGBoost). A análise de importância de atributos via SHAP
+Values (Figura \ref{fig:shap}) revela a hierarquia de fatores que movem
+o preço. Diferentemente de uma regressão linear que impõe coeficientes
+fixos, o modelo não-linear identifica que o impacto de variáveis
+macroeconômicas (como o Risco País/EMBI) e microeconômicas (como
+métricas de Valor) é condicional ao estado das outras variáveis.
+
+\begin{figure}
+\hypertarget{fig:shap}{%
+\centering
+\includegraphics{images/ml_feature_importance_beeswarm.pdf}
+\caption{SHAP Beeswarm Plot: Impacto das variáveis nos retornos futuros
+(5 dias). Pontos à direita indicam contribuição positiva para o
+retorno.}\label{fig:shap}
+}
+\end{figure}
+
+A Figura \ref{fig:interaction} ilustra a superfície de resposta entre
+Beta e Retorno do Brent. A curvatura da superfície demonstra que a
+sensibilidade do ativo ao preço do petróleo não é constante, mas é
+amplificada em regimes de alto risco sistemático (Beta elevado). Esta
+interação não-linear explica por que modelos de fator único falham em
+momentos de estresse de mercado.
+
+\begin{figure}
+\hypertarget{fig:interaction}{%
+\centering
+\includegraphics{images/interaction_surface_2d.pdf}
+\caption{Superfície de Interação: Retorno Esperado (eixo Z/Cor) em
+função do Beta e do Petróleo.}\label{fig:interaction}
+}
+\end{figure}
+
+\hypertarget{dinuxe2mica-de-regimes-markov-switching}{%
+\subsubsection{4.4.2. Dinâmica de Regimes (Markov
+Switching)}\label{dinuxe2mica-de-regimes-markov-switching}}
+
+A aplicação do modelo \emph{Markov Switching} (MS-DR) identificou dois
+regimes de mercado distintos e persistentes, corroborando a Hipótese dos
+Mercados Adaptativos. A Figura \ref{fig:regime_map} apresenta a evolução
+do preço do ativo condicionada à probabilidade de regime.
+
+\begin{figure}
+\hypertarget{fig:regime_map}{%
+\centering
+\includegraphics{images/markov_regime_map.pdf}
+\caption{Mapa de Regimes de Mercado: A cor da linha indica a
+probabilidade de regime de alta volatilidade (Vermelho) vs.~baixa
+volatilidade (Verde).}\label{fig:regime_map}
+}
+\end{figure}
+
+Os regimes identificados apresentam características estruturais
+divergentes: * \textbf{Regime 0 (Calmaria/Bull):} Caracterizado por
+baixa variância (\(\sigma^2 \approx 3.2\)) e \emph{drift} positivo. Este
+regime tende a prevalecer em períodos de estabilidade macroeconômica e
+clareza regulatória, onde a informação fundamentalista tem maior peso
+relativo. * \textbf{Regime 1 (Crise/Bear):} Caracterizado por variância
+explosiva (\(\sigma^2 \approx 47.8\)) e \emph{drift} negativo. Este
+regime captura choques exógenos e incertezas políticas, momentos em que
+a volatilidade (ruído) domina o sinal fundamentalista.
+
+\hypertarget{suxedntese-avaliauxe7uxe3o-econuxf4mica}{%
+\subsection{4.5. Síntese: Avaliação
+Econômica}\label{suxedntese-avaliauxe7uxe3o-econuxf4mica}}
+
+Para testar a utilidade econômica desses modelos sob a ótica de
+Grossman-Stiglitz --- isto é, se o custo da informação é compensado por
+retornos superiores ---, simulamos uma estratégia de negociação baseada
+nos sinais do modelo XGBoost comparada à estratégia passiva (\emph{Buy
+\& Hold}). A Figura \ref{fig:equity} apresenta as curvas de capital
+resultantes.
+
+\begin{figure}
+\hypertarget{fig:equity}{%
+\centering
+\includegraphics{images/ml_comparison_equity_curve.pdf}
+\caption{Backtest Comparativo: Estratégia ML vs.~Buy \& Hold
+(2021-2025).}\label{fig:equity}
+}
+\end{figure}
+
+A estratégia baseada em ML demonstrou capacidade de gerar retornos
+ajustados ao risco superiores, primariamente através da proteção de
+capital em períodos de alta volatilidade (Regime 1). Este resultado
+oferece evidência favorável à Hipótese dos Mercados Adaptativos:
+ineficiências temporárias e previsíveis emergem e podem ser exploradas
+por modelos capazes de adaptar-se a mudanças de regime, validando a
+premissa de que a análise fundamentalista estruturada adiciona valor
+econômico marginal, ainda que este valor seja condicional ao estado do
+mercado.
 
 \hypertarget{discussuxe3o}{%
-\section{Discussão}\label{discussuxe3o}}
+\section{5. Discussão}\label{discussuxe3o}}
+
+Os resultados empíricos apresentados oferecem uma resposta nuançada à
+pergunta central deste trabalho: a análise fundamentalista estruturada
+adiciona informação ao processo de precificação, mas essa contribuição
+não é constante, linear ou incondicional. A evidência aponta para um
+mercado que opera sob a lógica da Hipótese dos Mercados Adaptativos
+(AMH), alternando entre regimes de eficiência e ineficiência em resposta
+a mudanças ambientais.
+
+\hypertarget{a-ilusuxe3o-da-linearidade-e-a-natureza-do-ruuxeddo}{%
+\subsection{5.1. A Ilusão da Linearidade e a Natureza do
+Ruído}\label{a-ilusuxe3o-da-linearidade-e-a-natureza-do-ruuxeddo}}
+
+A divergência entre os critérios de informação --- com o AIC favorecendo
+o modelo multifatorial (M2) e o BIC favorecendo o modelo parcimonioso
+(M0) --- revela a tensão central na precificação de ativos: a distinção
+entre sinal e ruído. O modelo linear clássico captura a estrutura média
+de correlação, onde o Beta explica a maior parte da variância. A
+informação fundamentalista (Valor, Qualidade) existe e é detectável
+(reduz o AIC), mas sua magnitude é frequentemente ofuscada pela
+volatilidade estocástica do mercado (penalizada pelo BIC).
+
+O colapso do poder explicativo fora da amostra (\(R^2\) caindo de 0.60
+para 0.12) sugere que as relações lineares estimadas \emph{ex-ante} são
+instáveis. Isso corrobora a crítica da Economia da Complexidade: assumir
+que a elasticidade do preço em relação aos fundamentos é constante (um
+\(\beta\) fixo) é uma simplificação excessiva. A análise de superfície
+de resposta (Figura \ref{fig:interaction}) demonstra que o mercado
+precifica o ``Valor'' de forma diferente dependendo do nível de
+``Risco''. Em momentos de estresse (Beta alto), o mercado ignora
+fundamentos de qualidade e reage primordialmente a fatores macro (Risco
+País, Petróleo), um comportamento de ``fuga para a liquidez'' que
+modelos lineares interpretam como erro de previsão.
+
+\hypertarget{eficiuxeancia-adaptativa-o-mercado-como-sistema-de-regimes}{%
+\subsection{5.2. Eficiência Adaptativa: O Mercado como Sistema de
+Regimes}\label{eficiuxeancia-adaptativa-o-mercado-como-sistema-de-regimes}}
+
+A identificação de dois regimes de volatilidade distintos via Markov
+Switching oferece a explicação teórica mais robusta para os achados. O
+mercado não é ``eficiente'' ou ``ineficiente'' em abstrato; ele exibe
+eficiência variável dependendo do estado.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{No Regime 0 (Calmaria),} a volatilidade é baixa e o mercado
+  aproxima-se da eficiência hayekiana: os preços incorporam gradualmente
+  as informações fundamentais, e o \emph{Information Coefficient} é
+  positivo.
+\item
+  \textbf{No Regime 1 (Crise),} a volatilidade explode e a eficiência
+  informacional colapsa. O ruído domina o sinal, e o comportamento de
+  manada (\emph{herding}) prevalece sobre a análise racional.
+\end{itemize}
+
+Este achado valida a proposição de Lo (2004): a eficiência é uma
+característica dinâmica. Estratégias fundamentalistas que funcionam no
+Regime 0 podem falhar catastroficamente no Regime 1 se não incorporarem
+mecanismos de adaptação ao risco.
+
+\hypertarget{o-paradoxo-de-grossman-stiglitz-revisitado}{%
+\subsection{5.3. O Paradoxo de Grossman-Stiglitz
+Revisitado}\label{o-paradoxo-de-grossman-stiglitz-revisitado}}
+
+O teste econômico da estratégia baseada em Machine Learning lança luz
+sobre o Paradoxo de Grossman-Stiglitz. A estratégia gerou retorno
+superior ao \emph{benchmark} (Alpha positivo), mas esse retorno não
+adveio de uma capacidade mágica de prever cada movimento de preço. Pelo
+contrário, a vantagem adveio da capacidade de \emph{evitar} perdas nos
+regimes de alta volatilidade.
+
+Isso sugere uma reinterpretação do ``custo da informação''. O
+investimento em análise fundamentalista sofisticada (Q-VAL + ML) é
+compensado não por lucros fáceis em mercados de alta, mas pela proteção
+de capital em mercados de baixa. A ineficiência que permite o lucro não
+é uma falha de mercado, mas um prêmio pela capacidade de processar
+informações complexas e não-lineares que o investidor médio (linear)
+ignora.
+
+\hypertarget{implicauxe7uxf5es-para-a-avaliauxe7uxe3o-de-ativos-em-mercados-emergentes}{%
+\subsection{5.4. Implicações para a Avaliação de Ativos em Mercados
+Emergentes}\label{implicauxe7uxf5es-para-a-avaliauxe7uxe3o-de-ativos-em-mercados-emergentes}}
+
+Para o caso específico da Petrobras (PETR4), os resultados destacam a
+primazia dos fatores macroeconômicos e de risco sistemático sobre os
+fundamentos idiossincráticos no curto prazo. A alta curtose e a
+importância dominante do Risco País (EMBI) e do Petróleo (Brent) indicam
+que, para ativos em mercados emergentes, a ``Qualidade'' e o ``Valor''
+são condições necessárias, mas não suficientes, para a performance. O
+mercado exige um prêmio de risco variável para carregar o ativo, e esse
+prêmio flutua drasticamente com o ciclo político e econômico.
+
+Em suma, a análise fundamentalista adiciona valor, todavia, esse valor é
+estritamente condicional ao regime de mercado vigente. O investidor que
+ignora a dinâmica de regimes e confia cegamente em múltiplos estáticos
+(como P/L histórico) está fadado a subestimar os riscos de cauda. A
+integração de métricas de qualidade com modelos adaptativos de risco
+representa, portanto, a fronteira da prática de \emph{valuation}
+rigorosa.
 
 \hypertarget{conclusuxe3o}{%
-\section{Conclusão}\label{conclusuxe3o}}
+\section{6. Conclusão}\label{conclusuxe3o}}
+
+Este estudo investigou a estrutura informacional do mercado de capitais
+brasileiro através de uma análise empírica da Petrobras (PETR4),
+confrontando a Hipótese dos Mercados Eficientes com a perspectiva dos
+Mercados Adaptativos. A construção e teste do motor Q-VAL permitiram
+isolar a contribuição marginal da informação fundamentalista sobre o
+modelo de mercado tradicional.
+
+Os resultados indicam que a eficiência de mercado não é um estado
+binário, mas um processo dinâmico e dependente de regime. Enquanto
+modelos lineares (CAPM e Multifatoriais) capturam a estrutura média de
+retornos, eles falham em explicar a dinâmica de preços em períodos de
+estresse, onde a não-linearidade e a interação entre variáveis
+macroeconômicas tornam-se dominantes. A superioridade do modelo de
+\emph{Machine Learning} e a identificação de regimes de volatilidade via
+\emph{Markov Switching} confirmam que o mercado alterna entre períodos
+de coordenação eficiente e períodos de ruído comportamental.
+
+Conclui-se que a análise fundamentalista estruturada possui valor
+econômico, validando a premissa de Grossman-Stiglitz; contudo, sua
+eficácia não deriva da mera disponibilidade de dados, mas da
+sofisticação do processamento. A vantagem informacional reside na
+capacidade de navegar a complexidade e a não-estacionariedade,
+transformando dados brutos em sinal adaptativo. Para o investidor em
+mercados emergentes, a lição é clara: a busca por ``Alpha'' não reside
+apenas na identificação de ativos baratos, mas na compreensão dos
+regimes de risco que governam a precificação desses ativos.
+
+Pesquisas futuras podem expandir esta metodologia para uma cesta
+diversificada de ativos, testar arquiteturas de \emph{Deep Learning}
+(como LSTMs) para captura de dependências temporais de longo prazo, e
+incorporar dados não-estruturados (análise de sentimento de notícias)
+para enriquecer o conjunto informacional do motor Q-VAL, avançando na
+fronteira da \emph{Natural Language Processing} aplicada a finanças.
 
 \hypertarget{referuxeancias}{%
 \section*{Referências}\label{referuxeancias}}
 \addcontentsline{toc}{section}{Referências}
 
 \hypertarget{refs}{}
-\begin{CSLReferences}{0}{0}
+\begin{CSLReferences}{0}{1}
+\leavevmode\vadjust pre{\hypertarget{ref-arthurBoundedRationalityElArol1994}{}}%
+ARTHUR, W. Brian. Inductive Reasoning and Bounded Rationality.
+\textbf{American Economic Review}, v. 84, n. 2, p. 406--411, 1994.
+
+\leavevmode\vadjust pre{\hypertarget{ref-arthurComplexityEconomy2014}{}}%
+ARTHUR, W. Brian. \textbf{Complexity and the Economy}.
+\emph{{[}S.l.{]}}: Oxford University Press, 2014.
+
+\leavevmode\vadjust pre{\hypertarget{ref-arthurComplexityEconomics2021}{}}%
+ARTHUR, W. Brian. Foundations of Complexity Economics. \textbf{Nature
+Reviews Physics}, v. 3, p. 136--145, 2021.
+
+\leavevmode\vadjust pre{\hypertarget{ref-asnessSizeValueQuality2014}{}}%
+ASNESS, Clifford S.; FRAZZINI, Andrea; PEDERSEN, Lasse Heje. Quality
+Minus Junk. \textbf{Review of Accounting Studies}, v. 24, n. 1, p.
+34--112, a2019.
+
+\leavevmode\vadjust pre{\hypertarget{ref-asnessSizeValueQuality2019}{}}%
+ASNESS, Clifford S.; FRAZZINI, Andrea; PEDERSEN, Lasse Heje. Quality
+Minus Junk. \textbf{Review of Accounting Studies}, v. 24, n. 1, p.
+34--112, b2019.
+
+\leavevmode\vadjust pre{\hypertarget{ref-asnesValueMomentumEverywhere2013}{}}%
+ASNESS, Clifford S.; MOSKOWITZ, Tobias J.; PEDERSEN, Lasse Heje. Value
+and Momentum Everywhere. \textbf{The Journal of Finance}, v. 68, n. 3,
+p. 929--985, 2013.
+
+\leavevmode\vadjust pre{\hypertarget{ref-bikhchandaniTheoryFadsCustom1992}{}}%
+BIKHCHANDANI, Sushil; HIRSHLEIFER, David; WELCH, Ivo. A Theory of Fads,
+Fashion, Custom, and Cultural Change as Informational Cascades.
+\textbf{Journal of Political Economy}, v. 100, n. 5, p. 992--1026, 1992.
+
+\leavevmode\vadjust pre{\hypertarget{ref-shimirovichSocialMediaStock2011}{}}%
+BOLLEN, Johan; MAO, Huina; ZENG, Xiaojun. Twitter Mood Predicts the
+Stock Market. \textbf{Journal of Computational Science}, v. 2, n. 1, p.
+1--8, 2011.
+
+\leavevmode\vadjust pre{\hypertarget{ref-buckheitWaveLab1995}{}}%
+BUCKHEIT, Jonathan B.; DONOHO, David L. WaveLab and Reproducible
+Research. \textbf{Wavelets and Statistics}, p. 55--81, 1995.
+
+\leavevmode\vadjust pre{\hypertarget{ref-colinjaegerEfficientMarketHypothesis2020}{}}%
+COLIN-JAEGER, Nathanaël; DELCEY, Thomas. When Efficient Market
+Hypothesis Meets Hayek on Information: Beyond a Methodological Reading.
+\textbf{Journal of Economic Methodology}, v. 27, n. 2, p. 97--116, 2020.
+
+\leavevmode\vadjust pre{\hypertarget{ref-famaEfficientCapitalMarkets1970}{}}%
+FAMA, Eugene F. Efficient Capital Markets: A Review of Theory and
+Empirical Work. \textbf{The Journal of Finance}, v. 25, n. 2, p.
+383--417, 1970.
+
+\leavevmode\vadjust pre{\hypertarget{ref-fama1998MarketEfficiencyLongterm}{}}%
+FAMA, Eugene F. Market Efficiency, Long-Term Returns, and Behavioral
+Finance. \textbf{Journal of Financial Economics}, v. 49, n. 3, p.
+283--306, 1998.
+
+\leavevmode\vadjust pre{\hypertarget{ref-famaCommonRiskFactors1993}{}}%
+FAMA, Eugene F.; FRENCH, Kenneth R. Common Risk Factors in the Returns
+on Stocks and Bonds. \textbf{Journal of Financial Economics}, v. 33, n.
+1, p. 3--56, 1993.
+
+\leavevmode\vadjust pre{\hypertarget{ref-famaFivefactorAssetPricing2015}{}}%
+FAMA, Eugene F.; FRENCH, Kenneth R. A Five-Factor Asset Pricing Model.
+\textbf{Journal of Financial Economics}, v. 116, n. 1, p. 1--22, 2015.
+
+\leavevmode\vadjust pre{\hypertarget{ref-glostenBidAskSpread1985}{}}%
+GLOSTEN, Lawrence R.; MILGROM, Paul R. Bid, Ask and Transaction Prices
+in a Specialist Market with Heterogeneously Informed Traders.
+\textbf{Journal of Financial Economics}, v. 14, n. 1, p. 71--100, 1985.
+
+\leavevmode\vadjust pre{\hypertarget{ref-grahamSecurityAnalysis1934}{}}%
+GRAHAM, Benjamin; DODD, David L. \textbf{Security Analysis}.
+\emph{{[}S.l.{]}}: McGraw-Hill, 1934.
+
+\leavevmode\vadjust pre{\hypertarget{ref-grayQuantitativeValuePractitioners2012}{}}%
+GRAY, Wesley R.; CARLISLE, Tobias E. \textbf{Quantitative Value: A
+Practitioner's Guide to Automating Intelligent Investment and
+Eliminating Behavioral Errors}. \emph{{[}S.l.{]}}: Wiley, 2012.
+
+\leavevmode\vadjust pre{\hypertarget{ref-grossmanImpossibilityInformationallyEfficient1980}{}}%
+GROSSMAN, Sanford J.; STIGLITZ, Joseph E. On the Impossibility of
+Informationally Efficient Markets. \textbf{American Economic Review}, v.
+70, n. 3, p. 393--408, 1980.
+
+\leavevmode\vadjust pre{\hypertarget{ref-gruberAnotherPuzzleGrowth1996}{}}%
+GRUBER, Martin J. Another Puzzle: The Growth in Actively Managed Mutual
+Funds. \textbf{The Journal of Finance}, v. 51, n. 3, p. 783--810, 1996.
+
+\leavevmode\vadjust pre{\hypertarget{ref-guEmpiricalAssetPricing2020}{}}%
+GU, Shihao; KELLY, Bryan; XIU, Dacheng. Empirical Asset Pricing via
+Machine Learning. \textbf{The Review of Financial Studies}, v. 33, n. 5,
+p. 2223--2273, 2020.
+
+\leavevmode\vadjust pre{\hypertarget{ref-harveyReplicationCrossSection2016}{}}%
+HARVEY, Campbell R.; LIU, Yan; ZHU, Heqing. and the Cross-Section of
+Expected Returns. \textbf{The Review of Financial Studies}, v. 29, n. 1,
+p. 5--68, 2016.
+
+\leavevmode\vadjust pre{\hypertarget{ref-hayekUseKnowledgeSociety1945}{}}%
+HAYEK, Friedrich A. The Use of Knowledge in Society. \textbf{American
+Economic Review}, v. 35, n. 4, p. 519--530, 1945.
+
+\leavevmode\vadjust pre{\hypertarget{ref-hellwigAggregatingInformationPredict2009}{}}%
+HELLWIG, Christian; VELDKAMP, Laura. Knowing What Others Know:
+Coordination Motives in Information Acquisition. \textbf{The Review of
+Economic Studies}, v. 76, n. 1, p. 223--251, 2009.
+
+\leavevmode\vadjust pre{\hypertarget{ref-hirshleifer2023SocialContagion}{}}%
+HIRSHLEIFER, David; LO, Andrew W.; ZHANG, Ruixun. Social Contagion and
+the Survival of Diverse Investment Styles. \textbf{Journal of Economic
+Dynamics and Control}, v. 154, p. 104710, 2023.
+
+\leavevmode\vadjust pre{\hypertarget{ref-jaaborImpactInsiderTrading2004}{}}%
+JAFFE, Jeffrey F. Special Information and Insider Trading. \textbf{The
+Journal of Business}, v. 47, n. 3, p. 410--428, 1974.
+
+\leavevmode\vadjust pre{\hypertarget{ref-jegadeeshReturnsBuyingWinners1993}{}}%
+JEGADEESH, Narasimhan; TITMAN, Sheridan. Returns to Buying Winners and
+Selling Losers: Implications for Stock Market Efficiency. \textbf{The
+Journal of Finance}, v. 48, n. 1, p. 65--91, 1993.
+
+\leavevmode\vadjust pre{\hypertarget{ref-kucharCompetitionSociallyExtended2025}{}}%
+KUCHAR, Pavel. Competition as Socially Extended Cognition.
+\textbf{Working Paper}, 2025.
+
+\leavevmode\vadjust pre{\hypertarget{ref-kyleInformedSpeculationImperfect1989}{}}%
+KYLE, Albert S. Informed Speculation with Imperfect Competition.
+\textbf{The Review of Economic Studies}, v. 56, n. 3, p. 317--355, 1989.
+
+\leavevmode\vadjust pre{\hypertarget{ref-leBaron2006AgentBasedComputational}{}}%
+LEBARON, Blake. Agent-Based Computational Finance. \emph{In}:
+TESFATSION, Leigh; JUDD, Kenneth L. (Orgs.). \textbf{Handbook of
+Computational Economics}. \emph{{[}S.l.{]}}: Elsevier, 2006. v. 2 p.
+1187--1233.
+
+\leavevmode\vadjust pre{\hypertarget{ref-loAdaptiveMarketsHypothesis2004}{}}%
+LO, Andrew W. The Adaptive Markets Hypothesis. \textbf{Journal of
+Portfolio Management}, v. 30, n. 5, p. 15--29, 2004.
+
+\leavevmode\vadjust pre{\hypertarget{ref-loAdaptiveMarketsHypothesis2024}{}}%
+LO, Andrew W.; ZHANG, Ruixun. \textbf{The Adaptive Markets Hypothesis:
+An Evolutionary Approach to Understanding Financial System Dynamics}.
+\emph{{[}S.l.{]}}: Oxford University Press, 2024.
+
+\leavevmode\vadjust pre{\hypertarget{ref-mcleanDoesAcademicResearch2016}{}}%
+MCLEAN, R. David; PONTIFF, Jeffrey. Does Academic Research Destroy Stock
+Return Predictability? \textbf{The Journal of Finance}, v. 71, n. 1, p.
+5--32, 2016.
+
+\leavevmode\vadjust pre{\hypertarget{ref-novy-marxOtherSideValue2013}{}}%
+NOVY-MARX, Robert. The Other Side of Value: The Gross Profitability
+Premium. \textbf{Journal of Financial Economics}, v. 108, n. 1, p.
+1--28, 2013.
+
+\leavevmode\vadjust pre{\hypertarget{ref-pastushkovEvolutionaryModelFinancial2024}{}}%
+PASTUSHKOV, Ivan. An Evolutionary Model of Financial Market Efficiency
+with Costly Information. \textbf{HSE Economic Journal}, v. 28, n. 4, p.
+508--534, 2024.
+
+\leavevmode\vadjust pre{\hypertarget{ref-sorosAlchemyFinance1987}{}}%
+SOROS, George. \textbf{The Alchemy of Finance: Reading the Mind of the
+Market}. \emph{{[}S.l.{]}}: Simon \& Schuster, 1987.
+
+\leavevmode\vadjust pre{\hypertarget{ref-stiglitzKosenkoEconomicsInformation2024}{}}%
+STIGLITZ, Joseph E.; KOSENKO, Andrew. \textbf{The Economics of
+Information}. \emph{{[}S.l.{]}}: National Bureau of Economic Research,
+2024.
+
+\leavevmode\vadjust pre{\hypertarget{ref-verrecchiaInformationAcquisitionCapital1982}{}}%
+VERRECCHIA, Robert E. Information Acquisition in a Noisy Rational
+Expectations Economy. \textbf{Econometrica}, v. 50, n. 6, p. 1415--1430,
+1982.
+
 \end{CSLReferences}
 
 %% --------------------------------------------------------------------------
 %% BIBLIOGRAFIA
 %% --------------------------------------------------------------------------
+\newpage
+\bibliography{references.bib}
 
 \end{document}

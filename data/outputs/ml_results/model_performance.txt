@@ -1,0 +1,5 @@
+XGBoost Model Performance (R²)
+==============================
+1 Day Horizon:   -0.0131
+5 Day Horizon:   0.1295
+21 Day Horizon:  -0.3585

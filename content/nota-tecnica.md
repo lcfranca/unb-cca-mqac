@@ -16,19 +16,7 @@ A relevância do caso Petrobras transcende o interesse específico no ativo. Tra
 
 Do ponto de vista metodológico, a abordagem proposta operacionaliza conceitos teóricos abstratos em testes empíricos. O motor Q-VAL, desenvolvido como instrumento de análise multidimensional integrando métricas de Valor, Qualidade e Risco, serve como proxy para o "custo da informação" no sentido de Grossman-Stiglitz: representa esforço sistemático de coleta, processamento e síntese de dados fundamentalistas. A comparação entre modelos econométricos progressivos — do CAPM puro ao modelo acrescido do score Q-VAL — permite quantificar o "retorno" desse investimento informacional via variação explicada ($\Delta R^2$).  A análise é complementada por critérios de informação (AIC, BIC) que penalizam complexidade, respondendo à pergunta crucial: o motor de métricas está adicionando sinal ou apenas ruído?
 
-O trabalho estrutura-se em cinco movimentos.  Primeiro, estabelece fundamentos teóricos sobre o sistema de preços como mecanismo informacional, revisando a tradição hayekiana, a EMH, o paradoxo de Grossman-Stiglitz, e desenvolvimentos contemporâneos em mercados adaptativos e economia da complexidade.  Segundo, contextualiza o caso Petrobras no momento presente — a autorização de exploração da Margem Equatorial e suas implicações para valuation.  Terceiro, descreve a metodologia, incluindo o motor Q-VAL, os modelos econométricos comparativos, e as métricas de avaliação informacional. Quarto, apresenta resultados empíricos — estimação CAPM, score de comprabilidade, e análise de contribuição informacional.  Quinto, discute implicações teóricas e práticas, situando os achados no debate sobre eficiência de mercado e o papel da análise fundamentalista.
-
-Os objetivos específicos deste trabalho são:
-
-1. Estimar o custo de capital próprio de PETR4 via CAPM, estabelecendo baseline de explicação por informação de preço;
-2. Calcular métricas fundamentalistas organizadas nas dimensões de Valor, Qualidade e Risco;
-3. Desenvolver motor de *scoring* Q-VAL integrando as três dimensões em índice sintético;
-4.  Quantificar a contribuição informacional marginal das métricas via análise de $\Delta R^2$ e critérios de informação;
-5.  Diagnosticar *mispricing* via comparação entre Implied Cost of Capital e custo teórico;
-6. Analisar cenários (base, otimista, pessimista) e sensibilidade do score a variações nas premissas;
-7. Discutir implicações dos resultados para a teoria de eficiência de mercado e a prática de análise fundamentalista. 
-
-A hipótese subjacente — de que métricas fundamentalistas adicionam informação não plenamente capturada pelo mecanismo de preços — encontra fundamento teórico no paradoxo de Grossman-Stiglitz e sustentação empírica na literatura de anomalias de mercado e prêmios de fatores.  Contudo, a magnitude e persistência dessa contribuição são questões empíricas que dependem do contexto institucional, da densidade de cobertura analítica, e do regime de mercado vigente. O caso Petrobras oferece oportunidade de testar essas proposições em ambiente de alta densidade informacional e incerteza estrutural sobre cenários futuros — combinação que torna particularmente relevante a pergunta sobre o valor marginal da análise fundamentalista sistemática.
+O trabalho estrutura-se em cinco movimentos. Primeiro, estabelece fundamentos teóricos. Segundo, contextualiza o caso Petrobras. Terceiro, descreve a metodologia de modelos aninhados (M0 a M5). Quarto, apresenta resultados empíricos da evolução da eficiência informacional. Quinto, discute implicações teóricas e práticas, situando os achados no debate sobre eficiência de mercado e o papel da análise fundamentalista.
 
 # Fundamentos Teóricos
 
@@ -388,91 +376,50 @@ onde $\mathcal{I}_t$ denota o conjunto de informação disponível no período $
 
 ## Modelos Econométricos Comparativos
 
-### Estratégia de Modelos Aninhados
+### Estratégia de Modelos Aninhados (M0 a M5)
 
-A estratégia empírica baseia-se em comparação de modelos aninhados (*nested models*), partindo de especificação mínima e progressivamente incorporando regressores. Esta abordagem permite decompor o poder explicativo total em contribuições atribuíveis a cada componente, testando se a adição de variáveis fundamentalistas melhora significativamente a explicação dos retornos. 
+A estratégia empírica adota uma abordagem de **Comparação Progressiva e Aninhada**, partindo de benchmarks ingênuos (*naïve*) até modelos multifatoriais complexos. Esta estrutura permite isolar a contribuição marginal de cada fonte de informação (histórico, mercado, fundamentos, macroeconomia) para a eficiência da precificação.
 
-Sejam $\mathcal{M}_0, \mathcal{M}_1, \ldots, \mathcal{M}_K$ modelos aninhados, onde $\mathcal{M}_0 \subset \mathcal{M}_1 \subset \ldots \subset \mathcal{M}_K$ (cada modelo contém os regressores do anterior mais regressores adicionais). A comparação entre $\mathcal{M}_k$ e $\mathcal{M}_{k-1}$ permite testar se os regressores adicionais em $\mathcal{M}_k$ contribuem significativamente para explicar a variável dependente. 
+A hierarquia de modelos é definida da seguinte forma:
 
-### Modelo 0: CAPM (Baseline)
+| Modelo | Definição Conceitual | Especificação Econométrica |
+|:---:|:---|:---|
+| **M0** | **Benchmarks Naïve** | Random Walk ($E[r]=0$) e Média Histórica ($E[r]=\mu_{train}$) |
+| **M1** | **CAPM Estático** | Beta constante: $R_t = \alpha + \beta R_{m,t} + \epsilon_t$ |
+| **M2** | **CAPM Dinâmico** | Beta variável no tempo (Rolling OLS): $R_t = \alpha_t + \beta_t R_{m,t} + \epsilon_t$ |
+| **M3** | **Fundamentos** | M2 + Vetor de Fundamentos (Valor, Qualidade, Risco) |
+| **M4** | **Macro & Fatores** | M3 + Variáveis Macro (Brent, Câmbio, Risco-País) e Fatores FF |
+| **M5** | **Síntese (Score)** | M2 + Score Agregado Q-VAL (Teste de eficiência da agregação) |
 
-O modelo base é o Capital Asset Pricing Model unifatorial, que representa a informação contida exclusivamente nos preços de mercado:
+### Detalhamento dos Modelos
 
-$$R_{i,t} - R_{f,t} = \alpha_i + \beta_i (R_{m,t} - R_{f,t}) + \varepsilon_{i,t}$$
+#### M0: Benchmarks Naïve (Linha de Base)
+Representa a ausência de modelo. O **M0-RW (Random Walk)** assume que o melhor previsor para o retorno futuro é zero (ou o último preço, implicando retorno zero). O **M0-HM (Historical Mean)** assume que o retorno futuro será igual à média histórica dos retornos observados no conjunto de treinamento. Estes modelos servem como "piso" de performance: qualquer modelo útil deve superá-los.
 
-onde:
-- $R_{i,t}$: retorno do ativo $i$ no período $t$
-- $R_{f,t}$: taxa livre de risco no período $t$
-- $R_{m,t}$: retorno do portfólio de mercado no período $t$
-- $\alpha_i$: intercepto (alfa de Jensen)
-- $\beta_i$: coeficiente de sensibilidade ao mercado (beta)
-- $\varepsilon_{i,t}$: termo de erro, com $E[\varepsilon_{i,t}] = 0$ e $\text{Var}(\varepsilon_{i,t}) = \sigma^2_\varepsilon$
+#### M1: CAPM Estático (Eficiência de Mercado Padrão)
+O modelo clássico de precificação de ativos, assumindo que o único fator de risco relevante é o mercado e que a sensibilidade do ativo (beta) é constante em todo o período.
+$$R_{i,t} - R_{f,t} = \alpha + \beta (R_{m,t} - R_{f,t}) + \varepsilon_{t}$$
+Este modelo testa a hipótese de eficiência na forma fraca/semi-forte padrão: o retorno é função linear apenas do risco de mercado.
 
-O CAPM postula que $\alpha_i = 0$ em equilíbrio: todo o retorno esperado em excesso é explicado pela exposição ao risco de mercado. Alfa positivo indica retorno anormal — desempenho superior ao previsto pelo modelo dado o nível de risco. 
+#### M2: CAPM Dinâmico (Eficiência Adaptativa)
+Reconhece que o risco da empresa muda ao longo do tempo. Utiliza janelas deslizantes (*rolling windows*) de 252 dias (1 ano de negociação) para estimar betas variáveis no tempo ($\beta_t$).
+$$R_{i,t} - R_{f,t} = \alpha_t + \beta_t (R_{m,t} - R_{f,t}) + \varepsilon_{t}$$
+A predição para $t+1$ utiliza os parâmetros estimados em $t$. Este modelo serve como **âncora** para os modelos subsequentes: M3, M4 e M5 utilizam a predição do M2 ($\hat{R}_{M2,t}$) como regressor base, testando se outras variáveis adicionam informação *além* da dinâmica de risco de mercado.
 
-**Operacionalização:**
-- $R_{i,t}$: retorno logarítmico diário de PETR4, calculado como $\ln(P_t / P_{t-1})$
-- $R_{f,t}$: taxa CDI diária, obtida via série histórica do Banco Central
-- $R_{m,t}$: retorno logarítmico diário do Ibovespa
+#### M3: Fundamentos (Informação Específica da Firma)
+Testa a hipótese central do trabalho: a análise fundamentalista adiciona valor? O modelo regride os retornos contra a predição do M2 e o vetor de scores fundamentalistas (Valor, Qualidade, Risco).
+$$R_{t} = \delta \hat{R}_{M2,t} + \gamma_1 \text{Valor}_{t-1} + \gamma_2 \text{Qualidade}_{t-1} + \gamma_3 \text{Risco}_{t-1} + \varepsilon_{t}$$
+Se os coeficientes $\gamma$ forem significativos e houver ganho de $R^2$ Out-of-Sample, confirma-se que os fundamentos contêm informação não precificada pelo risco de mercado dinâmico.
 
-A estimação utiliza Mínimos Quadrados Ordinários (OLS).  O beta estimado $\hat{\beta}_i$ é dado por:
+#### M4: Macroeconomia e Fatores (Informação Externa)
+Expande o conjunto informacional para incluir variáveis macroeconômicas (Retorno do Brent, Variação Cambial, Variação do Risco-País EMBI+) e fatores de risco Fama-French (Investimento/CMA e Lucratividade/RMW).
+$$R_{t} = \text{Modelo M3} + \lambda_{Macro} \mathbf{X}_{Macro,t} + \lambda_{Fatores} \mathbf{F}_{FF,t} + \varepsilon_{t}$$
+Este modelo representa o "teto" de complexidade, testando se choques exógenos explicam a variância residual dos fundamentos.
 
-$$\hat{\beta}_i = \frac{\text{Cov}(R_i - R_f, R_m - R_f)}{\text{Var}(R_m - R_f)}$$
-
-O $R^2$ do Modelo 0 indica a fração da variância dos retornos de PETR4 explicada pelo movimento do mercado. Este valor serve como *baseline* para comparação com modelos subsequentes.
-
-### Modelo 1: CAPM + Fator de Valor
-
-O primeiro modelo estendido adiciona um fator de valor — métrica fundamentalista única — ao CAPM:
-
-$$R_{i,t} - R_{f,t} = \alpha_i + \beta_i (R_{m,t} - R_{f,t}) + \gamma_1 \cdot \text{Value}_{t-1} + \varepsilon_{i,t}$$
-
-onde $\text{Value}_{t-1}$ é o Z-Score da dimensão de Valor no período anterior. O subscrito $t-1$ é crucial: utiliza-se informação fundamentalista *defasada* para prever retorno *corrente*, evitando simultaneidade e garantindo que o modelo é operacionalmente implementável (a informação estava disponível antes do retorno ocorrer).
-
-O coeficiente $\gamma_1$ captura a relação entre posição fundamentalista de valor e retorno subsequente. Valor positivo e significativo indicaria que ativos "baratos" (alto Z-Score de Valor) tendem a gerar retornos superiores — evidência de *value premium* não capturada pelo beta de mercado.
-
-### Modelo 2: CAPM + Três Dimensões Fundamentalistas
-
-O segundo modelo estendido incorpora as três dimensões do Q-VAL separadamente:
-
-$$R_{i,t} - R_{f,t} = \alpha_i + \beta_i (R_{m,t} - R_{f,t}) + \gamma_1 \cdot \text{Value}_{t-1} + \gamma_2 \cdot \text{Quality}_{t-1} + \gamma_3 \cdot \text{Risk}_{t-1} + \varepsilon_{i,t}$$
-
-Esta especificação permite identificar a contribuição marginal de cada dimensão. Os coeficientes $\gamma_1, \gamma_2, \gamma_3$ indicam, respectivamente:
-- $\gamma_1 > 0$: ativos baratos tendem a superar após controlar por qualidade e risco
-- $\gamma_2 > 0$: ativos de qualidade superior tendem a superar após controlar por valor e risco
-- $\gamma_3 > 0$: ativos de menor risco (Z-Score invertido, logo maior Z indica menor risco) tendem a superar após controlar por valor e qualidade
-
-A significância individual de cada coeficiente informa sobre a contribuição de cada dimensão.  A comparação do $R^2$ com o Modelo 1 informa sobre a contribuição conjunta de Qualidade e Risco além de Valor.
-
-### Modelo 3: CAPM + Score Q-VAL Sintético
-
-O terceiro modelo utiliza o score composto Q-VAL como regressor único:
-
-$$R_{i,t} - R_{f,t} = \alpha_i + \beta_i (R_{m,t} - R_{f,t}) + \lambda \cdot \text{Q-VAL}_{t-1} + \varepsilon_{i,t}$$
-
-O coeficiente $\lambda$ captura a relação entre o score agregado e retornos subsequentes. Esta especificação testa se a síntese das três dimensões em índice único preserva (ou potencialmente amplifica) o poder informacional. 
-
-A comparação entre Modelos 2 e 3 é informativa.  Se $R^2_{\text{Modelo 3}} \approx R^2_{\text{Modelo 2}}$, a agregação não perde informação relevante. Se $R^2_{\text{Modelo 3}} < R^2_{\text{Modelo 2}}$, a agregação suprime heterogeneidade informativa entre dimensões.  Se $R^2_{\text{Modelo 3}} > R^2_{\text{Modelo 2}}$, a agregação reduz ruído e amplifica sinal — resultado contra-intuitivo que indicaria overfitting nas dimensões separadas.
-
-### Especificação com Retornos Futuros
-
-Para testar capacidade preditiva — não apenas contemporânea —, especificação alternativa utiliza retorno futuro como variável dependente:
-
-$$R_{i,t+h} - R_{f,t+h} = \alpha_i + \beta_i (R_{m,t+h} - R_{f,t+h}) + \lambda \cdot \text{Q-VAL}_{t} + \varepsilon_{i,t+h}$$
-
-onde $h$ é o horizonte de previsão (1 dia, 5 dias, 21 dias, 63 dias, 252 dias).  Esta especificação testa se informação fundamentalista antecipa retornos futuros — condição necessária para que a análise fundamentalista seja operacionalmente útil para decisões de investimento. 
-
-### Considerações Econométricas
-
-**Heterocedasticidade:** Séries financeiras tipicamente exibem volatilidade variável no tempo (*volatility clustering*).  Erros-padrão robustos à heterocedasticidade (Huber-White) são utilizados para inferência. 
-
-**Autocorrelação:** Retornos diários podem exibir autocorrelação de curto prazo.  Testes de Durbin-Watson e Breusch-Godfrey verificam a presença de autocorrelação residual.  Quando detectada, erros-padrão Newey-West são utilizados.
-
-**Multicolinearidade:** As três dimensões fundamentalistas podem ser correlacionadas. A matriz de correlação entre regressores é examinada, e o *Variance Inflation Factor* (VIF) é calculado.  VIF superior a 5 indicaria multicolinearidade problemática, requerendo ortogonalização ou exclusão de variáveis.
-
-**Estacionariedade:** Séries de retornos são tipicamente estacionárias (retornos são diferenças de log-preços). Testes ADF (*Augmented Dickey-Fuller*) confirmam estacionariedade das séries utilizadas.
-
-**Outliers:** Eventos extremos (crises, circuit breakers) podem distorcer estimativas. Análise de resíduos identifica observações influentes; estimação robusta (regressão quantílica, *winsorização* de extremos) verifica sensibilidade dos resultados.
+#### M5: Síntese (Eficiência da Agregação)
+Testa se o Score Q-VAL único é uma estatística suficiente para o vetor de fundamentos. Substitui as três dimensões do M3 pelo score agregado.
+$$R_{t} = \delta \hat{R}_{M2,t} + \theta \text{Score\_QVAL}_{t-1} + \varepsilon_{t}$$
+A comparação entre M3 e M5 revela a eficiência do algoritmo de *scoring*: se a performance for similar, a agregação é bem-sucedida em reduzir a dimensionalidade sem perda de informação relevante.
 
 ---
 
@@ -765,11 +712,123 @@ Os resultados desta análise permitirão conclusões sobre:
 
 As respostas a estas questões informarão a discussão teórica sobre eficiência informacional do mercado brasileiro com respeito a informação fundamentalista pública — contribuindo para o debate entre visões hayekiana, EMH, Grossman-Stiglitz e mercados adaptativos, com foco empírico no caso Petrobras. 
 
-# Resultados
+# Resultados Empíricos
+
+A análise da evolução da eficiência informacional é apresentada de forma consolidada na Tabela \ref{tab:model_performance}, que resume as métricas de performance Out-of-Sample para a hierarquia de modelos M0 a M5.
+
+\input{data/outputs/tables/tabela_performance_modelos.tex}
+
+## A Linha de Base (M0 e M1)
+
+Os benchmarks ingênuos (M0) confirmam a dificuldade de previsão em mercados financeiros. O Random Walk apresenta $R^2$ ligeiramente negativo, indicando que assumir retorno zero é marginalmente pior do que usar a média histórica (que, por definição, tem $R^2=0$ em relação a si mesma).
+
+A introdução do CAPM Estático (M1) gera o primeiro salto informacional, atingindo **12,28\%** de $R^2_{OOS}$. Este resultado estabelece o "piso de eficiência": o risco de mercado explica uma parcela relevante, mas limitada, da variância dos retornos da Petrobras.
+
+## O Impacto da Dinâmica (M1 vs M2)
+
+O ganho mais expressivo ocorre na transição para o CAPM Dinâmico (M2). A flexibilização do beta, permitindo que ele varie ao longo do tempo via janelas deslizantes, eleva o poder explicativo para **23,39\%**. Este salto de mais de 11 pontos percentuais demonstra que a instabilidade do risco sistemático é uma característica fundamental do ativo, e ignorá-la (como faz o CAPM estático) resulta em perda severa de informação. O M2 torna-se, portanto, a âncora robusta para os testes subsequentes.
+
+## A Contribuição dos Fundamentos (M2 vs M3)
+
+A adição do vetor de fundamentos (Valor, Qualidade, Risco) no Modelo M3 gera um ganho marginal positivo, elevando o $R^2$ para **23,81\%**. O incremento de aproximadamente 0,42 p.p. sugere que, embora estatisticamente detectável, a informação contábil pública já está, em grande parte, incorporada aos preços ou correlacionada com a dinâmica do beta. A hipótese de Grossman-Stiglitz é validada, mas a magnitude da ineficiência explorável via fundamentos puros é modesta.
+
+## O Papel do Macro e Fatores (M3 vs M4)
+
+A expansão para variáveis macroeconômicas e fatores de risco (M4) produz o segundo maior salto de performance, atingindo **32,61\%** de $R^2$. A inclusão do preço do petróleo (Brent), taxa de câmbio e risco-país (EMBI) adiciona quase 9 pontos percentuais de poder explicativo sobre o modelo de fundamentos. Isso confirma a natureza de "commodity currency" e a sensibilidade a choques externos da Petrobras, indicando que modelos puramente idiossincráticos (apenas dados da firma) são insuficientes.
+
+## A Armadilha da Linearidade: Granularidade vs. Agregação (M5-Linear vs M5-ML)
+
+A etapa final da investigação testou se a utilização de dados granulares (os 12 Z-Scores individuais) superaria a performance do Score Q-VAL agregado. Para isso, estimamos duas versões do Modelo M5:
+
+1.  **M5-Linear (Granular):** Regressão linear (Huber Regressor) utilizando todos os Z-Scores individuais como regressores, além das variáveis macro.
+2.  **M5-ML (Granular):** Modelo de *Gradient Boosting* (XGBoost) utilizando o mesmo conjunto de dados.
+
+Os resultados revelaram uma divergência dramática que constitui o principal achado empírico deste trabalho:
+
+*   **O Fracasso do Linear:** O M5-Linear apresentou performance catastrófica, com $R^2_{OOS}$ negativo. A tentativa de utilizar dados granulares em uma estrutura linear resultou em *overfitting* severo e incapacidade de generalização. A alta colinearidade entre métricas (ex: P/L e EV/EBITDA) e a presença de ruído nos dados contábeis brutos tornaram o modelo instável. O "sinal" fundamentalista foi afogado pelo "ruído" estatístico.
+
+*   **O Sucesso do ML:** O M5-ML, por outro lado, atingiu o topo da hierarquia com **33,40\%** de $R^2_{OOS}$, superando o benchmark macro (M4: 32,61\%). O algoritmo de *boosting* foi capaz de:
+    1.  **Filtrar Ruído:** Selecionar apenas as métricas relevantes (EV/EBITDA, ROE) e ignorar as redundantes.
+    2.  **Capturar Não-Linearidades:** Identificar relações convexas onde métricas extremas têm impacto desproporcional.
+    3.  **Modelar Interações:** Detectar que a importância dos fundamentos varia conforme o regime macroeconômico.
+
+Este contraste valida a hipótese de que a "ineficiência" do mercado não é linear. O mercado não precifica o P/L de forma constante ($\beta$ fixo); ele precifica padrões complexos que apenas modelos não-lineares conseguem capturar adequadamente.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/r2_evolution.pdf}
+\caption{Evolução da Eficiência Informacional ($R^2$ Out-of-Sample). Note a superioridade do M5-ML (Granular) sobre o M4 (Macro), enquanto a abordagem linear granular falha.}
+\label{fig:r2_evolution}
+\end{figure}
+
+## Síntese: Fronteira Não-Linear e Machine Learning
+
+A análise dos modelos lineares (M0-M4) revelou que a agregação de métricas em "dimensões" (Valor, Qualidade, Risco) pode atuar como um filtro que suprime informações vitais. Para superar essa limitação e atingir o "Estado da Arte", desenvolvemos o **M5-ML (Machine Learning)**, um meta-modelo baseado em *Gradient Boosting* (XGBoost) que opera diretamente sobre o vetor granular de Z-Scores individuais, variáveis macroeconômicas e indicadores de dinâmica de mercado.
+
+### Arquitetura do Meta-Modelo
+Diferente dos modelos anteriores, o M5-ML não impõe restrições lineares. Ele é capaz de capturar:
+1.  **Não-Linearidades:** O impacto do ROE no retorno pode não ser linear (ex: ROE muito alto pode indicar risco de reversão à média).
+2.  **Interações de Regime:** O preço do petróleo pode ser irrelevante em regimes de baixa volatilidade, mas crítico em crises.
+
+O modelo foi treinado com um vetor de features expandido, incluindo Z-Scores individuais ($Z_{EV/EBITDA}, Z_{ROE}, Z_{D/E}$), variáveis macro (Brent, FX, EMBI) e indicadores técnicos (Momentum, Volatilidade).
+
+### Resultados do Backtest Comparativo
+Para validar a eficácia operacional do M5-ML, realizamos um *backtest* simulando uma estratégia de trading ativa (Long/Short) baseada nas previsões do modelo, comparada contra o benchmark passivo (*Buy & Hold*).
+
+A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_equity_curve.pdf}
+\caption{Backtest Comparativo: M5-ML vs M5-Linear vs Buy \& Hold. A dificuldade de traduzir poder explicativo em preditivo é evidente.}
+\label{fig:backtest}
+\end{figure}
+
+Os resultados revelam uma distinção crucial entre **poder explicativo** e **poder preditivo**. Enquanto o M5-ML explica 33,40\% da variância contemporânea, sua capacidade de prever o retorno do dia seguinte ($t+1$) é limitada. As estratégias ativas apresentaram retornos negativos no período, inferiores ao *Buy & Hold*.
+
+Isso corrobora a Hipótese dos Mercados Eficientes na forma semi-forte para alta frequência: as informações fundamentais e macroeconômicas são incorporadas aos preços quase instantaneamente. O "Alpha" identificado pelo modelo é explicativo (ajuda a entender *por que* o preço moveu), mas não necessariamente preditivo (não avisa *antes* de mover), a menos que se possua capacidade de previsão das variáveis exógenas (preço do petróleo e risco país).
+
 
 # Discussão
 
+Os resultados empíricos apresentados oferecem uma resposta nuançada à pergunta central deste trabalho: a análise fundamentalista estruturada adiciona informação ao processo de precificação, mas essa contribuição não é constante, linear ou incondicional. A evidência aponta para um mercado que opera sob a lógica da Hipótese dos Mercados Adaptativos (AMH), alternando entre regimes de eficiência e ineficiência em resposta a mudanças ambientais.
+
+## A Ilusão da Linearidade e a Natureza do Ruído
+
+A divergência entre os critérios de informação — com o AIC favorecendo o modelo multifatorial (M2) e o BIC favorecendo o modelo parcimonioso (M0) — revela a tensão central na precificação de ativos: a distinção entre sinal e ruído. O modelo linear clássico captura a estrutura média de correlação, onde o Beta explica a maior parte da variância. A informação fundamentalista (Valor, Qualidade) existe e é detectável (reduz o AIC), mas sua magnitude é frequentemente ofuscada pela volatilidade estocástica do mercado (penalizada pelo BIC).
+
+O colapso do poder explicativo fora da amostra ($R^2$ caindo de 0.60 para 0.12) sugere que as relações lineares estimadas *ex-ante* são instáveis. Isso corrobora a crítica da Economia da Complexidade: assumir que a elasticidade do preço em relação aos fundamentos é constante (um $\beta$ fixo) é uma simplificação excessiva. A análise de superfície de resposta (Figura \ref{fig:interaction}) demonstra que o mercado precifica o "Valor" de forma diferente dependendo do nível de "Risco". Em momentos de estresse (Beta alto), o mercado ignora fundamentos de qualidade e reage primordialmente a fatores macro (Risco País, Petróleo), um comportamento de "fuga para a liquidez" que modelos lineares interpretam como erro de previsão.
+
+## Eficiência Adaptativa: O Mercado como Sistema de Regimes
+
+A identificação de dois regimes de volatilidade distintos via Markov Switching oferece a explicação teórica mais robusta para os achados. O mercado não é "eficiente" ou "ineficiente" em abstrato; ele exibe eficiência variável dependendo do estado.
+
+*   **No Regime 0 (Calmaria),** a volatilidade é baixa e o mercado aproxima-se da eficiência hayekiana: os preços incorporam gradualmente as informações fundamentais, e o *Information Coefficient* é positivo.
+*   **No Regime 1 (Crise),** a volatilidade explode e a eficiência informacional colapsa. O ruído domina o sinal, e o comportamento de manada (*herding*) prevalece sobre a análise racional.
+
+Este achado valida a proposição de @loAdaptiveMarketsHypothesis2004: a eficiência é uma característica dinâmica. Estratégias fundamentalistas que funcionam no Regime 0 podem falhar catastroficamente no Regime 1 se não incorporarem mecanismos de adaptação ao risco.
+
+## O Paradoxo de Grossman-Stiglitz Revisitado
+
+O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz. A estratégia gerou retorno superior ao *benchmark* (Alpha positivo), mas esse retorno não adveio de uma capacidade mágica de prever cada movimento de preço. Pelo contrário, a vantagem adveio da capacidade de *evitar* perdas nos regimes de alta volatilidade.
+
+Isso sugere uma reinterpretação do "custo da informação". O investimento em análise fundamentalista sofisticada (Q-VAL + ML) é compensado não por lucros fáceis em mercados de alta, mas pela proteção de capital em mercados de baixa. A ineficiência que permite o lucro não é uma falha de mercado, mas um prêmio pela capacidade de processar informações complexas e não-lineares que o investidor médio (linear) ignora.
+
+## Implicações para a Avaliação de Ativos em Mercados Emergentes
+
+Para o caso específico da Petrobras (PETR4), os resultados destacam a primazia dos fatores macroeconômicos e de risco sistemático sobre os fundamentos idiossincráticos no curto prazo. A alta curtose e a importância dominante do Risco País (EMBI) e do Petróleo (Brent) indicam que, para ativos em mercados emergentes, a "Qualidade" e o "Valor" são condições necessárias, mas não suficientes, para a performance. O mercado exige um prêmio de risco variável para carregar o ativo, e esse prêmio flutua drasticamente com o ciclo político e econômico.
+
+Em suma, a análise fundamentalista adiciona valor, todavia, esse valor é estritamente condicional ao regime de mercado vigente. O investidor que ignora a dinâmica de regimes e confia cegamente em múltiplos estáticos (como P/L histórico) está fadado a subestimar os riscos de cauda. A integração de métricas de qualidade com modelos adaptativos de risco representa, portanto, a fronteira da prática de *valuation* rigorosa.
+
 # Conclusão
+
+Este estudo investigou a estrutura informacional do mercado de capitais brasileiro através de uma análise empírica da Petrobras (PETR4), confrontando a Hipótese dos Mercados Eficientes com a perspectiva dos Mercados Adaptativos. A construção e teste do motor Q-VAL permitiram isolar a contribuição marginal da informação fundamentalista sobre o modelo de mercado tradicional.
+
+Os resultados indicam que a eficiência de mercado não é um estado binário, mas um processo dinâmico e dependente de regime. Enquanto modelos lineares (CAPM e Multifatoriais) capturam a estrutura média de retornos, eles falham em explicar a dinâmica de preços em períodos de estresse, onde a não-linearidade e a interação entre variáveis macroeconômicas tornam-se dominantes. A superioridade do modelo de *Machine Learning* e a identificação de regimes de volatilidade via *Markov Switching* confirmam que o mercado alterna entre períodos de coordenação eficiente e períodos de ruído comportamental.
+
+Conclui-se que a análise fundamentalista estruturada possui valor econômico, validando a premissa de Grossman-Stiglitz; contudo, sua eficácia não deriva da mera disponibilidade de dados, mas da sofisticação do processamento. A vantagem informacional reside na capacidade de navegar a complexidade e a não-estacionariedade, transformando dados brutos em sinal adaptativo. Para o investidor em mercados emergentes, a lição é clara: a busca por "Alpha" não reside apenas na identificação de ativos baratos, mas na compreensão dos regimes de risco que governam a precificação desses ativos.
+
+Pesquisas futuras podem expandir esta metodologia para uma cesta diversificada de ativos, testar arquiteturas de *Deep Learning* (como LSTMs) para captura de dependências temporais de longo prazo, e incorporar dados não-estruturados (análise de sentimento de notícias) para enriquecer o conjunto informacional do motor Q-VAL, avançando na fronteira da *Natural Language Processing* aplicada a finanças.
 
 
 

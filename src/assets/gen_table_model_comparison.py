@@ -1,5 +1,6 @@
 """
-Gerador da Tabela 5.4 - Comparação de Modelos (In-Sample vs Out-of-Sample).
+Gerador da Tabela 5.4 - Comparação de Modelos (M0 a M5).
+Consolidado a partir de full_model_comparison.json e dynamic_metrics.json.
 """
 import json
 import pandas as pd
@@ -7,63 +8,73 @@ from pathlib import Path
 from src.core.config import PROJECT_ROOT
 
 def gen_table_model_comparison():
-    oos_path = PROJECT_ROOT / "data" / "outputs" / "oos_results.json"
+    input_path = PROJECT_ROOT / "data" / "outputs" / "full_model_comparison.json"
+    dynamic_path = PROJECT_ROOT / "data" / "outputs" / "dynamic_metrics.json"
     output_path = PROJECT_ROOT / "data" / "outputs" / "tables" / "comparacao_modelos.tex"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(oos_path, 'r') as f:
-        results = json.load(f)
-    
-    # Mapeamento de nomes
-    model_names = {
-        "M0": "CAPM (1 Fator)",
-        "M3": "Fama-French (3 Fatores)"
-    }
+    with open(input_path, 'r') as f:
+        data = json.load(f)
+        
+    with open(dynamic_path, 'r') as f:
+        dynamic_data = json.load(f)
     
     latex = []
-    latex.append(r"\begin{table}[h]")
+    latex.append(r"\begin{table}[H]")
     latex.append(r"\centering")
-    latex.append(r"\caption{Comparação de Performance: In-Sample vs Out-of-Sample}")
+    latex.append(r"\caption{Comparação de Performance Preditiva e Ajuste (M0 a M5)}")
     latex.append(r"\label{tab:model_comparison}")
     latex.append(r"\begin{tabular}{lccccc}")
     latex.append(r"\toprule")
-    latex.append(r"& \multicolumn{2}{c}{\textbf{In-Sample (2016-2022)}} & \multicolumn{3}{c}{\textbf{Out-of-Sample (2023-2025)}} \\")
-    latex.append(r"\cmidrule(lr){2-3} \cmidrule(lr){4-6}")
-    latex.append(r"Modelo & $R^2$ & Adj. $R^2$ & $R^2_{OOS}$ & RMSE & MAE \\")
+    latex.append(r"Modelo & $R^2_{Adj}$ (In) & $R^2_{OOS}$ (Out) & MSE ($10^{-4}$) & AIC & Params \\")
     latex.append(r"\midrule")
     
-    for model_key in ["M0", "M3"]:
-        name = model_names.get(model_key, model_key)
+    # Lista manual de modelos para a tabela
+    models_to_show = [
+        ("M0 (CAPM)", data.get("M0 (CAPM)", {})),
+        ("Dynamic CAPM", dynamic_data.get("Dynamic CAPM", {})),
+        ("M4 (Macro)", data.get("M4 (Macro)", {})),
+        ("M5 (Fatores)", data.get("M5 (Fatores)", {}))
+    ]
+    
+    for name, v in models_to_show:
+        if not v: continue
         
-        # In-Sample
-        is_metrics = results["in_sample"].get(model_key, {})
-        r2 = is_metrics.get("r2", 0)
-        adj_r2 = is_metrics.get("adj_r2", 0)
+        # Extrair métricas
+        r2_adj = v.get('R2_Adj', 0) * 100
+        r2_oos = v.get('R2_OOS', 0) * 100
+        mse = v.get('MSE', 0) * 10000 # Escalar para legibilidade
+        aic = v.get('AIC', 0)
+        params = v.get('Num_Params', 0)
         
-        # Out-of-Sample
-        oos_metrics = results["out_of_sample"].get(model_key, {})
-        r2_oos = oos_metrics.get("r2_oos", 0)
-        rmse = oos_metrics.get("rmse", 0)
-        mae = oos_metrics.get("mae", 0)
+        # Dynamic CAPM não tem AIC/Params no JSON, tratar
+        if name == "Dynamic CAPM":
+            aic_str = "-"
+            params_str = "1 (Rolling)"
+            r2_adj_str = "-" # Geralmente não calculado da mesma forma
+        else:
+            aic_str = f"{aic:.0f}"
+            params_str = str(params)
+            r2_adj_str = f"{r2_adj:.2f}\%"
         
-        # Format row
-        # Multiplicando RMSE/MAE por 100 para % se forem retornos, mas geralmente RMSE é na escala original.
-        # Assumindo escala original (decimal) para RMSE/MAE e % para R2.
-        # R2 OOS pode ser negativo, mas aqui parece positivo.
+        # Destaque para o melhor OOS (M5) e o salto (M4)
+        if "M5" in name:
+            row = f"\\textbf{{{name}}} & {r2_adj_str} & \\textbf{{{r2_oos:.2f}\\%}} & {mse:.4f} & {aic_str} & {params_str} \\\\"
+        else:
+            row = f"{name} & {r2_adj_str} & {r2_oos:.2f}\\% & {mse:.4f} & {aic_str} & {params_str} \\\\"
         
-        row = f"{name} & {r2:.3f} & {adj_r2:.3f} & {r2_oos:.3f} & {rmse:.4f} & {mae:.4f} \\\\"
         latex.append(row)
         
     latex.append(r"\bottomrule")
     latex.append(r"\end{tabular}")
     latex.append(r"\footnotesize")
-    latex.append(r"Nota: $R^2_{OOS}$ calculado como $1 - \frac{\sum(y - \hat{y})^2}{\sum(y - \bar{y}_{train})^2}$. RMSE e MAE em escala decimal.")
+    latex.append(r"Nota: $R^2_{OOS}$ mede a capacidade preditiva fora da amostra. MSE escalado por $10^4$. AIC: Critério de Akaike (menor é melhor).")
     latex.append(r"\end{table}")
 
     with open(output_path, 'w') as f:
         f.write("\n".join(latex))
     
-    print(f"Tabela 5.4 salva em {output_path}")
+    print(f"Tabela salva em {output_path}")
 
 if __name__ == "__main__":
     gen_table_model_comparison()

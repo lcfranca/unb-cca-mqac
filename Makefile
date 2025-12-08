@@ -27,22 +27,15 @@ TABLES_DIR := $(OUTPUT_DIR)/tables
 RETURNS_PARQUET := $(PROCESSED_DIR)/returns/returns.parquet
 QVAL_PARQUET := $(PROCESSED_DIR)/qval/qval_timeseries.parquet
 METRICS_PARQUET := $(PROCESSED_DIR)/metrics/metrics.parquet
-OOS_RESULTS := $(OUTPUT_DIR)/oos_results.json
-ROLLING_R2 := $(OUTPUT_DIR)/rolling_r2.parquet
+NESTED_RESULTS := $(OUTPUT_DIR)/nested_models_results.json
+M5_PREDICTIONS := $(OUTPUT_DIR)/m5_predictions.parquet
+BACKTEST_RESULTS := $(OUTPUT_DIR)/backtest_results.json
 
 # Arquivos de saída (Assets)
-FIGURES := $(FIGURES_DIR)/sml_dynamic.pdf \
-           $(FIGURES_DIR)/radar_chart.pdf \
-           $(FIGURES_DIR)/learning_curve.pdf \
-           $(FIGURES_DIR)/rolling_r2.pdf \
-           $(FIGURES_DIR)/scatter_pred_actual.pdf \
-           $(FIGURES_DIR)/residuals_hist.pdf
+FIGURES := $(FIGURES_DIR)/r2_evolution.pdf \
+           $(FIGURES_DIR)/backtest_equity_curve.pdf
 
-TABLES := $(TABLES_DIR)/estatisticas_descritivas.tex \
-          $(TABLES_DIR)/resultados_capm.tex \
-          $(TABLES_DIR)/score_comprabilidade.tex \
-          $(TABLES_DIR)/comparacao_modelos.tex \
-          $(TABLES_DIR)/criterios_informacao.tex
+TABLES := $(TABLES_DIR)/tabela_performance_modelos.tex
 
 PDF := output/nota-tecnica.pdf
 
@@ -64,7 +57,7 @@ data:
 	@echo "✓ Dados processados encontrados."
 
 ## analysis: Executa scripts de análise (se necessário)
-analysis: $(OOS_RESULTS) $(ROLLING_R2)
+analysis: $(NESTED_RESULTS) $(M5_PREDICTIONS) $(BACKTEST_RESULTS)
 
 ## figures: Gera todas as figuras
 figures: $(FIGURES)
@@ -83,41 +76,39 @@ pdf: figures tables
 # REGRAS DE ANÁLISE
 # ==============================================================================
 
-$(OOS_RESULTS):
-	@echo "Executando validação Out-of-Sample..."
-	$(PYTHON) -m src.analysis.oos_validation
+$(NESTED_RESULTS):
+	@echo "Executando estimativa de modelos aninhados (M0-M5)..."
+	$(PYTHON) -m src.analysis.estimate_nested_models
 
-$(ROLLING_R2):
-	@echo "Calculando Rolling R2..."
-	$(PYTHON) -m src.analysis.rolling_r2
+$(M5_PREDICTIONS):
+	@echo "Treinando modelos M5 (Linear e ML)..."
+	$(PYTHON) -m src.analysis.train_m5_models
+
+$(BACKTEST_RESULTS): $(M5_PREDICTIONS)
+	@echo "Executando backtest M5..."
+	$(PYTHON) -m src.analysis.backtest_m5
 
 # ==============================================================================
 # GERADORES DE FIGURAS
 # ==============================================================================
 
-# Agrupando figuras geradas pelo mesmo script para evitar múltiplas execuções
-$(FIGURES_DIR)/sml_dynamic.pdf $(FIGURES_DIR)/radar_chart.pdf $(FIGURES_DIR)/learning_curve.pdf:
-	@echo "Gerando figuras avançadas (SML, Radar, Learning Curve)..."
-	$(PYTHON) -m src.assets.gen_advanced_figures
+$(FIGURES_DIR)/r2_evolution.pdf: $(NESTED_RESULTS)
+	@echo "Gerando gráfico de evolução do R2..."
+	$(PYTHON) -m src.assets.gen_fig_r2_evolution
 
-$(FIGURES_DIR)/rolling_r2.pdf $(FIGURES_DIR)/scatter_pred_actual.pdf $(FIGURES_DIR)/residuals_hist.pdf:
-	@echo "Gerando figuras de diagnóstico..."
-	$(PYTHON) -m src.assets.gen_fig_model_diagnostics
+$(FIGURES_DIR)/backtest_equity_curve.pdf: $(BACKTEST_RESULTS)
+	@echo "Gerando gráfico de backtest..."
+	# O script backtest_m5 já gera a figura, mas definimos a dependência aqui
+	@echo "Figura de backtest atualizada."
 
 # ==============================================================================
 # GERADORES DE TABELAS
 # ==============================================================================
 
-$(TABLES_DIR)/estatisticas_descritivas.tex:
-	@echo "Gerando tabela: Estatísticas Descritivas..."
-	$(PYTHON) -m src.assets.gen_table_descriptive
+$(TABLES_DIR)/tabela_performance_modelos.tex: $(NESTED_RESULTS)
+	@echo "Gerando tabela de performance dos modelos..."
+	$(PYTHON) -m src.assets.gen_table_model_performance
 
-$(TABLES_DIR)/resultados_capm.tex:
-	@echo "Gerando tabela: Resultados CAPM..."
-	$(PYTHON) -m src.assets.gen_table_capm
-
-$(TABLES_DIR)/score_comprabilidade.tex:
-	@echo "Gerando tabela: Score Q-VAL..."
 	$(PYTHON) -m src.assets.gen_table_qval_score
 
 $(TABLES_DIR)/comparacao_modelos.tex:

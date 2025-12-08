@@ -1,0 +1,15 @@
+\begin{table}[H]
+\centering
+\caption{Impacto da Dinâmica Temporal: CAPM Estático vs. Dinâmico}
+\label{tab:dynamic_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Modelo & MSE ($10^{-4}$) & MAE & RMSE & $R^2_{OOS}$ (\\%) \\\\
+\midrule
+M0 (CAPM Estático) & 2.5936 & 0.0123 & 0.0161 & 12.33\% \\
+\textbf{CAPM Dinâmico} & \textbf{2.2653} & \textbf{0.0109} & \textbf{0.0151} & \textbf{23.43\%} \\
+\bottomrule
+\end{tabular}
+\footnotesize
+Nota: O modelo dinâmico utiliza janelas rolantes de 252 dias para estimar o Beta.
+\end{table}
