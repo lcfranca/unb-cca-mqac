@@ -102,12 +102,12 @@ def run_backtest():
     # 5. Métricas
     metrics = {
         "Buy & Hold": calculate_metrics(df['ret_bh_net']),
-        "M5-Linear": calculate_metrics(df['ret_linear_net']),
-        "M5-ML": calculate_metrics(df['ret_ml_net'])
+        "M5a (Score Linear)": calculate_metrics(df['ret_linear_net']),
+        "M5b (ML Granular)": calculate_metrics(df['ret_ml_net'])
     }
     
     # Adicionar Max Drawdown
-    for name, col in [("Buy & Hold", "equity_bh"), ("M5-Linear", "equity_linear"), ("M5-ML", "equity_ml")]:
+    for name, col in [("Buy & Hold", "equity_bh"), ("M5a (Score Linear)", "equity_linear"), ("M5b (ML Granular)", "equity_ml")]:
         _, mdd = calculate_drawdown(df[col])
         metrics[name]["Max Drawdown"] = mdd
         
@@ -124,8 +124,8 @@ def run_backtest():
     
     # Equity Curve
     ax1.plot(df.index, df['equity_bh'], label='Buy & Hold (Petrobras)', color='gray', alpha=0.7, linestyle='--')
-    ax1.plot(df.index, df['equity_linear'], label='M5-Linear (ElasticNet)', color=COLORS['primary'], linewidth=2)
-    ax1.plot(df.index, df['equity_ml'], label='M5-ML (XGBoost)', color=COLORS['secondary'], linewidth=2)
+    ax1.plot(df.index, df['equity_linear'], label='M5a (Score Linear)', color=COLORS['primary'], linewidth=2)
+    ax1.plot(df.index, df['equity_ml'], label='M5b (ML Granular)', color=COLORS['secondary'], linewidth=2)
     
     ax1.set_ylabel('Retorno Acumulado (Base 1.0)', fontweight='bold')
     ax1.set_title('Backtest Comparativo: Estratégias M5 vs Benchmark', fontweight='bold', pad=20)
@@ -138,8 +138,8 @@ def run_backtest():
     dd_ml, _ = calculate_drawdown(df['equity_ml'])
     
     ax2.fill_between(df.index, dd_bh, 0, color='gray', alpha=0.3, label='DD B&H')
-    ax2.plot(df.index, dd_linear, color=COLORS['primary'], linewidth=1, label='DD Linear')
-    ax2.plot(df.index, dd_ml, color=COLORS['secondary'], linewidth=1, label='DD ML')
+    ax2.plot(df.index, dd_linear, color=COLORS['primary'], linewidth=1, label='DD M5a')
+    ax2.plot(df.index, dd_ml, color=COLORS['secondary'], linewidth=1, label='DD M5b')
     
     ax2.set_ylabel('Drawdown', fontweight='bold')
     ax2.set_xlabel('Data', fontweight='bold')

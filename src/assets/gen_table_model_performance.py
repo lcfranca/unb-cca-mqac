@@ -22,7 +22,7 @@ def run():
         "M0_RW", "M0_HM", 
         "M1_Static", "M2_Dynamic", 
         "M3_Fundamentals", "M4_Macro", 
-        "M5_Score"
+        "M5_Score", "M5_Linear", "M5_ML"
     ]
     
     model_labels = {
@@ -32,7 +32,9 @@ def run():
         "M2_Dynamic": "M2 (CAPM Dinâmico)",
         "M3_Fundamentals": "M3 (Fundamentos)",
         "M4_Macro": "M4 (Macro e Fatores)",
-        "M5_Score": "M5 (Score Agregado)"
+        "M5_Score": "M5 (Score Agregado)",
+        "M5_Linear": "M5a (Score Linear)",
+        "M5_ML": "M5b (ML Granular)"
     }
     
     for m in models_order:

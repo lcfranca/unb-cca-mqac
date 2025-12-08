@@ -7,7 +7,7 @@
         "Sortino Ratio": 0.7694890375847112,
         "Max Drawdown": -0.29386542787070036
     },
-    "M5-Linear": {
+    "M5a (Score Linear)": {
         "Total Return": -0.5479658548633782,
         "Annualized Return": -0.23793381264386043,
         "Volatility": 0.2700822137655583,
@@ -15,7 +15,7 @@
         "Sortino Ratio": -1.3275115692574382,
         "Max Drawdown": -0.6701101774516788
     },
-    "M5-ML": {
+    "M5b (ML Granular)": {
         "Total Return": -0.4505899351643463,
         "Annualized Return": -0.17045158030628405,
         "Volatility": 0.27043896517606875,
