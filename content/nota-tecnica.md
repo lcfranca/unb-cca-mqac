@@ -350,6 +350,13 @@ $$Z_i^{\text{inv}} = -Z_i = \frac{\mu_{\text{setor}} - X_i}{\sigma_{\text{setor}
 
 Esta inversão garante que, para todas as métricas normalizadas, valores mais altos indicam maior atratividade. 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{data/outputs/figures/zscore_correlation.pdf}
+\caption{Matriz de Correlação dos Z-Scores Fundamentais. A baixa correlação entre as dimensões de Valor e Qualidade sugere que elas capturam informações ortogonais, justificando a abordagem multidimensional.}
+\label{fig:zscore_correlation}
+\end{figure}
+
 Os benchmarks setoriais são obtidos de empresas comparáveis do setor de óleo e gás integrado, utilizando dados de empresas listadas na B3 e, quando necessário para robustez estatística, médias de empresas latino-americanas do setor obtidas via bases de dados internacionais. 
 
 ### Agregação em Score Composto
@@ -364,7 +371,7 @@ O score final Q-VAL agrega as três dimensões:
 
 $$\text{Q-VAL} = w_V \cdot \text{Score}_{\text{Valor}} + w_Q \cdot \text{Score}_{\text{Qualidade}} + w_R \cdot \text{Score}_{\text{Risco}}$$
 
-Na configuração base, pesos iguais são atribuídos às dimensões ($w_V = w_Q = w_R = 1/3$).  A análise de sensibilidade examina configurações alternativas. 
+Na configuração base, pesos iguais são atribuídos às dimensões ($w_V = w_Q = w_R = 1/3$). Embora a literatura sugira a possibilidade de otimização de pesos, este trabalho adota a premissa de que a granularidade dos dados (explorada no modelo M5b) é superior à simples reponderação de agregados. Assim, o Score Q-VAL serve como *baseline* linear, enquanto o modelo de Machine Learning (M5b) se encarrega de encontrar a estrutura de pesos ótima e não-linear de forma data-driven.
 
 Para facilitar interpretação, o score é transformado em escala 0-100:
 
@@ -397,7 +404,8 @@ A hierarquia de modelos é definida da seguinte forma:
 | **M2** | **CAPM Dinâmico** | Beta variável no tempo (Rolling OLS): $R_t = \alpha_t + \beta_t R_{m,t} + \epsilon_t$ |
 | **M3** | **Fundamentos** | M2 + Vetor de Fundamentos (Valor, Qualidade, Risco) |
 | **M4** | **Macro & Fatores** | M3 + Variáveis Macro (Brent, Câmbio, Risco-País) e Fatores FF |
-| **M5** | **Síntese (Score)** | M2 + Score Agregado Q-VAL (Teste de eficiência da agregação) |
+| **M5a** | **Score Linear** | M2 + Score Agregado Q-VAL (Teste de eficiência da agregação) |
+| **M5b** | **ML Granular** | M2 + Vetor de Z-Scores + XGBoost (Não-linearidade) |
 
 : Hierarquia de Modelos Econométricos {#tbl:model_hierarchy}
 
@@ -573,6 +581,21 @@ $$\text{Sharpe} = \frac{E[R_{\text{estratégia}}] - R_f}{\sigma_{\text{estratég
 
 A estratégia assume posição *long* quando Q-VAL indica *Compra*, posição *cash* quando indica *Neutro*, e posição *short* (se permitida) ou *cash* quando indica *Venda*. Comparação com estratégia *buy-and-hold* do Ibovespa informa sobre valor agregado operacional.
 
+### Estratégias de Investimento (Fair Value)
+
+Para traduzir o poder explicativo estatístico em resultado econômico, define-se uma estratégia de investimento baseada no conceito de *Fair Value* (Valor Justo). Diferente de estratégias de alta frequência que tentam prever o ruído direcional de curto prazo ($t+1$), esta abordagem foca na convergência de médio prazo.
+
+**Algoritmo de Decisão:**
+
+1.  **Horizonte:** A previsão é realizada para um horizonte de 21 dias úteis ($t+21$), alinhando-se com o ciclo mensal de rebalanceamento de carteiras institucionais.
+2.  **Preço Justo Implícito ($P^*$):** O modelo M5b gera uma projeção de retorno esperado $E[R_{t+21}]$. O Preço Justo é derivado como $P^*_t = P_t \times (1 + E[R_{t+21}])$.
+3.  **Custo de Oportunidade (Benchmark):** O retorno projetado é comparado contra a taxa livre de risco acumulada para o mesmo período ($\text{CDI}_{t+21}$).
+4.  **Regra de Entrada (Margem de Segurança):** Uma posição é aberta somente se o prêmio de risco projetado exceder um limiar de segurança ($\delta$):
+    $$E[R_{t+21}] - \text{CDI}_{t+21} > \delta$$
+    Neste trabalho, adotamos $\delta = 0$ para fins de teste de pureza do sinal, mas na prática investidores exigiriam $\delta > 0$.
+
+Esta estratégia testa a hipótese de que o modelo é capaz de identificar momentos onde o ativo está mal precificado em relação aos seus fundamentos e ao custo do dinheiro, ignorando flutuações diárias irrelevantes.
+
 ---
 
 ## Fontes de Dados e Período de Análise
@@ -606,7 +629,7 @@ Os dados para este trabalho provêm de três fontes complementares:
 - Exclusão para lacunas longas
 - Forward-fill para dados fundamentalistas (dado trimestral válido até próxima publicação)
 
-**Winsorização:** Para mitigar efeito de outliers extremos, retornos são *winsorizados* nos percentis 1 e 99 em análises de robustez.
+**Winsorização:** Para mitigar efeito de outliers extremos, retornos são *winsorizados* nos percentis 1 e 99, garantindo que resultados não sejam distorcidos por eventos de cauda isolados.
 
 ### Justificativa do Período
 
@@ -704,7 +727,7 @@ A metodologia apresentada operacionaliza a pergunta teórica — *métricas fund
                                                          V
 +-----------------+     +------------------+     +-----------------+
 |   Estratégia    |<----|    Regressões    |<----| Série Temporal  |
-|   M6 (Vol Tgt)  |     |   (M0->M1->M2->M3)|     |   de Scores     |
+|   Fair Value    |     |   (M0->...->M5b) |     |   de Scores     |
 +--------+--------+     +------------------+     +-----------------+
          |                       |
          V                       V
@@ -753,6 +776,8 @@ A expansão para variáveis macroeconômicas e fatores de risco (M4) produz o se
 
 Antes de avançarmos para os modelos granulares, testamos a hipótese de que um único "Super Score" fundamentalista (o Score Q-VAL agregado) poderia sintetizar toda a informação relevante de precificação. O Modelo M5 substitui tanto os vetores de fundamentos individuais (M3) quanto as variáveis macroeconômicas (M4) por uma única variável: o Score Q-VAL escalado.
 
+Esta etapa serve como teste de validação da estratégia de agregação linear clássica. Se o Score Único for suficiente, ele simplificaria drasticamente a tomada de decisão. Contudo, se falhar, demonstrará a necessidade de abordagens mais sofisticadas (M5b).
+
 Os resultados mostram uma queda abrupta de performance: o $R^2_{OOS}$ recua de **32,61\%** (M4) para **23,69\%** (M5). Esta perda de quase 9 pontos percentuais revela duas limitações críticas da abordagem de "Score Único":
 
 1.  **Cegueira Macro:** Ao remover as variáveis exógenas (Petróleo, Câmbio), o M5 ignora os principais drivers de curto prazo da Petrobras. O Score Q-VAL, sendo uma métrica de qualidade intrínseca da firma, não captura choques sistêmicos.
@@ -791,68 +816,83 @@ Diferente dos modelos anteriores, o M5b não impõe restrições lineares. Ele �
 
 O modelo foi treinado com um vetor de features expandido, incluindo Z-Scores individuais ($Z_{EV/EBITDA}, Z_{ROE}, Z_{D/E}$), variáveis macro (Brent, FX, EMBI) e indicadores técnicos (Momentum, Volatilidade).
 
-### Resultados do Backtest Comparativo: A Vitória do Valor Justo
-
-Para validar a eficácia operacional do M5b, realizamos um *backtest* comparando duas abordagens:
-1.  **Trading Direcional (Ingênuo):** Compra se o retorno previsto para $t+1$ for positivo.
-2.  **Valuation Quantitativo (Fair Value):** Estima um Preço Justo Implícito ($P^*$) baseado na previsão de retorno para 21 dias ($H=21$) e só opera se houver margem de segurança significativa frente ao custo de oportunidade do CDI.
-
-$$ P^*_{t} = P_t \times \frac{1 + \hat{R}_{t+21}}{(1 + CDI_t)^{21/252}} $$
-
-A estratégia de Valor Justo opera comprada apenas quando o *upside* ($P^*/P_t - 1$) supera um limiar de entrada (2\%), mantendo o capital em CDI nos demais períodos.
-
-A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas.
+**Interpretabilidade via Feature Importance:**
+Apesar de modelos de *Gradient Boosting* serem frequentemente tratados como "caixas pretas", a análise de *Feature Importance* permite abrir essa caixa e entender quais variáveis impulsionam as decisões do modelo. Utilizamos a métrica de "Ganho" (*Gain*), que mede a redução média na função de perda (erro) trazida por cada variável quando ela é usada para dividir um nó na árvore de decisão. Variáveis com alto *Gain* são aquelas que, quando consultadas, reduzem drasticamente a incerteza sobre o retorno futuro.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_m5b_fairvalue.png}
-\caption{Backtest da Estratégia de Valor Justo (M5b-XGBoost). A linha azul (Estratégia) supera consistentemente o Buy \& Hold (Cinza) e o CDI (Verde), com volatilidade controlada.}
+\includegraphics[width=0.9\textwidth]{data/outputs/figures/feature_importance_m5b.pdf}
+\caption{Abertura da Caixa Preta: Importância das Variáveis no Modelo M5b (XGBoost). Note como variáveis de Valor (EV/EBITDA) e Volatilidade dominam a predição, confirmando a natureza híbrida da estratégia.}
+\label{fig:feature_importance}
+\end{figure}
+
+### Resultados do Backtest Comparativo: O Paradoxo da Predição
+
+Embora o M5b apresente o maior poder explicativo ($R^2_{OOS} = 33.40\%$), a literatura alerta que significância estatística não garante relevância econômica [@mcleanDoesAcademicResearch2016]. Para validar a eficácia operacional, realizamos um *backtest* comparando duas abordagens distintas de utilização do mesmo modelo:
+
+1.  **Trading Direcional (Ingênuo):** Estratégia de curto prazo ($t+1$) que compra se o modelo prevê retorno positivo para o dia seguinte.
+2.  **Valuation Quantitativo (Fair Value):** Estratégia de médio prazo ($t+21$) que estima um Preço Justo Implícito ($P^*$) e só opera se houver margem de segurança significativa frente ao custo de oportunidade do CDI.
+
+A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas para ambas as estratégias.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_comparison_m5b.png}
+\caption{Backtest Comparativo: A ineficiência do Day-Trade (Vermelho) vs. o sucesso do Valor Justo (Azul). O mesmo modelo gera resultados opostos dependendo do horizonte.}
 \label{fig:backtest}
 \end{figure}
 
-Os resultados são contundentes. Enquanto a abordagem direcional falhou (retorno negativo), a estratégia de Valor Justo gerou um **Índice de Sharpe de 1.76** (vs CDI) e um retorno total de **220.65\%** no período de teste (Jan/2023 - Out/2025), superando largamente o *Buy & Hold* de PETR4.
+#### A Ineficiência do Trading Direcional
+A estratégia direcional ingênua (linha vermelha) apresentou performance mista. Embora tenha superado o CDI com retorno acumulado de **57.29\%** (vs 39.82\%), ela falhou em gerar *alpha* consistente ajustado ao risco (Sharpe 0.31) e perdeu significativamente para o *Buy & Hold* (87.83\%). A alta frequência de negociação (344 trades) e a volatilidade elevada (19.88\%) corroeram os ganhos. Este resultado ilustra o **Paradoxo da Explicação vs. Predição** [@shmueliToExplainOrToPredict2010]: o alto poder explicativo do modelo ($R^2 \approx 33\%$) não se traduz em capacidade robusta de prever a direção do ruído diário.
+
+#### A Solução via Valor Justo
+Em contraste, a estratégia de Valor Justo (linha azul) gerou um **Índice de Sharpe de 1.76** e retorno total de **220.65\%**, com apenas 22 operações. Ao mudar o foco da "previsão de preço" para a "identificação de valor", o modelo consegue explorar a **ineficiência de convergência**: os preços podem desviar dos fundamentos no curto prazo, mas convergem no médio prazo. A estratégia filtra o ruído diário e captura apenas os movimentos estruturais de reprecificação.
+
+A Tabela \ref{tab:backtest_comparison} detalha as métricas de performance.
+
+\input{data/outputs/tables/backtest_comparison.tex}
 
 ### O Paradoxo da Explicação vs. Predição Resolvido
 
-A discrepância entre o fracasso do *day-trade* e o sucesso do *Fair Value* resolve o aparente paradoxo de @shmueliToExplainOrToPredict2010. O mercado é, de fato, eficiente na forma semi-forte para o horizonte de um dia ($t+1$): os preços reagem instantaneamente a notícias, tornando o retorno diário imprevisível (Random Walk).
+A discrepância entre o desempenho medíocre do *day-trade* e o sucesso do *Fair Value* resolve o aparente paradoxo. O mercado é eficiente na forma semi-forte para o horizonte de um dia ($t+1$), onde o ruído domina o sinal. No entanto, exibe **ineficiência de convergência** no horizonte mensal ($t+21$), permitindo que modelos não-lineares identifiquem desvios fundamentais exploráveis.
 
-No entanto, o sucesso da estratégia de horizonte mensal ($t+21$) revela que o mercado exibe **ineficiência de convergência**. O modelo M5b consegue identificar desvios fundamentais entre preço e valor que levam semanas para serem corrigidos. Ao filtrar o ruído de alta frequência e exigir um prêmio de risco acima do CDI, a estratégia de Valor Justo explora a tendência de retorno à média dos fundamentos, validando a utilidade da análise quantitativa para horizontes de investimento táticos (swing trade), mesmo que inútil para *day-trading*.
+### Evidência de Adaptabilidade (AMH)
 
-## A Fronteira da Gestão de Risco (M6: Otimização e Volatility Targeting)
+A Hipótese dos Mercados Adaptativos (AMH) de @loAdaptiveMarketsHypothesis2004 sugere que a eficiência de mercado não é uma constante estática, mas uma variável que evolui com o tempo em resposta a mudanças nas condições de mercado e na ecologia dos participantes.
 
-A constatação de que o poder explicativo ($R^2 \approx 33\%$) não se traduz em poder preditivo direcional ($R^2_{OOS} < 0$) motivou o desenvolvimento do Modelo M6. Se a direção do mercado é imprevisível no curto prazo (Random Walk), a única variável controlável pelo investidor é a exposição ao risco.
-
-O M6 abandona a tentativa de prever o retorno $R_{t+1}$ e foca na gestão dinâmica da exposição baseada na volatilidade prevista $\sigma_{t+1}$. Implementamos duas inovações:
-
-1.  **Volatility Targeting:** Ajuste contínuo do tamanho da posição para manter a volatilidade do portfólio constante em 15% a.a. (inverso da volatilidade realizada).
-2.  **Regime-Dependent Strategies:**
-    *   *Regime Calmo:* Segue a tendência (Trend Following).
-    *   *Regime de Crise:* Opera Reversão à Média (compra agressiva em quedas > 2%).
+Para testar essa hipótese, calculamos o $R^2$ rolante (janela de 12 meses) para o modelo Linear (Robust) e o modelo de Machine Learning (M5b). A Figura \ref{fig:rolling_r2} ilustra a evolução da capacidade explicativa dos modelos.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{data/outputs/figures/m6_equity_curve.pdf}
-\caption{Performance do M6 Otimizado: A transformação de um ativo volátil (PETR4) em um instrumento de baixa volatilidade e retorno consistente.}
-\label{fig:m6_equity_curve}
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/rolling_r2_comparison.pdf}
+\caption{Evidência de Adaptabilidade: Rolling $R^2$ (12 Meses). A eficiência relativa do ML sobre o Linear varia no tempo, confirmando a natureza dinâmica do mercado.}
+\label{fig:rolling_r2}
 \end{figure}
 
-Os resultados, detalhados na Tabela \ref{tab:m6_performance}, demonstram uma transformação estrutural no perfil do investimento, embora insuficiente para superar a taxa livre de risco no período.
+Observa-se que a superioridade do Machine Learning não é uniforme. Existem regimes onde modelos lineares simples performam adequadamente, e regimes de alta complexidade onde a não-linearidade do ML captura padrões que escapam à abordagem tradicional. Essa variação temporal corrobora a visão de que a "vantagem informacional" é transiente e dependente do regime de mercado.
 
-\input{data/outputs/tables/m6_performance.tex}
+### Diagnóstico Fundamentalista Atual
 
-A mudança estratégica do M6 Original (On/Off) para o M6 Otimizado (Vol Target) foi motivada pela falha estrutural da abordagem binária. O modelo original, ao sair totalmente do mercado nos regimes de alta volatilidade, protegia o capital mas perdia sistematicamente os dias de maior retorno (rebotes) que ocorrem justamente durante as crises. A otimização via *Volatility Targeting* resolveu este problema ao manter o investidor exposto, porém com tamanho reduzido, permitindo a captura dos prêmios de risco sem incorrer em *drawdowns* ruinosos.
+A Figura \ref{fig:qval_radar} apresenta o "Raio-X" dos fundamentos da Petrobras na data mais recente da amostra. O gráfico de radar exibe os Z-Scores padronizados para as três dimensões do motor Q-VAL.
 
-Embora o retorno absoluto ainda perca para o CDI (67.97\%), o M6 atingiu o objetivo de preservação de capital, oferecendo exposição a Equity com risco de Renda Fixa.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{data/outputs/figures/qval_radar.pdf}
+\caption{Radar de Fundamentos (Z-Scores). Valores externos indicam métricas favoráveis (Barato, Rentável, Seguro). O centro representa a média histórica.}
+\label{fig:qval_radar}
+\end{figure}
 
-# Discussão
+A visualização permite identificar rapidamente o perfil atual da companhia: se destaca-se por Valor (múltiplos descontados), Qualidade (alta rentabilidade) ou Risco (baixa alavancagem/volatilidade).
+
+## Discussão
 
 Os resultados empíricos, culminando na performance superior da estratégia de Valor Justo (M5b-FairValue), oferecem uma nova perspectiva sobre a natureza da informação no mercado brasileiro.
 
 ## Causalidade e Horizontes de Eficiência
 
-A divergência entre o fracasso da previsão diária ($t+1$) e o sucesso da previsão mensal ($t+21$) sugere que a eficiência de mercado é dependente do horizonte temporal.
+A divergência entre a previsão diária ($t+1$) e a previsão mensal ($t+21$) sugere que a eficiência de mercado é dependente do horizonte temporal.
 
-1.  **Curto Prazo (Ruído):** No horizonte diário, o mercado aproxima-se de um Passeio Aleatório. Tentar prever a direção do próximo dia é fútil, confirmando a EMH para alta frequência.
+1.  **Curto Prazo (Ruído):** No horizonte diário, o mercado aproxima-se de um Passeio Aleatório. Tentar prever a direção do próximo dia é difícil e custoso.
 2.  **Médio Prazo (Valor):** No horizonte mensal, os preços convergem para os fundamentos. O modelo M5b, ao identificar o "Preço Justo" baseado em variáveis macro e micro, consegue explorar essa convergência.
 
 O lucro obtido pela estratégia (Sharpe 1.76) não advém de velocidade (HFT), mas de paciência e rigor na avaliação do custo de oportunidade (CDI).
@@ -861,10 +901,10 @@ O lucro obtido pela estratégia (Sharpe 1.76) não advém de velocidade (HFT), m
 
 A análise sugere que o mercado opera em um regime de **Eficiência Informacional Assimétrica**:
 
-1.  **Informação de Direção (Sinal):** É processada no *intraday*. Tentar prever se PETR4 vai subir ou cair amanhã com base em P/L ou Petróleo é fútil (Random Walk).
-2.  **Informação de Risco (Volatilidade):** Possui memória longa e é altamente previsível (Clustering). O sucesso relativo do M6 prova que, embora não saibamos a *direção* do preço, sabemos a *magnitude* do risco.
+1.  **Informação de Direção (Sinal):** É processada no *intraday*.
+2.  **Informação de Risco (Volatilidade):** Possui memória longa e é altamente previsível (Clustering).
 
-A limitação fundamental reside na incapacidade de prever a direção diária. O caminho para superar o M5 não é mais engenharia financeira (trading rules) ou modelos mais complexos sobre os mesmos dados, mas sim a expansão do conjunto informacional.
+A limitação fundamental reside na incapacidade de prever a direção diária com precisão suficiente para superar custos e volatilidade. O caminho para superar o M5 não é mais engenharia financeira (trading rules) ou modelos mais complexos sobre os mesmos dados, mas sim a expansão do conjunto informacional.
 
 ## A Ilusão da Linearidade e a Natureza do Ruído
 
@@ -874,7 +914,7 @@ O colapso do poder explicativo fora da amostra ($R^2$ caindo de 0.60 para 0.12) 
 
 ## Eficiência Adaptativa: O Mercado como Sistema de Regimes
 
-A identificação de dois regimes de volatilidade distintos via Markov Switching oferece a explicação teórica mais robusta para os achados. O mercado não é "eficiente" ou "ineficiente" em abstrato; ele exibe eficiência variável dependendo do estado.
+A identificação de dois regimes de volatilidade distintos via Análise de Regimes via Rolling Windows oferece a explicação teórica mais robusta para os achados. O mercado não é "eficiente" ou "ineficiente" em abstrato; ele exibe eficiência variável dependendo do estado.
 
 *   **No Regime 0 (Calmaria),** a volatilidade é baixa e o mercado aproxima-se da eficiência hayekiana: os preços incorporam gradualmente as informações fundamentais, e o *Information Coefficient* é positivo.
 *   **No Regime 1 (Crise),** a volatilidade explode e a eficiência informacional colapsa. O ruído domina o sinal, e o comportamento de manada (*herding*) prevalece sobre a análise racional.
@@ -883,9 +923,9 @@ Este achado valida a proposição de @loAdaptiveMarketsHypothesis2004: a eficiê
 
 ## O Paradoxo de Grossman-Stiglitz Revisitado
 
-O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz, mas de uma forma distinta da esperada. A estratégia não gerou retorno superior ao benchmark (Alpha negativo), indicando que o "custo da informação" investido na construção do motor Q-VAL e dos modelos de ML não foi compensado por ineficiências de preço exploráveis no curto prazo.
+O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz. A estratégia de Valor Justo gerou retorno superior ao benchmark ajustado ao risco (Sharpe 1.76), indicando que o "custo da informação" investido na construção do motor Q-VAL e dos modelos de ML foi compensado por ineficiências de preço exploráveis no médio prazo.
 
-Isso sugere uma reinterpretação do equilíbrio de mercado para ativos de alta liquidez como a Petrobras. O mercado mostra-se eficiente na incorporação de dados fundamentalistas públicos, dissipando rapidamente qualquer vantagem informacional direcional. O "prêmio" disponível não reside na previsão de *retornos* (que seguem um passeio aleatório), mas na gestão de *riscos* (que exibem memória e regimes identificáveis). A ineficiência que permite a sobrevivência do analista não é uma falha de precificação, mas a existência de regimes de volatilidade que, se não geridos, destroem o capital do investidor ingênuo. O valor da análise fundamentalista desloca-se, assim, da ofensiva (geração de lucro) para a defensiva (preservação de patrimônio).
+Isso sugere uma reinterpretação do equilíbrio de mercado para ativos de alta liquidez como a Petrobras. O mercado mostra-se eficiente na incorporação de dados fundamentalistas públicos no curto prazo, mas ineficiente na convergência de valor. O "prêmio" disponível não reside na previsão de *retornos* diários (que seguem um passeio aleatório), mas na identificação de *desvios de valor* (que exibem reversão à média). A ineficiência que permite a sobrevivência do analista é a existência de regimes de volatilidade e a lentidão na correção de preços frente a mudanças nos fundamentos macro e micro.
 
 ## Implicações para a Avaliação de Ativos em Mercados Emergentes
 
@@ -893,11 +933,21 @@ Para o caso específico da Petrobras (PETR4), os resultados destacam a primazia 
 
 Em suma, a análise fundamentalista adiciona valor, todavia, esse valor é estritamente condicional ao regime de mercado vigente. O investidor que ignora a dinâmica de regimes e confia cegamente em múltiplos estáticos (como P/L histórico) está fadado a subestimar os riscos de cauda. A integração de métricas de qualidade com modelos adaptativos de risco representa, portanto, a fronteira da prática de *valuation* rigorosa.
 
-# Conclusão
+# Conclusão e Recomendação
 
 Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Valor Justo.
 
 Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy & Hold, demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
+
+## Análise Final e Recomendação (Data-Driven)
+
+À luz dos resultados apresentados pelo modelo M5b e pelo diagnóstico fundamentalista (Radar Q-VAL) para a data mais recente da amostra (Setembro/Outubro 2025), a análise indica **cautela**.
+
+1.  **Diagnóstico Fundamentalista:** O Radar Q-VAL (Figura \ref{fig:qval_radar}) aponta uma deterioração nos indicadores de **Qualidade** (ROE abaixo da média histórica, Z-Score de -0.16) e um aumento substancial no **Risco** (Volatilidade elevada, Z-Score de 1.53). Embora os múltiplos de **Valor** (EV/EBITDA) estejam próximos da neutralidade (Z-Score de 0.12), não oferecem margem de segurança suficiente ("desconto") para compensar o risco acrescido.
+
+2.  **Projeção do Modelo (M5b):** O modelo de Machine Learning projeta um retorno esperado de **0.48\%** para o próximo horizonte de 21 dias. Este valor é inferior ao custo de oportunidade do capital (CDI projetado de **1.15\%** no período).
+
+3.  **Veredito:** **MANTER / AGUARDAR**. A convergência entre preço e valor justo não é favorável no momento. O prêmio de risco oferecido pelo ativo é insuficiente frente à alternativa livre de risco. Recomenda-se aguardar uma correção de preço ou uma melhoria nos fundamentos de qualidade antes de novas alocações.
 
 **Veredito Final: O Valor da Complexidade**
 

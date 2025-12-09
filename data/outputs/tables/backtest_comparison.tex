@@ -1,0 +1,17 @@
+
+\begin{table}[H]
+\centering
+\caption{Performance Comparativa: Fair Value vs. Naive Directional vs. Benchmarks (Jan/2023 - Out/2025)}
+\label{tab:backtest_comparison}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Estratégia} & \textbf{Retorno Total} & \textbf{Retorno Anual} & \textbf{Volatilidade} & \textbf{Sharpe} & \textbf{Trades} \\
+\midrule
+M5b Fair Value & \textbf{220.65\%} & 51.31\% & 17.63\% & \textbf{1.76} & 22 \\
+M5b Naive (Day-Trade) & 57.29\% & 17.47\% & 19.88\% & 0.31 & 344 \\
+Buy \& Hold (PETR4) & 87.83\% & 25.11\% & 27.45\% & 0.52 & 1 \\
+CDI (Risk Free) & 39.82\% & 12.65\% & 0.09\% & - & - \\
+\bottomrule
+\end{tabular}
+\footnotesize{Nota: Sharpe Ratio calculado sobre o CDI. Volatilidade anualizada.}
+\end{table}

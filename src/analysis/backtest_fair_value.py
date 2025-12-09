@@ -23,12 +23,44 @@ from src.core.config import PROJECT_ROOT
 from src.core.style import set_style
 
 # Configs
-PREDICTIONS_PATH = PROJECT_ROOT / "data/outputs/m5_horizon_predictions.parquet"
+HORIZON_PREDICTIONS_PATH = PROJECT_ROOT / "data/outputs/m5_horizon_predictions.parquet"
+DAILY_PREDICTIONS_PATH = PROJECT_ROOT / "data/outputs/m5_predictions.parquet"
 OUTPUT_DIR = PROJECT_ROOT / "data/outputs/backtest"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 COST_BPS = 0.0005 # 5 bps transaction cost (slippage + fees)
 HORIZON = 21
+
+class NaiveDirectionalBacktest:
+    def __init__(self, df, model_col):
+        self.df = df.copy()
+        self.model_col = model_col
+        
+    def run(self):
+        # Signal: 1 if pred > 0, else 0 (Cash/CDI)
+        # Or Short? Let's assume Long/Cash for fair comparison with Fair Value
+        # If pred > 0 -> Long
+        # If pred <= 0 -> Cash (CDI)
+        
+        self.df['position'] = np.where(self.df[self.model_col] > 0, 1, 0)
+        
+        # Transaction Costs
+        self.df['pos_change'] = self.df['position'].diff().abs().fillna(0)
+        
+        # Strategy Return (Shifted)
+        pos_lag = self.df['position'].shift(1).fillna(0)
+        
+        self.df['strategy_gross'] = (
+            pos_lag * self.df['ret_petr4'] + 
+            (1 - pos_lag) * self.df['cdi_daily']
+        )
+        
+        costs_lag = self.df['pos_change'].shift(1).fillna(0) * COST_BPS
+        self.df['strategy_net'] = self.df['strategy_gross'] - costs_lag
+        
+        # Cumulative
+        self.df['equity'] = (1 + self.df['strategy_net']).cumprod()
+        return self.df
 
 class FairValueBacktest:
     def __init__(self, df, model_col, entry_threshold=0.02, exit_threshold=0.0):
@@ -107,31 +139,48 @@ class FairValueBacktest:
         
         return self.df
 
-    def plot_results(self, title):
+    def plot_results(self, title, comparison_df=None, comparison_label=None):
         set_style()
-        fig, ax = plt.subplots(figsize=(12, 6))
+        # Use Seaborn style for better aesthetics
+        sns.set_theme(style="whitegrid", rc={"grid.linestyle": ":", "axes.spines.right": False, "axes.spines.top": False})
         
-        # Plot Equity Curves
-        ax.plot(self.df.index, self.df['equity'], label='Strategy (Fair Value)', color='blue', linewidth=1.5)
-        ax.plot(self.df.index, self.df['benchmark_buyhold'], label='Buy & Hold (PETR4)', color='gray', alpha=0.5, linewidth=1)
-        ax.plot(self.df.index, self.df['benchmark_cdi'], label='CDI', color='green', linestyle='--', linewidth=1)
+        fig, ax = plt.subplots(figsize=(12, 7))
         
-        # Plot Drawdown area for Strategy?
-        # Maybe too cluttered.
+        # Define data and colors for iteration
+        lines = [
+            {'data': self.df, 'col': 'equity', 'label': 'Fair Value (M5b)', 'color': '#1f77b4', 'style': '-'},
+            {'data': self.df, 'col': 'benchmark_buyhold', 'label': 'Buy & Hold (PETR4)', 'color': 'gray', 'style': '-'},
+            {'data': self.df, 'col': 'benchmark_cdi', 'label': 'CDI', 'color': 'green', 'style': ':'}
+        ]
         
-        ax.set_title(title)
-        ax.set_ylabel("Cumulative Return (1.0 = Start)")
-        ax.legend()
-        ax.grid(True, alpha=0.3)
+        if comparison_df is not None:
+            lines.insert(1, {'data': comparison_df, 'col': 'equity', 'label': 'Naive (Day-Trade)', 'color': '#d62728', 'style': '--'})
+
+        # Plot loop
+        for line in lines:
+            data = line['data']
+            col = line['col']
+            last_date = data.index[-1]
+            last_val = data[col].iloc[-1]
+            
+            sns.lineplot(x=data.index, y=data[col], label=line['label'], 
+                         color=line['color'], linestyle=line['style'], linewidth=2, ax=ax)
+            
+            # Add annotation at the end
+            ax.annotate(f"{last_val:.2f}x", 
+                        xy=(last_date, last_val), 
+                        xytext=(8, 0), textcoords='offset points', 
+                        color=line['color'], fontweight='bold', fontsize=10,
+                        verticalalignment='center')
+
+        ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
+        ax.set_ylabel("Capital Acumulado (1.0 = Início)", fontsize=11)
+        ax.set_xlabel("")
         
-        # Add metrics text box
-        total_ret = self.df['equity'].iloc[-1] - 1
-        sharpe = self.calculate_sharpe()
-        textstr = f'Total Ret: {total_ret:.1%}\nSharpe: {sharpe:.2f}'
-        props = dict(boxstyle='round', facecolor='white', alpha=0.8)
-        ax.text(0.02, 0.95, textstr, transform=ax.transAxes, fontsize=10,
-                verticalalignment='top', bbox=props)
+        # Legend inside plot (Best location)
+        ax.legend(loc='upper left', frameon=True, framealpha=0.9, edgecolor='lightgray', fontsize=10)
         
+        plt.tight_layout()
         return fig
     
     def calculate_sharpe(self):
@@ -140,44 +189,121 @@ class FairValueBacktest:
         return (excess_ret.mean() * 252) / (excess_ret.std() * np.sqrt(252))
 
 def run_backtest():
-    print("🚀 Iniciando Backtest: Fair Value Strategy...")
+    print("🚀 Iniciando Backtest: Fair Value Strategy vs Naive Directional...")
     
-    # Load Predictions
-    df = pd.read_parquet(PREDICTIONS_PATH)
-    df = df.sort_index()
+    # Load Horizon Predictions (Fair Value)
+    df_horizon = pd.read_parquet(HORIZON_PREDICTIONS_PATH)
+    df_horizon = df_horizon.sort_index()
+    
+    # Load Daily Predictions (Naive)
+    if DAILY_PREDICTIONS_PATH.exists():
+        df_daily = pd.read_parquet(DAILY_PREDICTIONS_PATH)
+        df_daily = df_daily.sort_index()
+        # Merge daily predictions into horizon df
+        # df_daily has 'pred_ml' (XGBoost) and 'pred_linear' (ElasticNet)
+        # We need to join on index
+        df_combined = df_horizon.join(df_daily[['pred_ml']], how='left')
+    else:
+        print("⚠️ Predições diárias não encontradas. Usando placeholder.")
+        df_combined = df_horizon.copy()
+        df_combined['pred_ml'] = 0 # Placeholder
     
     # Filter for Out-of-Sample (2023+)
-    df_oos = df[df.index >= '2023-01-01'].copy()
+    df_oos = df_combined[df_combined.index >= '2023-01-01'].copy()
     
     print(f"   Período: {df_oos.index.min().date()} a {df_oos.index.max().date()}")
     
     # =========================================================================
-    # 1. M5a (Huber) - Mais volátil, exige threshold maior
+    # 1. Naive Directional (M5b Daily)
     # =========================================================================
-    print("\n   --- Executando para M5a (Huber) ---")
-    # Threshold 5% (só entra se tiver muito desconto)
-    bt_huber = FairValueBacktest(df_oos, 'pred_huber_21d', entry_threshold=0.05, exit_threshold=0.0)
-    res_huber = bt_huber.run()
-    print_metrics("M5a (Huber)", res_huber)
-    
-    fig_huber = bt_huber.plot_results("M5a (Huber) - Fair Value Strategy (Entry > 5%)")
-    fig_huber.savefig(OUTPUT_DIR / "backtest_m5a_fairvalue.png")
+    print("\n   --- Executando Naive Directional (M5b Daily) ---")
+    bt_naive = NaiveDirectionalBacktest(df_oos, 'pred_ml')
+    res_naive = bt_naive.run()
+    print_metrics("Naive Directional", res_naive)
     
     # =========================================================================
-    # 2. M5b (XGBoost) - Mais conservador
+    # 2. Fair Value (M5b Horizon)
     # =========================================================================
-    print("\n   --- Executando para M5b (XGBoost) ---")
+    print("\n   --- Executando Fair Value (M5b Horizon) ---")
     # Threshold 2% (mais sensível)
-    bt_xgb = FairValueBacktest(df_oos, 'pred_xgb_21d', entry_threshold=0.02, exit_threshold=0.0)
-    res_xgb = bt_xgb.run()
-    print_metrics("M5b (XGBoost)", res_xgb)
+    bt_fair = FairValueBacktest(df_oos, 'pred_xgb_21d', entry_threshold=0.02, exit_threshold=0.0)
+    res_fair = bt_fair.run()
+    print_metrics("Fair Value (M5b)", res_fair)
     
-    fig_xgb = bt_xgb.plot_results("M5b (XGBoost) - Fair Value Strategy (Entry > 2%)")
-    fig_xgb.savefig(OUTPUT_DIR / "backtest_m5b_fairvalue.png")
+    # Plot Comparison
+    fig_comp = bt_fair.plot_results(
+        "M5b: Fair Value (Swing) vs Naive Directional (Day-Trade)",
+        comparison_df=res_naive,
+        comparison_label="Naive Directional (Day-Trade)"
+    )
+    
+    # Save Figure to the correct figures directory for LaTeX inclusion
+    FIGURES_DIR = PROJECT_ROOT / "data/outputs/figures"
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    fig_comp.savefig(FIGURES_DIR / "backtest_comparison_m5b.png", dpi=300, bbox_inches='tight')
+    print(f"   Figura salva em: {FIGURES_DIR / 'backtest_comparison_m5b.png'}")
     
     # Save Results CSV
-    res_xgb.to_csv(OUTPUT_DIR / "backtest_results_m5b.csv")
+    res_fair.to_csv(OUTPUT_DIR / "backtest_results_fairvalue.csv")
+    res_naive.to_csv(OUTPUT_DIR / "backtest_results_naive.csv")
+    
+    # Generate LaTeX Table
+    generate_latex_table(res_fair, res_naive)
+    
     print(f"\n   Resultados salvos em: {OUTPUT_DIR}")
+
+def generate_latex_table(df_fair, df_naive):
+    """Gera tabela LaTeX comparativa."""
+    
+    def get_metrics(df):
+        total_ret = df['equity'].iloc[-1] - 1
+        ann_ret = (1 + total_ret) ** (252 / len(df)) - 1
+        vol = df['strategy_net'].std() * np.sqrt(252)
+        excess_ret = df['strategy_net'] - df['cdi_daily']
+        sharpe = (excess_ret.mean() * 252) / (excess_ret.std() * np.sqrt(252))
+        trades = df['pos_change'].sum()
+        return total_ret, ann_ret, vol, sharpe, trades
+
+    m_fair = get_metrics(df_fair)
+    m_naive = get_metrics(df_naive)
+    
+    # Benchmark CDI
+    cdi_total = df_fair['benchmark_cdi'].iloc[-1] - 1
+    cdi_ann = (1 + cdi_total) ** (252 / len(df_fair)) - 1
+    cdi_vol = df_fair['cdi_daily'].std() * np.sqrt(252)
+    
+    # Benchmark Buy & Hold
+    bh_total = df_fair['benchmark_buyhold'].iloc[-1] - 1
+    bh_ann = (1 + bh_total) ** (252 / len(df_fair)) - 1
+    bh_vol = df_fair['ret_petr4'].std() * np.sqrt(252)
+    bh_excess = df_fair['ret_petr4'] - df_fair['cdi_daily']
+    bh_sharpe = (bh_excess.mean() * 252) / (bh_excess.std() * np.sqrt(252))
+
+    def fmt_pct(val):
+        return f"{val:.2%}".replace("%", r"\%")
+
+    latex = r"""
+\begin{table}[H]
+\centering
+\caption{Performance Comparativa: Fair Value vs. Naive Directional vs. Benchmarks (Jan/2023 - Out/2025)}
+\label{tab:backtest_comparison}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Estratégia} & \textbf{Retorno Total} & \textbf{Retorno Anual} & \textbf{Volatilidade} & \textbf{Sharpe} & \textbf{Trades} \\
+\midrule
+M5b Fair Value & \textbf{""" + fmt_pct(m_fair[0]) + r"""} & """ + fmt_pct(m_fair[1]) + r""" & """ + fmt_pct(m_fair[2]) + r""" & \textbf{""" + f"{m_fair[3]:.2f}" + r"""} & """ + f"{int(m_fair[4])}" + r""" \\
+M5b Naive (Day-Trade) & """ + fmt_pct(m_naive[0]) + r""" & """ + fmt_pct(m_naive[1]) + r""" & """ + fmt_pct(m_naive[2]) + r""" & """ + f"{m_naive[3]:.2f}" + r""" & """ + f"{int(m_naive[4])}" + r""" \\
+Buy \& Hold (PETR4) & """ + fmt_pct(bh_total) + r""" & """ + fmt_pct(bh_ann) + r""" & """ + fmt_pct(bh_vol) + r""" & """ + f"{bh_sharpe:.2f}" + r""" & 1 \\
+CDI (Risk Free) & """ + fmt_pct(cdi_total) + r""" & """ + fmt_pct(cdi_ann) + r""" & """ + fmt_pct(cdi_vol) + r""" & - & - \\
+\bottomrule
+\end{tabular}
+\footnotesize{Nota: Sharpe Ratio calculado sobre o CDI. Volatilidade anualizada.}
+\end{table}
+"""
+    
+    with open(PROJECT_ROOT / "data/outputs/tables/backtest_comparison.tex", "w") as f:
+        f.write(latex)
+    print("   Tabela LaTeX gerada em: data/outputs/tables/backtest_comparison.tex")
 
 def print_metrics(name, df):
     total_ret = df['equity'].iloc[-1] - 1

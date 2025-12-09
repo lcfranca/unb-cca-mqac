@@ -51,15 +51,15 @@ def run():
     df = pd.DataFrame(plot_data)
     
     # Plot
-    fig, ax1 = plt.subplots(figsize=(14, 8))
+    fig, ax1 = plt.subplots(figsize=(12, 7))
     
-    # Cores baseadas no Tipo
+    # Cores baseadas no Tipo (Sóbrias e Profissionais)
     palette = {
-        'Benchmark': '#95a5a6', # Cinza
-        'Linear': '#3498db',    # Azul
-        'Dinâmico': '#e67e22',  # Laranja
-        'Multifator': '#2ecc71', # Verde
-        'Granular': '#9b59b6'   # Roxo
+        'Benchmark': '#7f8c8d', # Cinza Escuro
+        'Linear': '#2980b9',    # Azul Forte
+        'Dinâmico': '#d35400',  # Laranja Queimado
+        'Multifator': '#27ae60', # Verde Esmeralda
+        'Granular': '#8e44ad'   # Roxo Profundo
     }
     
     # Hue order
@@ -73,34 +73,27 @@ def run():
         hue='Tipo', 
         palette=palette, 
         dodge=False, 
-        alpha=0.9,
+        alpha=0.95,
         hue_order=hue_order
     )
     
     # Labels e Títulos
-    ax1.set_ylabel('R² Out-of-Sample (%)', color=COLORS['primary'], fontweight='bold', labelpad=10)
-    ax1.set_xlabel('Hierarquia de Modelos', fontweight='bold', labelpad=10)
+    ax1.set_ylabel('R² Out-of-Sample (%)', fontweight='bold', labelpad=10)
+    ax1.set_xlabel('', fontweight='bold', labelpad=10)
     
     plt.title('Evolução da Eficiência Informacional: Ganho Marginal de Informação', pad=20, fontweight='bold', fontsize=14)
     
-    # Ajuste de limites (Clipar valores muito negativos para não estragar o gráfico)
-    # Se houver valores < -5, clipar em -5 e avisar
+    # Ajuste de limites
     min_val = df['R2 OOS (%)'].min()
-    if min_val < -5:
-        ax1.set_ylim(-5, df['R2 OOS (%)'].max() * 1.15)
-    else:
-        ax1.set_ylim(min(0, min_val) * 1.1, df['R2 OOS (%)'].max() * 1.15)
+    max_val = df['R2 OOS (%)'].max()
+    ax1.set_ylim(min(0, min_val) - 5, max_val * 1.2) # Mais espaço no topo
     
     # Anotações nas Barras (OOS)
-    # Precisamos iterar sobre as barras na ordem do eixo X para calcular deltas
-    # O seaborn/matplotlib não garante a ordem nos containers se houver hue
-    # Vamos pegar as patches e ordenar pela coordenada x
-    
     patches = []
     for container in ax1.containers:
         patches.extend(container.patches)
     
-    # Filtrar patches que não são NaN (alguns podem ser placeholders do hue)
+    # Filtrar patches que não são NaN
     patches = [p for p in patches if not pd.isna(p.get_height())]
     # Ordenar por posição X
     patches.sort(key=lambda x: x.get_x())
@@ -113,13 +106,13 @@ def run():
         # 1. Valor Principal (R2)
         ax1.text(
             x_center,
-            height + 0.5 if height > 0 else height - 2.5, # Um pouco acima da barra
-            f'{height:.2f}%',
+            height + 1.0 if height > 0 else height - 3.0,
+            f'{height:.1f}%',
             ha='center',
             va='bottom',
             fontweight='bold',
             color='black',
-            fontsize=12 # Aumentado
+            fontsize=11
         )
         
         # 2. Delta (se não for o primeiro)
@@ -127,31 +120,24 @@ def run():
             prev_height = patches[i-1].get_height()
             diff = height - prev_height
             
-            color = 'green' if diff >= 0 else 'red'
+            color = '#27ae60' if diff >= 0 else '#c0392b'
             symbol = '▲' if diff >= 0 else '▼'
             
-            # Posicionar logo abaixo do número principal (mas ainda acima da barra, ou dentro se necessário)
-            # Vamos colocar logo ACIMA do número para não poluir a barra, ou logo ABAIXO se houver espaço?
-            # O usuário pediu "logo abaixo do numero".
-            # Se o numero está em (height + 0.5), o delta pode ficar em (height - 1.5) se for dentro da barra?
-            # Ou vamos subir o número principal e colocar o delta entre a barra e o número.
-            
-            # Estratégia: Subir o label principal e colocar o delta embaixo dele
-            
-            # Ajuste fino de posição
-            delta_y = height - 1.5 if height > 0 else height + 0.5 # Dentro da barra (topo)
-            
-            # Se a barra for muito pequena, colocar acima do número principal
-            if abs(height) < 5:
-                 delta_y = height + 2.5
-            
+            # Posicionar dentro da barra (topo) se houver espaço, senão acima
+            if height > 5:
+                y_pos = height - 2.0
+                txt_color = 'white'
+            else:
+                y_pos = height + 3.5
+                txt_color = color
+
             ax1.text(
                 x_center,
-                delta_y, 
-                f'{symbol} {abs(diff):.1f}pp',
+                y_pos, 
+                f'{symbol}{abs(diff):.1f}',
                 ha='center',
                 va='center',
-                color=color,
+                color=txt_color,
                 fontweight='bold',
                 fontsize=9
             )
@@ -159,11 +145,8 @@ def run():
     # Linha de base (0%)
     ax1.axhline(0, color='black', linewidth=1, linestyle='-')
     
-    # Grid
-    ax1.grid(axis='y', linestyle='--', alpha=0.3)
-    
-    # Legenda (Aumentada)
-    plt.legend(title='Classe de Modelo', loc='upper left', bbox_to_anchor=(1, 1), fontsize=11, title_fontsize=12)
+    # Legenda (Interna - Upper Left)
+    plt.legend(title='Classe de Modelo', loc='upper left', frameon=True, framealpha=0.95)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')

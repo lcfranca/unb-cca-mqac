@@ -53,7 +53,7 @@ coordenador-noturno: "Professor Mestre Elivânio Geraldo de Andrade"
 # ------------------------------------------------------------------------------
 
 abstract: |
-  Este trabalho investiga a eficiência informacional do mercado brasileiro através de uma análise empírica da Petrobras S.A. (PETR4), testando se a incorporação de dados fundamentalistas granulares e variáveis macroeconômicas adiciona poder explicativo sobre os retornos do ativo. Utilizando uma abordagem de modelos aninhados (M0 a M5b), partindo de benchmarks ingênuos até algoritmos de Machine Learning (XGBoost), documentamos a evolução do $R^2$ Out-of-Sample de 12,28\% (CAPM Estático) para 33,40\% (M5b - ML Granular). Identificamos dois fenômenos críticos: (i) a "Armadilha da Linearidade", onde a agregação de métricas em um score único destrói informação relevante, resultando em performance inferior ao modelo macro; e (ii) o "Paradoxo da Explicação vs. Predição" (Shmueli, 2010), onde o modelo M5b maximiza a explicação da variância contemporânea mas falha na previsão direcional *ex-ante* ($R^2_{OOS} < 0$), corroborando a Hipótese dos Mercados Eficientes na forma semi-forte. Em resposta, desenvolvemos o Modelo M6 de Volatility Targeting, que abandona a previsão de retornos em favor da gestão dinâmica de risco, transformando o perfil do investimento. Os resultados sugerem que o mercado opera em um regime de eficiência assimétrica, onde a direção dos preços é imprevisível (Random Walk), mas a estrutura de risco é modelável, validando a perspectiva dos Mercados Adaptativos e da Economia da Complexidade.
+  Este trabalho investiga a eficiência informacional do mercado brasileiro através de uma análise empírica da Petrobras S.A. (PETR4), testando se a incorporação de dados fundamentalistas granulares e variáveis macroeconômicas adiciona poder explicativo sobre os retornos do ativo. Utilizando uma abordagem de modelos aninhados (M0 a M5b), partindo de benchmarks ingênuos até algoritmos de Machine Learning (XGBoost), documentamos a evolução do $R^2$ Out-of-Sample de 12,28\% (CAPM Estático) para 33,40\% (M5b - ML Granular). Identificamos a "Armadilha da Linearidade", onde a agregação de métricas em um score único destrói informação relevante, resultando em performance inferior ao modelo macro. A análise da Hipótese dos Mercados Adaptativos (AMH) revela que a eficiência informacional varia no tempo, com o Machine Learning superando modelos lineares apenas em regimes específicos de alta complexidade. Embora a previsão direcional de curto prazo falhe devido ao ruído estocástico, a estratégia de Valor Justo (Fair Value) baseada no modelo M5b gerou um Índice de Sharpe de 1.76, explorando a ineficiência de convergência no médio prazo. O estudo conclui com um diagnóstico fundamentalista atual via Radar Q-VAL, recomendando cautela (MANTER) dada a assimetria desfavorável entre risco e retorno projetado, validando a perspectiva de que a geração de *alpha* em mercados emergentes exige a integração de análise fundamentalista, macroeconômica e modelagem não-linear adaptativa.
 
 keywords:
   - Eficiência de Mercado
@@ -68,8 +68,8 @@ keywords:
 # ------------------------------------------------------------------------------
 
 epigrafe:
-  texto: "Price is what you pay. Value is what you get."
-  autor: "Warren Buffett"
+  texto: "Economics is not a form of physics, but a form of biology."
+  autor: "**W. Brian Arthur**, *Complexity and the Economy*"
 
 # ------------------------------------------------------------------------------
 # LISTA DE ABREVIATURAS E SIGLAS
