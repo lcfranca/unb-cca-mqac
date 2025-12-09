@@ -36,7 +36,7 @@ def run():
         ('z_roe', 'ROE', False),
         ('z_roic', 'ROIC', False),
         ('z_ebitda_margin', 'Margem', False),
-        ('z_evs', 'Estabilidade', False), 
+        ('z_evs', 'EVS', False), 
         
         # Risco (Red)
         ('z_debt_to_equity', 'D/E', True), 

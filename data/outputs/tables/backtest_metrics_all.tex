@@ -1,0 +1,20 @@
+\begin{table}
+\small
+\caption{Performance da Estratégia de Valor Justo (2023-2024)}
+\label{tab:backtest_results}
+\begin{tabular}{lccccc}
+\toprule
+Modelo & Retorno Total & Volatilidade (a.a.) & Sharpe Ratio & Max Drawdown & Trades \\
+\midrule
+CDI & 41.37\% & 0.09\% & 0.00 & 0.00\% & 0 \\
+Buy \& Hold & 99.38\% & 27.31\% & 1.01 & -21.89\% & 1 \\
+M0 (Média Histórica) & 79.66\% & 19.51\% & 1.14 & -17.51\% & 2 \\
+M1 (CAPM Estático) & 41.37\% & 0.09\% & 133.99 & 0.00\% & 0 \\
+M2 (CAPM Dinâmico) & 41.37\% & 0.09\% & 133.99 & 0.00\% & 0 \\
+M3 (Linear Fundamentos) & 31.67\% & 21.36\% & 0.55 & -21.89\% & 1 \\
+M4 (Linear Macro) & 31.67\% & 21.36\% & 0.55 & -21.89\% & 1 \\
+M5a (Huber Robust) & 34.12\% & 20.51\% & 0.61 & -18.72\% & 36 \\
+M5b (XGBoost ML) & 217.15\% & 17.63\% & 2.42 & -9.78\% & 22 \\
+\bottomrule
+\end{tabular}
+\end{table}

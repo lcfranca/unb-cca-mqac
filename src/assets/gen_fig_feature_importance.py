@@ -57,7 +57,7 @@ def load_data_horizon():
     
     # Merge AsOf
     df = df.sort_values('date')
-    z_cols = ['z_earnings_yield', 'z_ev_ebitda', 'z_pb_ratio', 'z_roe', 'z_debt_to_equity']
+    z_cols = ['z_earnings_yield', 'z_ev_ebitda', 'z_pb_ratio', 'z_roe', 'z_debt_to_equity', 'z_evs']
     available_z_cols = [c for c in z_cols if c in df_qval.columns]
     
     df = pd.merge_asof(df, df_qval[['available_date'] + available_z_cols], left_on='date', right_on='available_date', direction='backward')
@@ -124,6 +124,7 @@ def run():
         'mom_21d': 'Momentum (21d)',
         'z_earnings_yield': 'Valor: Earnings Yield',
         'z_ev_ebitda': 'Valor: EV/EBITDA',
+        'z_evs': 'Valor: EV/Sales',
         'z_pb_ratio': 'Valor: P/VP',
         'z_roe': 'Qualidade: ROE',
         'z_debt_to_equity': 'Risco: Dívida/PL'

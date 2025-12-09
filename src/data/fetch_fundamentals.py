@@ -88,6 +88,7 @@ def _ingest_module(
             or entry.get("endDate")
             or entry.get("period")
             or entry.get("mostRecentQuarter")
+            or entry.get("updatedAt")
         )
         dt = _parse_date(date_field)
         if dt is None:

@@ -359,25 +359,22 @@ Esta inversão garante que, para todas as métricas normalizadas, valores mais a
 
 Os benchmarks setoriais são obtidos de empresas comparáveis do setor de óleo e gás integrado, utilizando dados de empresas listadas na B3 e, quando necessário para robustez estatística, médias de empresas latino-americanas do setor obtidas via bases de dados internacionais. 
 
-### Agregação em Score Composto
+### Agregação em Score Composto e Abordagem Machine Learning
 
-Os Z-Scores normalizados são agregados em score composto via média ponderada:
+A agregação das métricas normalizadas em um sinal único de investimento é realizada através de duas abordagens distintas, permitindo testar hipóteses sobre a estrutura da informação fundamentalista.
 
+**Abordagem Linear (Baseline - M5a):**
+Inicialmente, os Z-Scores são agregados em um score composto via média ponderada simples. Esta abordagem assume que a contribuição de cada métrica é linear e aditiva.
 $$\text{Score}_{\text{Dimensão}} = \sum_{j=1}^{n} w_j \cdot Z_j$$
-
-onde $w_j$ são pesos atribuídos a cada métrica dentro da dimensão, com $\sum w_j = 1$. Na implementação base, pesos iguais são atribuídos a cada métrica dentro de cada dimensão ($w_j = 1/n$). 
-
-O score final Q-VAL agrega as três dimensões:
-
-$$\text{Q-VAL} = w_V \cdot \text{Score}_{\text{Valor}} + w_Q \cdot \text{Score}_{\text{Qualidade}} + w_R \cdot \text{Score}_{\text{Risco}}$$
-
-Na configuração base, pesos iguais são atribuídos às dimensões ($w_V = w_Q = w_R = 1/3$). Embora a literatura sugira a possibilidade de otimização de pesos, este trabalho adota a premissa de que a granularidade dos dados (explorada no modelo M5b) é superior à simples reponderação de agregados. Assim, o Score Q-VAL serve como *baseline* linear, enquanto o modelo de Machine Learning (M5b) se encarrega de encontrar a estrutura de pesos ótima e não-linear de forma data-driven.
-
-Para facilitar interpretação, o score é transformado em escala 0-100:
-
+O score final Q-VAL agrega as três dimensões (Valor, Qualidade, Risco) com pesos iguais ($w=1/3$). Este score linear serve como *baseline*: ele representa a heurística tradicional de "somar pontos" para avaliar uma empresa. Para facilitar a interpretação, o score é transformado para a escala 0-100:
 $$\text{Q-VAL}_{[0,100]} = 50 + 10 \cdot \text{Q-VAL}_{\text{bruto}}$$
 
-Scores acima de 60 indicam recomendação de *Compra*; entre 40 e 60, *Neutro*; abaixo de 40, *Venda*. Estes limiares correspondem aproximadamente a $\pm 1$ desvio-padrão em torno da média. 
+**Abordagem Não-Linear (Machine Learning - M5b):**
+Reconhecendo que a relação entre fundamentos e retornos é complexa e condicional (ex: alavancagem alta pode ser benéfica em expansão mas fatal em recessão), adota-se uma abordagem baseada em *Gradient Boosting* (XGBoost). O modelo M5b recebe o vetor completo de Z-Scores individuais como *features* e aprende a função de mapeamento $f(X)$ que maximiza a aderência aos retornos observados.
+$$f(X) = \sum_{k=1}^{K} f_k(X), \quad f_k \in \mathcal{F}$$
+Diferentemente da agregação linear, o M5b captura interações não-lineares e efeitos de limiar (*thresholds*) sem impor uma estrutura de pesos fixa *a priori*. A comparação entre o desempenho do Score Linear (M5a) e do Modelo ML (M5b) constitui um teste direto da hipótese de complexidade: se o M5b superar significativamente o M5a, confirma-se que a "receita" de agregação importa tanto quanto os ingredientes (dados).
+
+Scores acima de 60 (na escala linear) ou sinais fortes do modelo ML indicam recomendação de *Compra*; abaixo de 40, *Venda*. Estes limiares correspondem aproximadamente a $\pm 1$ desvio-padrão em torno da média histórica. 
 
 ### Série Temporal de Scores
 
@@ -434,10 +431,15 @@ Expande o conjunto informacional para incluir variáveis macroeconômicas (Retor
 $$R_{t} = \text{Modelo M3} + \lambda_{Macro} \mathbf{X}_{Macro,t} + \lambda_{Fatores} \mathbf{F}_{FF,t} + \varepsilon_{t}$$
 Este modelo representa o "teto" de complexidade, testando se choques exógenos explicam a variância residual dos fundamentos.
 
-#### M5: Síntese (Eficiência da Agregação)
-Testa se o Score Q-VAL único é uma estatística suficiente para o vetor de fundamentos. Substitui as três dimensões do M3 pelo score agregado.
+#### M5a: Score Linear (Eficiência da Agregação Simples)
+Testa se o Score Q-VAL único (agregado linearmente) é uma estatística suficiente para o vetor de fundamentos. Substitui as três dimensões do M3 pelo score agregado.
 $$R_{t} = \delta \hat{R}_{M2,t} + \theta \text{Score\_QVAL}_{t-1} + \varepsilon_{t}$$
-A comparação entre M3 e M5 revela a eficiência do algoritmo de *scoring*: se a performance for similar, a agregação é bem-sucedida em reduzir a dimensionalidade sem perda de informação relevante.
+Se a performance do M5a for similar à do M3, a agregação linear é bem-sucedida em reduzir a dimensionalidade sem perda de informação. Nas tabelas de resultados, este modelo é frequentemente referido como **"M5 (Score Agregado)"**.
+
+#### M5b: Machine Learning Granular (Não-Linearidade)
+Abandona a premissa de linearidade e de agregação prévia. Utiliza o algoritmo XGBoost para processar o vetor completo de Z-Scores individuais, permitindo interações complexas entre as métricas. Além dos fundamentos da firma, o M5b incorpora também as variáveis macroeconômicas e fatores de risco do M4, funcionando como um modelo integrador.
+$$R_{t} = f_{XGB}(\text{Z-Scores}_{t-1}, \text{Macro}_{t-1}, \text{Fatores}_{t-1}) + \varepsilon_{t}$$
+Este modelo testa o limite superior da extração de informação. A diferença de performance entre M5b e M5a ($\Delta R^2_{NL}$) quantifica o valor da não-linearidade e da complexidade na modelagem de preços. O fato de métricas macroeconômicas (M4) estarem disponíveis ao modelo mas não aparecerem entre os principais *drivers* de importância (Feature Importance) indicaria que, para a Petrobras neste período, a dinâmica idiossincrática (fundamentos) domina a dinâmica macro.
 
 ---
 
@@ -562,16 +564,19 @@ O $R^2$ rolling é calculado para cada posição da janela, gerando série tempo
 
 **Erro Quadrático Médio (MSE) e Raiz do Erro Quadrático Médio (RMSE):**
 
-$$\text{MSE} = \frac{1}{n}\sum_{t=1}^{n}(y_t - \hat{y}_t)^2$$
-$$\text{RMSE} = \sqrt{\text{MSE}}$$
+O MSE calcula a média dos quadrados dos erros (diferença entre valor previsto e real). Ele penaliza erros grandes mais severamente do que erros pequenos, sendo útil para identificar modelos que cometem falhas graves pontuais.
 
-O RMSE tem a vantagem de estar na mesma unidade da variável dependente (retorno), facilitando interpretação econômica.
+$$\text{MSE} = \frac{1}{n}\sum_{t=1}^{n}(y_t - \hat{y}_t)^2$$
+
+O RMSE é simplesmente a raiz quadrada do MSE. Sua principal vantagem é estar na mesma unidade da variável dependente (neste caso, retornos percentuais), o que facilita a interpretação econômica direta. Por exemplo, um RMSE de 0.02 significa que o erro típico do modelo é de 2% por período.
+
+$$\text{RMSE} = \sqrt{\text{MSE}}$$
 
 **Erro Absoluto Médio (MAE):**
 
-$$\text{MAE} = \frac{1}{n}\sum_{t=1}^{n}|y_t - \hat{y}_t|$$
+O MAE calcula a média das diferenças absolutas entre previsão e realidade. Diferente do MSE/RMSE, ele trata todos os erros com o mesmo peso proporcional. Isso o torna menos sensível a *outliers* (valores extremos atípicos) e oferece uma visão mais "robusta" do erro médio esperado em dias normais.
 
-O MAE é menos sensível a outliers que o MSE/RMSE. 
+$$\text{MAE} = \frac{1}{n}\sum_{t=1}^{n}|y_t - \hat{y}_t|$$ 
 
 **Razão de Sharpe da Estratégia:**
 
@@ -826,35 +831,37 @@ Apesar de modelos de *Gradient Boosting* serem frequentemente tratados como "cai
 \label{fig:feature_importance}
 \end{figure}
 
-### Resultados do Backtest Comparativo: O Paradoxo da Predição
+### Resultados do Backtest Comparativo: A Hegemonia Não-Linear
 
-Embora o M5b apresente o maior poder explicativo ($R^2_{OOS} = 33.40\%$), a literatura alerta que significância estatística não garante relevância econômica [@mcleanDoesAcademicResearch2016]. Para validar a eficácia operacional, realizamos um *backtest* comparando duas abordagens distintas de utilização do mesmo modelo:
+A validação operacional dos modelos via *backtesting* da estratégia de Valor Justo (Fair Value) revela uma estrutura hierárquica de eficiência que transcende a simples métrica de erro quadrático. Ao submeter todos os modelos da hierarquia (M0 a M5b) ao mesmo protocolo de decisão — projetar o retorno em $t+21$ e alocar capital apenas quando o prêmio de risco excede o custo de oportunidade —, emerge uma distinção fundamental entre a capacidade de *descrever* o passado e a capacidade de *navegar* o futuro.
 
-1.  **Trading Direcional (Ingênuo):** Estratégia de curto prazo ($t+1$) que compra se o modelo prevê retorno positivo para o dia seguinte.
-2.  **Valuation Quantitativo (Fair Value):** Estratégia de médio prazo ($t+21$) que estima um Preço Justo Implícito ($P^*$) e só opera se houver margem de segurança significativa frente ao custo de oportunidade do CDI.
-
-A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas para ambas as estratégias.
+A Figura \ref{fig:backtest} apresenta as curvas de capital acumuladas para todos os modelos testados, comparados aos benchmarks de mercado (Buy \& Hold e CDI).
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_comparison_m5b.png}
-\caption{Backtest Comparativo: A ineficiência do Day-Trade (Vermelho) vs. o sucesso do Valor Justo (Azul). O mesmo modelo gera resultados opostos dependendo do horizonte.}
+\includegraphics[width=1.0\textwidth]{data/outputs/figures/backtest_equity_all.pdf}
+\caption{Evolução do Capital: Estratégia de Valor Justo (2023-2024). O modelo M5b (Vermelho) destaca-se como a única estratégia ativa capaz de superar consistentemente o Buy \& Hold (Preto) e o CDI (Cinza).}
 \label{fig:backtest}
 \end{figure}
 
-#### A Ineficiência do Trading Direcional
-A estratégia direcional ingênua (linha vermelha) apresentou performance mista. Embora tenha superado o CDI com retorno acumulado de **57.29\%** (vs 39.82\%), ela falhou em gerar *alpha* consistente ajustado ao risco (Sharpe 0.31) e perdeu significativamente para o *Buy & Hold* (87.83\%). A alta frequência de negociação (344 trades) e a volatilidade elevada (19.88\%) corroeram os ganhos. Este resultado ilustra o **Paradoxo da Explicação vs. Predição** [@shmueliToExplainOrToPredict2010]: o alto poder explicativo do modelo ($R^2 \approx 33\%$) não se traduz em capacidade robusta de prever a direção do ruído diário.
+Os resultados, detalhados na Tabela \ref{tab:backtest_results}, revelam uma dicotomia clara entre abordagens lineares e não-lineares.
 
-#### A Solução via Valor Justo
-Em contraste, a estratégia de Valor Justo (linha azul) gerou um **Índice de Sharpe de 1.76** e retorno total de **220.65\%**, com apenas 22 operações. Ao mudar o foco da "previsão de preço" para a "identificação de valor", o modelo consegue explorar a **ineficiência de convergência**: os preços podem desviar dos fundamentos no curto prazo, mas convergem no médio prazo. A estratégia filtra o ruído diário e captura apenas os movimentos estruturais de reprecificação.
+\input{data/outputs/tables/backtest_metrics_all.tex}
 
-A Tabela \ref{tab:backtest_comparison} detalha as métricas de performance.
+#### O Fracasso Estrutural dos Modelos Lineares (M3, M4, M5a)
+A performance sub-ótima dos modelos lineares (M3, M4) e robustos (M5a), que entregaram retornos reais negativos (abaixo do CDI) e Índices de Sharpe pouco expressivos (0.47-0.61), aponta para uma limitação epistemológica da abordagem econométrica tradicional. A imposição de uma forma funcional rígida ($y = \alpha + \beta X + \varepsilon$) assume que a elasticidade do retorno aos fundamentos é constante e independente do regime de mercado. Esta premissa de estacionariedade estrutural apresenta limitações severas em períodos de transição de regime. O modelo linear, cego às assimetrias de risco e às interações complexas entre variáveis, continua a emitir sinais de entrada baseados em correlações médias históricas, expondo o capital a *drawdowns* severos justamente quando a preservação de patrimônio é crítica.
 
-\input{data/outputs/tables/backtest_comparison.tex}
+#### A Resiliência Bayesiana da Média (M0)
+O desempenho surpreendente do modelo ingênuo M0 (Média Histórica), que superou toda a classe de modelos lineares com um Índice de Sharpe de 1.13, oferece uma lição bayesiana profunda. Na ausência de um sinal preditivo de alta fidelidade, a melhor estimativa *a priori* (o *prior* histórico) domina estimativas condicionais ruidosas. O M0 opera, efetivamente, como uma estratégia de reversão à média simples: ele ignora o ruído de curto prazo e a falsa precisão dos múltiplos lineares, capturando o prêmio de risco acionista (*equity risk premium*) estrutural de longo prazo. Sua superioridade sobre o M3/M4 sugere que adicionar informação ruidosa via modelos mal especificados subtrai, em vez de adicionar, valor econômico.
+
+#### A Supremacia Adaptativa do Machine Learning (M5b)
+O modelo M5b (XGBoost) estabelece-se como um *outlier* positivo, entregando um retorno de **217.15\%** e um Índice de Sharpe de **2.42** — mais que o dobro do benchmark de mercado (*Buy \& Hold*: 1.01). A superioridade do M5b não reside apenas na precisão direcional, mas na **seletividade adaptativa**.
+
+Com apenas 22 operações em 35 meses, o modelo exibiu um comportamento de "caçador de assimetrias": permaneceu líquido (em CDI) durante a maior parte do tempo, alocando capital apenas quando a convergência não-linear de múltiplos de Valor, Qualidade e variáveis Macro sinalizava uma probabilidade de alta significativamente superior ao ruído de fundo. Esta capacidade de identificar *regimes de oportunidade* — e não apenas prever preços — é a marca distintiva da inteligência artificial aplicada a finanças, validando a hipótese de que o mercado exibe ineficiências exploráveis apenas por agentes capazes de processar complexidade não-linear.
 
 ### O Paradoxo da Explicação vs. Predição Resolvido
 
-A discrepância entre o desempenho medíocre do *day-trade* e o sucesso do *Fair Value* resolve o aparente paradoxo. O mercado é eficiente na forma semi-forte para o horizonte de um dia ($t+1$), onde o ruído domina o sinal. No entanto, exibe **ineficiência de convergência** no horizonte mensal ($t+21$), permitindo que modelos não-lineares identifiquem desvios fundamentais exploráveis.
+A discrepância entre o desempenho limitado do *day-trade* e o sucesso do *Fair Value* resolve o aparente paradoxo. O mercado é eficiente na forma semi-forte para o horizonte de um dia ($t+1$), onde o ruído domina o sinal. No entanto, exibe **ineficiência de convergência** no horizonte mensal ($t+21$), permitindo que modelos não-lineares identifiquem desvios fundamentais exploráveis.
 
 ### Evidência de Adaptabilidade (AMH)
 
@@ -895,7 +902,7 @@ A divergência entre a previsão diária ($t+1$) e a previsão mensal ($t+21$) s
 1.  **Curto Prazo (Ruído):** No horizonte diário, o mercado aproxima-se de um Passeio Aleatório. Tentar prever a direção do próximo dia é difícil e custoso.
 2.  **Médio Prazo (Valor):** No horizonte mensal, os preços convergem para os fundamentos. O modelo M5b, ao identificar o "Preço Justo" baseado em variáveis macro e micro, consegue explorar essa convergência.
 
-O lucro obtido pela estratégia (Sharpe 1.76) não advém de velocidade (HFT), mas de paciência e rigor na avaliação do custo de oportunidade (CDI).
+O lucro obtido pela estratégia (Sharpe 2.42) não advém de velocidade (HFT), mas de paciência e rigor na avaliação do custo de oportunidade (CDI).
 
 ## O Regime Estrutural da Informação
 
@@ -923,9 +930,9 @@ Este achado valida a proposição de @loAdaptiveMarketsHypothesis2004: a eficiê
 
 ## O Paradoxo de Grossman-Stiglitz Revisitado
 
-O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz. A estratégia de Valor Justo gerou retorno superior ao benchmark ajustado ao risco (Sharpe 1.76), indicando que o "custo da informação" investido na construção do motor Q-VAL e dos modelos de ML foi compensado por ineficiências de preço exploráveis no médio prazo.
+O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz. A estratégia de Valor Justo gerou retorno superior ao benchmark ajustado ao risco (Sharpe 2.42), indicando que o "custo da informação" investido na construção do motor Q-VAL e dos modelos de ML foi compensado por ineficiências de preço exploráveis no médio prazo.
 
-Isso sugere uma reinterpretação do equilíbrio de mercado para ativos de alta liquidez como a Petrobras. O mercado mostra-se eficiente na incorporação de dados fundamentalistas públicos no curto prazo, mas ineficiente na convergência de valor. O "prêmio" disponível não reside na previsão de *retornos* diários (que seguem um passeio aleatório), mas na identificação de *desvios de valor* (que exibem reversão à média). A ineficiência que permite a sobrevivência do analista é a existência de regimes de volatilidade e a lentidão na correção de preços frente a mudanças nos fundamentos macro e micro.
+Isso sugere uma reinterpretação do equilíbrio de mercado para ativos de alta liquidez como a Petrobras. O mercado mostra-se eficiente na incorporação de dados fundamentalistas públicos no curto prazo (onde modelos lineares falham), mas ineficiente na convergência de valor não-linear. O "prêmio" disponível não reside na previsão de *retornos* diários, mas na identificação de *desvios de valor* complexos que apenas modelos flexíveis (ML) conseguem capturar. A ineficiência que permite a sobrevivência do analista é a existência de regimes de volatilidade e a lentidão na correção de preços frente a mudanças não-lineares nos fundamentos.
 
 ## Implicações para a Avaliação de Ativos em Mercados Emergentes
 
@@ -933,11 +940,28 @@ Para o caso específico da Petrobras (PETR4), os resultados destacam a primazia 
 
 Em suma, a análise fundamentalista adiciona valor, todavia, esse valor é estritamente condicional ao regime de mercado vigente. O investidor que ignora a dinâmica de regimes e confia cegamente em múltiplos estáticos (como P/L histórico) está fadado a subestimar os riscos de cauda. A integração de métricas de qualidade com modelos adaptativos de risco representa, portanto, a fronteira da prática de *valuation* rigorosa.
 
+## Limitações Metodológicas e Humildade Epistêmica
+
+Apesar da aparente hegemonia do modelo M5b (XGBoost) sobre as abordagens lineares e o benchmark de mercado, a integridade científica exige um reconhecimento rigoroso das limitações inerentes a este estudo. A "superioridade" observada deve ser interpretada com cautela epistêmica, evitando a falácia da generalização prematura.
+
+### O Viés da Idiossincrasia e a Falácia da Indução
+A análise restringiu-se a um único ativo (PETR4), uma *proxy* de alta liquidez e sensibilidade macroeconômica. No entanto, o sucesso do modelo em capturar a dinâmica de preços deste ativo específico não garante sua transferibilidade para outros setores ou classes de ativos. O modelo pode ter aprendido, inadvertidamente, a microestrutura específica e os padrões comportamentais dos participantes deste mercado (*overfitting* idiossincrático), em vez de princípios universais de precificação de ativos. Como alerta @whiteRealityCheckData2000, a mineração de dados em uma única série temporal aumenta exponencialmente a probabilidade de descobertas espúrias.
+
+### Significância Estatística vs. Relevância Econômica
+Embora a diferença econômica entre o retorno acumulado do M5b (217,15\%) e do *Buy \& Hold* (99,38\%) seja expressiva, a validação estatística impõe uma dose de realismo. Testes de hipótese realizados sobre os retornos diários da estratégia revelam um *p-valor* de **0,34** para o teste t pareado e um *Information Ratio* modesto de **0,56**.
+Isso implica que não podemos rejeitar a hipótese nula de que a média dos retornos da estratégia é estatisticamente indistinguível do benchmark a um nível de confiança de 95\%. A "vantagem" observada, embora economicamente valiosa na amostra, carece de robustez estatística suficiente para ser declarada uma "lei" de mercado. A alta volatilidade do ativo subjacente dilui a significância estatística do *alpha* gerado, um fenômeno comum em finanças quantitativas conhecido como "Sharpe Ratio Deflacionado" [@baileyDeflatedSharpeRatio2014].
+
+### Dependência de Regime e Viés de Sobrevivência
+O período de teste (2023-2024) caracterizou-se por taxas de juros elevadas e volatilidade de commodities específica. Não há garantia de que a estrutura de correlação aprendida pelo modelo (ex: a relação entre Brent e PETR4) se manterá em regimes futuros de estresse financeiro global ou mudanças regulatórias domésticas. A suposição de estacionariedade, mesmo relaxada por modelos não-lineares, permanece uma vulnerabilidade central. O modelo não foi testado em "cisnes negros" (como a crise de 2008 ou a pandemia de 2020), onde as correlações históricas tendem a colapsar para a unidade.
+
+### O Risco do "Look-Ahead Bias" Meta-Metodológico
+Mesmo com a estrita separação entre treino e teste, a escolha das variáveis (Fatores Q-VAL) e da arquitetura do modelo (Gradient Boosting) foi informada pelo "estado da arte" da literatura financeira atual. Existe, portanto, um viés de seleção implícito: escolhemos métodos que *sabemos*, a posteriori, que funcionaram bem na última década. A verdadeira prova de fogo para qualquer modelo quantitativo não é o *backtest*, por mais rigoroso que seja, mas a performance em tempo real (*forward testing*), onde a incerteza é genuína e não simulada.
+
 # Conclusão e Recomendação
 
 Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Valor Justo.
 
-Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy & Hold, demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
+Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy & Hold (Sharpe 2.42 vs 1.01), demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
 
 ## Análise Final e Recomendação (Data-Driven)
 

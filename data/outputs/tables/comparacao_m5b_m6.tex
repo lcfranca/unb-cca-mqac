@@ -1,0 +1,15 @@
+\begin{table}[H]
+\centering
+\caption{Comparação de Performance: M5b (Fundamentos) vs. M6 (Integração Total)}
+\label{tab:m6_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Modelo & $R^2_{OOS}$ (\%) & RMSE & AIC & $\Delta R^2$ \\
+\midrule
+M5b (Fundamentos) & 0.92\% & 0.0788 & -3583 & - \\
+M6 (Integração Total) & 0.46\% & 0.0790 & -3570 & -0.46\% \\
+\bottomrule
+\end{tabular}
+\footnotesize
+Nota: Horizonte de previsão de 21 dias. M5b utiliza apenas Z-Scores e dinâmica de mercado. M6 adiciona variáveis macro e fatores.
+\end{table}

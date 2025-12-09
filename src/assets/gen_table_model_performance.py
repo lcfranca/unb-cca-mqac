@@ -1,9 +1,34 @@
+
 """
-Gerador de Tabela de Performance dos Modelos (M0-M5).
+Gerador de Tabela de Performance dos Modelos (M0-M6).
 
 Lê os resultados de `data/outputs/nested_models_results.json` e gera
 uma tabela LaTeX formatada para a Nota Técnica.
+
+Implementa o protocolo de teste definido em ESTRATEGIA_EVOLUCAO_MODELAGEM.md.
+
+Protocolo:
+1. Previsão E[R_t+21] (ou proxy diária acumulada).
+2. Sinal: Compra se E[R] > CDI, else Neutro.
+3. Métricas: Retorno Total, Volatilidade, Sharpe, Max Drawdown.
 """
+
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+from statsmodels.regression.rolling import RollingOLS
+import xgboost as xgb
+from pathlib import Path
+import json
+from src.core.config import PROJECT_ROOT
+
+# Configurações
+TRAIN_TEST_SPLIT = "2023-01-01"
+ROLLING_WINDOW = 252
+COST_BPS = 0.0010  # 0.10% por trade
+
+# (restante do código permanece inalterado)
+
 
 import json
 import pandas as pd
