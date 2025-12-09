@@ -652,106 +652,17 @@ A escolha do período Janeiro/2016 a Novembro/2025 justifica-se por:
 
 ## Reprodutibilidade Computacional
 
-A reprodutibilidade constitui princípio metodológico central deste trabalho.  Seguindo o paradigma de pesquisa computacional reproduzível [@buckheitWaveLab1995], todos os dados, procedimentos analíticos e rotinas de geração de resultados estão disponíveis em repositório público:
+Seguindo o paradigma de pesquisa reproduzível [@buckheitWaveLab1995], todo o código, dados e procedimentos estão disponíveis em repositório público:
 
-> **Repositório:** [https://github.com/lcfranca/unb-cca-mqac](https://github. com/lcfranca/unb-cca-mqac)
+> **Repositório:** [https://github.com/lcfranca/unb-cca-mqac](https://github.com/lcfranca/unb-cca-mqac)
 
-### Estrutura do Repositório
-
-O repositório organiza-se segundo princípios de separação de responsabilidades:
-
-```
-unb-cca-mqac/
-+-- data/
-|   +-- raw/              # Dados brutos (não processados)
-|   +-- processed/        # Dados processados
-|   +-- outputs/          # Resultados gerados
-|       +-- tables/       # Tabelas em formato LaTeX
-|       +-- figures/      # Figuras em formato PDF
-+-- src/                  # Código-fonte Python
-|   +-- assets/           # Scripts geradores de artefatos
-|       +-- gen_capm_analysis.py
-|       +-- gen_qval_scoring.py
-|       +-- gen_table_results.py
-|       +-- ...
-|   +-- core/             # Lógica central e carregadores
-|       +-- data_loader.py
-|       +-- config.py
-|       +-- ...
-+-- content/              # Conteúdo textual (Markdown/LaTeX)
-+-- notebooks/            # Jupyter notebooks exploratórios
-+-- Makefile              # Automação de execução
-```
-
-### Princípios de Reprodutibilidade
-
-**Separação Dados-Código-Resultados:** Dados brutos são armazenados separadamente do código de processamento e dos outputs derivados. Esta separação permite:
-- Verificação independente dos procedimentos
-- Atualização de dados sem modificação de código
-- Rastreabilidade completa do pipeline analítico
-
-**Versionamento:** Todo código é versionado via Git, com histórico completo de modificações.  Cada resultado pode ser rastreado à versão específica do código que o gerou.
-
-**Ambiente Computacional:** Dependências são especificadas em arquivo `requirements.txt`, garantindo que o ambiente computacional possa ser recriado.  Versões específicas de bibliotecas são fixadas para evitar quebras por atualizações. 
-
-**Execução Automatizada:** O `Makefile` na raiz do repositório permite execução completa do pipeline analítico via comando único:
-
-```bash
-make all
-```
-
-Este comando executa sequencialmente:
-1.  Coleta e processamento de dados
-2.  Estimação de modelos
-3. Geração de tabelas e figuras
-4. Compilação do documento final
-
-### Verificação Independente
-
-Pesquisadores interessados em verificar ou estender os resultados podem:
-
-1.  Clonar o repositório: `git clone https://github.com/lcfranca/unb-cca-mqac.git`
-2. Instalar dependências: `pip install -r requirements. txt`
-3.  Executar pipeline: `make all`
-4. Comparar outputs gerados com os reportados no documento
-
-A transparência metodológica permite que usuários ajustem parâmetros (pesos do Q-VAL, período amostral, métricas incluídas), verifiquem robustez, e adaptem os modelos a novos contextos ou ativos.
+O repositório organiza-se com separação clara entre dados brutos (`data/raw/`), processados (`data/processed/`), outputs (`data/outputs/`) e código-fonte (`src/`). A execução completa do pipeline analítico — da coleta de dados à compilação do documento — é automatizada via `make all`. Dependências são especificadas em `requirements.txt` para garantir reprodutibilidade do ambiente computacional.
 
 ---
 
 ## Síntese Metodológica
 
-A metodologia apresentada operacionaliza a pergunta teórica — *métricas fundamentalistas adicionam informação ao mecanismo de preços? * — em procedimento empírico testável. O diagrama abaixo sintetiza o fluxo analítico:
-
-```
-+-----------------+     +------------------+     +-----------------+
-|  Dados Brutos   |---->|   Processamento  |---->|  Motor Q-VAL    |
-|  (Preços, DFs)  |     |  (Normalização)  |     |  (Score 0-100)  |
-+-----------------+     +------------------+     +--------+--------+
-                                                         |
-                                                         V
-+-----------------+     +------------------+     +-----------------+
-|   Estratégia    |<----|    Regressões    |<----| Série Temporal  |
-|   Fair Value    |     |   (M0->...->M5b) |     |   de Scores     |
-+--------+--------+     +------------------+     +-----------------+
-         |                       |
-         V                       V
-+-----------------+     +-----------------------------------------+
-|   Performance   |     |          Métricas de Avaliação          |
-|   Financeira    |     |  * Delta R2 / AIC / BIC                 |
-|   (Sharpe/CDI)  |     |  * Testes de Significância              |
-+-----------------+     +-----------------------------------------+
-```
-
-Os resultados desta análise permitirão conclusões sobre:
-
-1. **Magnitude da contribuição:** Qual o $\Delta R^2$ atribuível às métricas fundamentalistas?
-2.  **Significância estatística:** A contribuição é estatisticamente distinguível de zero?
-3. **Relevância econômica:** A contribuição traduz-se em capacidade preditiva operacional? 
-4. **Estabilidade temporal:** A contribuição é estável ou varia entre regimes? 
-5. **Parcimônia:** O ganho explicativo justifica a complexidade adicional? 
-
-As respostas a estas questões informarão a discussão teórica sobre eficiência informacional do mercado brasileiro com respeito a informação fundamentalista pública — contribuindo para o debate entre visões hayekiana, EMH, Grossman-Stiglitz e mercados adaptativos, com foco empírico no caso Petrobras. 
+A metodologia operacionaliza a pergunta teórica em procedimento empírico testável. O fluxo analítico parte de dados brutos (preços, demonstrações financeiras), passa pelo processamento e normalização via motor Q-VAL, estima a hierarquia de modelos (M0→M5b), e avalia os resultados por métricas de contribuição informacional ($\Delta R^2$, AIC/BIC) e relevância econômica (Sharpe da estratégia Fair Value). A pergunta central — *métricas fundamentalistas adicionam informação?* — é assim traduzida em teste empírico com critérios objetivos de adjudicação.
 
 # Resultados Empíricos
 
@@ -849,7 +760,7 @@ Os resultados, detalhados na Tabela \ref{tab:backtest_results}, revelam uma dico
 \input{data/outputs/tables/backtest_metrics_all.tex}
 
 #### O Fracasso Estrutural dos Modelos Lineares (M3, M4, M5a)
-A performance sub-ótima dos modelos lineares (M3, M4) e robustos (M5a), que entregaram retornos reais negativos (abaixo do CDI) e Índices de Sharpe pouco expressivos (0.47-0.61), aponta para uma limitação epistemológica da abordagem econométrica tradicional. A imposição de uma forma funcional rígida ($y = \alpha + \beta X + \varepsilon$) assume que a elasticidade do retorno aos fundamentos é constante e independente do regime de mercado. Esta premissa de estacionariedade estrutural apresenta limitações severas em períodos de transição de regime. O modelo linear, cego às assimetrias de risco e às interações complexas entre variáveis, continua a emitir sinais de entrada baseados em correlações médias históricas, expondo o capital a *drawdowns* severos justamente quando a preservação de patrimônio é crítica.
+A performance sub-ótima dos modelos lineares (M3, M4) e robustos (M5a), que entregaram retornos reais negativos (abaixo do CDI) e Índices de Sharpe pouco expressivos (0.55-0.61), aponta para uma limitação epistemológica da abordagem econométrica tradicional. A imposição de uma forma funcional rígida ($y = \alpha + \beta X + \varepsilon$) assume que a elasticidade do retorno aos fundamentos é constante e independente do regime de mercado. Esta premissa de estacionariedade estrutural apresenta limitações severas em períodos de transição de regime. O modelo linear, cego às assimetrias de risco e às interações complexas entre variáveis, continua a emitir sinais de entrada baseados em correlações médias históricas, expondo o capital a *drawdowns* severos justamente quando a preservação de patrimônio é crítica.
 
 #### A Resiliência Bayesiana da Média (M0)
 O desempenho surpreendente do modelo ingênuo M0 (Média Histórica), que superou toda a classe de modelos lineares com um Índice de Sharpe de 1.13, oferece uma lição bayesiana profunda. Na ausência de um sinal preditivo de alta fidelidade, a melhor estimativa *a priori* (o *prior* histórico) domina estimativas condicionais ruidosas. O M0 opera, efetivamente, como uma estratégia de reversão à média simples: ele ignora o ruído de curto prazo e a falsa precisão dos múltiplos lineares, capturando o prêmio de risco acionista (*equity risk premium*) estrutural de longo prazo. Sua superioridade sobre o M3/M4 sugere que adicionar informação ruidosa via modelos mal especificados subtrai, em vez de adicionar, valor econômico.
@@ -893,46 +804,57 @@ A visualização permite identificar rapidamente o perfil atual da companhia: se
 
 ## Discussão
 
-Os resultados empíricos, culminando na performance superior da estratégia de Valor Justo (M5b-FairValue), oferecem uma nova perspectiva sobre a natureza da informação no mercado brasileiro.
+Os resultados empíricos, culminando na performance superior da estratégia de Valor Justo (M5b-FairValue), oferecem uma nova perspectiva sobre a natureza da informação no mercado brasileiro e permitem revisitar as questões teóricas fundamentais levantadas na introdução deste trabalho.
 
-## Causalidade e Horizontes de Eficiência
+## Adjudicação das Hipóteses Teóricas: As Quatro Visões em Confronto
 
-A divergência entre a previsão diária ($t+1$) e a previsão mensal ($t+21$) sugere que a eficiência de mercado é dependente do horizonte temporal.
+A introdução deste trabalho estabeleceu quatro tradições teóricas sobre a relação entre informação e preços: Hayek, Fama (EMH), Grossman-Stiglitz e Economia da Complexidade. Os resultados empíricos permitem adjudicar entre estas visões, identificando quais se confirmam, quais se refutam, e em que condições cada uma se aplica.
 
-1.  **Curto Prazo (Ruído):** No horizonte diário, o mercado aproxima-se de um Passeio Aleatório. Tentar prever a direção do próximo dia é difícil e custoso.
-2.  **Médio Prazo (Valor):** No horizonte mensal, os preços convergem para os fundamentos. O modelo M5b, ao identificar o "Preço Justo" baseado em variáveis macro e micro, consegue explorar essa convergência.
+### A Visão de Fama (EMH): Parcialmente Refutada
 
-O lucro obtido pela estratégia (Sharpe 2.42) não advém de velocidade (HFT), mas de paciência e rigor na avaliação do custo de oportunidade (CDI).
+A Hipótese dos Mercados Eficientes na forma semi-forte postula que toda informação pública está instantaneamente incorporada aos preços, tornando a análise fundamentalista inútil. Os resultados **refutam parcialmente** esta visão:
 
-## O Regime Estrutural da Informação
+*   **Evidência Contra:** O modelo M5b (ML Granular) alcançou $R^2_{OOS}$ de 33,40\%, superando o CAPM dinâmico (M2: 23,39\%) em aproximadamente 10 pontos percentuais. Se os preços refletissem perfeitamente toda informação pública, a adição de métricas fundamentalistas (Z-Scores de Valor, Qualidade, Risco) e macroeconômicas (Brent, EMBI) não deveria adicionar poder explicativo. A evidência mostra o contrário.
 
-A análise sugere que o mercado opera em um regime de **Eficiência Informacional Assimétrica**:
+*   **Nuance Temporal:** A EMH aproxima-se da verdade no horizonte diário ($t+1$), onde o mercado se comporta como Passeio Aleatório (M0: $R^2 \approx 0$). A informação de "direção" é processada rapidamente no *intraday*. Contudo, a EMH falha no horizonte mensal ($t+21$), onde a estratégia de Valor Justo captura ineficiências persistentes.
 
-1.  **Informação de Direção (Sinal):** É processada no *intraday*.
-2.  **Informação de Risco (Volatilidade):** Possui memória longa e é altamente previsível (Clustering).
+*   **Veredito:** A EMH é **condicionalmente válida** — aplica-se ao curto prazo e à dimensão de *timing* (quando comprar), mas não à dimensão de *valor* (quanto pagar). O mercado é eficiente em incorporar fluxo de notícias, mas ineficiente em convergir preços para fundamentos complexos.
 
-A limitação fundamental reside na incapacidade de prever a direção diária com precisão suficiente para superar custos e volatilidade. O caminho para superar o M5 não é mais engenharia financeira (trading rules) ou modelos mais complexos sobre os mesmos dados, mas sim a expansão do conjunto informacional.
+### A Visão de Grossman-Stiglitz: Confirmada
 
-## A Ilusão da Linearidade e a Natureza do Ruído
+O Paradoxo de Grossman-Stiglitz estabelece que algum grau de ineficiência é necessário para compensar o custo da informação. Os resultados **confirmam fortemente** esta visão:
 
-A divergência entre os critérios de informação — com o AIC favorecendo o modelo multifatorial (M2) e o BIC favorecendo o modelo parcimonioso (M0) — revela a tensão central na precificação de ativos: a distinção entre sinal e ruído. O modelo linear clássico captura a estrutura média de correlação, onde o Beta explica a maior parte da variância. A informação fundamentalista (Valor, Qualidade) existe e é detectável (reduz o AIC), mas sua magnitude é frequentemente ofuscada pela volatilidade estocástica do mercado (penalizada pelo BIC).
+*   **Evidência a Favor:** O *alpha* gerado pela estratégia M5b (Sharpe 2.42 vs. Buy \& Hold 1.01) demonstra que o "custo da informação" — investido na construção do motor Q-VAL, na coleta de dados macroeconômicos, e no treinamento de modelos de ML — foi compensado por retornos anormais exploráveis.
 
-O colapso do poder explicativo fora da amostra ($R^2$ caindo de 0.60 para 0.12) sugere que as relações lineares estimadas *ex-ante* são instáveis. Isso corrobora a crítica da Economia da Complexidade: assumir que a elasticidade do preço em relação aos fundamentos é constante (um $\beta$ fixo) é uma simplificação excessiva. Em momentos de estresse (Beta alto), o mercado tende a ignorar fundamentos de qualidade e reagir primordialmente a fatores macro (Risco País, Petróleo), um comportamento de "fuga para a liquidez" que modelos lineares interpretam como erro de previsão, mas que reflete uma mudança estrutural de regime.
+*   **A Magnitude da Ineficiência:** O $\Delta R^2$ de aproximadamente 10 p.p. entre M2 e M5b quantifica o "prêmio" disponível para agentes informados. Esta magnitude é consistente com o equilíbrio de Grossman-Stiglitz: ineficiência suficiente para remunerar a análise, mas não tão grande que seja trivialmente explorável.
 
-## Eficiência Adaptativa: O Mercado como Sistema de Regimes
+*   **O Papel do Ruído:** A performance dos modelos M1/M2 (CAPM Estático/Dinâmico), que nunca emitiram sinais de compra durante o backtest (Trades = 0), ilustra o papel dos *noise traders*. Estes modelos, incapazes de distinguir sinal de ruído, permaneceram em CDI, cedendo o *alpha* aos agentes mais sofisticados (M5b).
 
-A identificação de dois regimes de volatilidade distintos via Análise de Regimes via Rolling Windows oferece a explicação teórica mais robusta para os achados. O mercado não é "eficiente" ou "ineficiente" em abstrato; ele exibe eficiência variável dependendo do estado.
+*   **Veredito:** O mercado opera em equilíbrio de Grossman-Stiglitz. A análise fundamentalista é **economicamente viável**, mas apenas para agentes capazes de processar informação de forma não-trivial (não-linear, adaptativa).
 
-*   **No Regime 0 (Calmaria),** a volatilidade é baixa e o mercado aproxima-se da eficiência hayekiana: os preços incorporam gradualmente as informações fundamentais, e o *Information Coefficient* é positivo.
-*   **No Regime 1 (Crise),** a volatilidade explode e a eficiência informacional colapsa. O ruído domina o sinal, e o comportamento de manada (*herding*) prevalece sobre a análise racional.
+### A Visão Hayekiana: Parcialmente Confirmada, com Qualificações
 
-Este achado valida a proposição de @loAdaptiveMarketsHypothesis2004: a eficiência é uma característica dinâmica. Estratégias fundamentalistas que funcionam no Regime 0 podem falhar catastroficamente no Regime 1 se não incorporarem mecanismos de adaptação ao risco.
+Hayek concebia o sistema de preços como mecanismo de telecomunicação que condensa conhecimento tácito e disperso. A questão central é: o conhecimento relevante para precificação é *proposicional* (articulável em métricas) ou *tácito* (processual, emergente da competição)?
 
-## O Paradoxo de Grossman-Stiglitz Revisitado
+*   **Evidência a Favor do Conhecimento Proposicional:** O sucesso do motor Q-VAL — que operacionaliza fundamentos em métricas quantificáveis (EV/EBITDA, ROE, Beta) — sugere que parcela substancial do conhecimento relevante *é* proposicional e pode ser capturada por modelos. Se o conhecimento fosse puramente tácito, métricas formalizadas não deveriam ter poder preditivo.
 
-O teste econômico da estratégia baseada em Machine Learning lança luz sobre o Paradoxo de Grossman-Stiglitz. A estratégia de Valor Justo gerou retorno superior ao benchmark ajustado ao risco (Sharpe 2.42), indicando que o "custo da informação" investido na construção do motor Q-VAL e dos modelos de ML foi compensado por ineficiências de preço exploráveis no médio prazo.
+*   **Evidência a Favor do Conhecimento Processual:** A superioridade do M5b (ML) sobre o M5a (Score Linear) indica que a *forma* de processar as métricas importa tanto quanto as métricas em si. O XGBoost captura interações não-lineares e condicionais que a agregação linear ignora — sugerindo que parte do "conhecimento" reside no *procedimento* de agregação, não apenas nos dados brutos. Este é o sentido hayekiano: o mercado "sabe" mais do que qualquer métrica isolada pode articular.
 
-Isso sugere uma reinterpretação do equilíbrio de mercado para ativos de alta liquidez como a Petrobras. O mercado mostra-se eficiente na incorporação de dados fundamentalistas públicos no curto prazo (onde modelos lineares falham), mas ineficiente na convergência de valor não-linear. O "prêmio" disponível não reside na previsão de *retornos* diários, mas na identificação de *desvios de valor* complexos que apenas modelos flexíveis (ML) conseguem capturar. A ineficiência que permite a sobrevivência do analista é a existência de regimes de volatilidade e a lentidão na correção de preços frente a mudanças não-lineares nos fundamentos.
+*   **A Defasagem Informacional:** O fato de o modelo utilizar dados defasados (fundamentos do trimestre $q-1$, disponíveis no trimestre $q$) e ainda assim adicionar poder explicativo sugere que o mercado processa informação *gradualmente*, não instantaneamente. Isto corrobora a intuição de Hayek sobre a natureza processual da descoberta de preços.
+
+*   **Veredito:** O conhecimento relevante é **híbrido** — parcialmente proposicional (capturável por métricas), parcialmente processual (emergente da interação não-linear entre métricas e regime de mercado). A visão hayekiana é **parcialmente confirmada**: preços condensam conhecimento disperso, mas a condensação é imperfeita e passível de exploração por modelos sofisticados.
+
+### A Visão da Economia da Complexidade: Fortemente Confirmada
+
+A Economia da Complexidade propõe que mercados são sistemas adaptativos complexos onde a eficiência varia por regime, não-linearidades são prevalentes, e a própria análise participa do processo que pretende medir. Os resultados **confirmam fortemente** esta visão:
+
+*   **Eficiência Variável por Regime:** A análise de Rolling $R^2$ (Figura \ref{fig:rolling_r2}) demonstra que a superioridade do ML sobre o modelo linear varia substancialmente ao longo do tempo. Em regimes de baixa volatilidade, a vantagem do ML é modesta; em regimes de alta complexidade, a não-linearidade torna-se decisiva. Isto é precisamente o que a Economia da Complexidade prevê: a "receita" ótima muda com o ambiente.
+
+*   **A Dominância da Não-Linearidade:** O fracasso dos modelos lineares (M3, M4, M5a) no backtest — com retornos abaixo do CDI e Sharpe de 0.55-0.61 — versus o sucesso do M5b (Sharpe 2.42) constitui evidência empírica direta de que a relação entre fundamentos e retornos é intrinsecamente não-linear. Assumir elasticidade constante ($\beta$ fixo) é simplificação excessiva que destrói valor.
+
+*   **Emergência e Interações:** A análise de *Feature Importance* do M5b revela que variáveis de Valor (EV/EBITDA) e Volatilidade dominam conjuntamente a predição. Não é o Valor *ou* o Risco isoladamente, mas sua *interação* que gera o sinal. Este comportamento emergente — onde o todo é maior que a soma das partes — é a marca distintiva de sistemas complexos.
+
+*   **Veredito:** A Economia da Complexidade oferece o enquadramento teórico **mais consistente** com os resultados empíricos. O mercado não é eficiente ou ineficiente em abstrato; exibe eficiência dependente de regime, com nichos de ineficiência exploráveis por modelos capazes de processar não-linearidade.
 
 ## Implicações para a Avaliação de Ativos em Mercados Emergentes
 
@@ -959,9 +881,15 @@ Mesmo com a estrita separação entre treino e teste, a escolha das variáveis (
 
 # Conclusão e Recomendação
 
-Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Valor Justo.
+Este estudo investigou a fronteira da eficiência informacional no caso Petrobras, partindo de modelos lineares (CAPM) até algoritmos de Machine Learning (XGBoost) e estratégias de Valor Justo. A análise permitiu responder às questões teóricas fundamentais levantadas na introdução, oferecendo contribuições tanto para a teoria financeira quanto para a prática de investimentos.
 
-Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy & Hold (Sharpe 2.42 vs 1.01), demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
+## Síntese dos Achados Teóricos
+
+Os resultados empíricos permitiram adjudicar entre as quatro visões teóricas sobre informação e preços apresentadas na introdução. A EMH mostrou-se **condicionalmente válida** — o mercado aproxima-se da eficiência no horizonte diário, mas exibe ineficiências exploráveis no horizonte mensal. O Paradoxo de Grossman-Stiglitz foi **empiricamente verificado**: o *alpha* gerado (Sharpe 2.42) demonstra que o custo da informação é compensado, mas apenas para agentes sofisticados. A Economia da Complexidade oferece o **enquadramento mais consistente**: a dependência de regime, a não-linearidade e a variação temporal da eficiência caracterizam o mercado como sistema adaptativo complexo, não como "espelho" estático de informação.
+
+## Implicações Práticas
+
+Conclui-se que a análise fundamentalista e macroeconômica, quando processada por modelos não-lineares (M5b) e aplicada ao horizonte correto (médio prazo), gera valor econômico significativo. A estratégia de Valor Justo, ao superar consistentemente o CDI e o Buy \& Hold (Sharpe 2.42 vs 1.01), demonstra que o mercado não é perfeitamente eficiente na precificação de fundamentos complexos.
 
 ## Análise Final e Recomendação (Data-Driven)
 
@@ -973,17 +901,13 @@ Conclui-se que a análise fundamentalista e macroeconômica, quando processada p
 
 3.  **Veredito:** **MANTER / AGUARDAR**. A convergência entre preço e valor justo não é favorável no momento. O prêmio de risco oferecido pelo ativo é insuficiente frente à alternativa livre de risco. Recomenda-se aguardar uma correção de preço ou uma melhoria nos fundamentos de qualidade antes de novas alocações.
 
-**Veredito Final: O Valor da Complexidade**
+## Contribuição Teórica
 
-A engenharia financeira, operacionalizada através do modelo M5b (XGBoost) e da estratégia de Valor Justo, provou ser capaz de extrair *alpha* em um mercado líquido e competitivo. A chave para o sucesso não foi a previsão direcional de curto prazo (que falhou), mas a identificação robusta de assimetrias entre Preço e Valor.
+Este trabalho oferece três contribuições à literatura: (i) a **quantificação da ineficiência** via $\Delta R^2$ de ~10 p.p. entre CAPM dinâmico e modelo ML granular; (ii) um **teste empírico das visões teóricas** (EMH, AMH, Complexidade) através de modelos aninhados, permitindo adjudicação baseada em dados; e (iii) a **operacionalização do conhecimento híbrido**, demonstrando que a superioridade do ML sobre o Score Linear valida a hipótese de que parte do conhecimento relevante é processual e emerge de interações complexas.
 
-**Próximos Passos: A Fronteira do Alternative Data**
+## Direções Futuras
 
-Embora o modelo atual seja vitorioso, a busca por *alpha* é uma corrida armamentista contínua. A próxima fronteira reside na expansão do conjunto informacional para dados não-estruturados (*Alternative Data*), como análise de sentimento de notícias e dados de satélite, que podem antecipar os movimentos macroeconômicos que hoje o modelo apenas reage.
-
-**Implicações para o Investidor**
-
-Para o investidor, a lição é clara: o *day-trading* baseado em fundamentos é ineficaz, mas o *position trading* baseado em Valuation Quantitativo é altamente promissor. A disciplina de comparar o retorno esperado do ativo contra o custo de oportunidade do CDI (como feito na estratégia) é o diferencial que separa a aposta da alocação racional de capital.
+A busca por *alpha* é uma corrida armamentista contínua. A próxima fronteira reside na expansão do conjunto informacional para dados não-estruturados (*Alternative Data*) — análise de sentimento, dados de satélite, fluxo de ordens — que podem antecipar movimentos macroeconômicos que o modelo atual apenas reage. Para o investidor, a lição é clara: o *day-trading* baseado em fundamentos é ineficaz, mas o *position trading* baseado em Valuation Quantitativo é promissor. A disciplina de comparar o retorno esperado contra o custo de oportunidade do CDI é o diferencial que separa a aposta da alocação racional de capital.
 
 
 
