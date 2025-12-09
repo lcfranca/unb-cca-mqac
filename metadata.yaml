@@ -8,11 +8,11 @@
 # ------------------------------------------------------------------------------
 
 # Título do trabalho (MAIÚSCULAS)
-title: "NOTA TÉCNICA - RECOMENDAÇÃO DE COMPRA DE AÇÃO VIA CAPM"
+title: "PETROBRAS (PETR4): ANÁLISE DE VALOR JUSTO E RECOMENDAÇÃO DE INVESTIMENTO VIA MODELOS QUANTITATIVOS E ANÁLISE DE EFICIÊNCIA INFORMACIONAL"
 
 # Autor(es)
 author:
-  - ""
+  - "Lucas Coelho França"
 
 # Logo da UnB (caminho relativo)
 logo: images/logo-unb.png
@@ -23,13 +23,13 @@ disciplina: "Métodos Quantitativos Aplicados à Contabilidade"
 disciplina-sigla: "MQC"
 
 # Nota técnica (deixe vazio para usar "___")
-nota-tecnica-numero: ""
-data: ""
+nota-tecnica-numero: "01"
+data: "09/12/2025"
 
 # Empresa analisada (campos sempre exibidos)
-empresa: ""
-setor: ""
-periodo: ""
+empresa: "Petróleo Brasileiro S.A. (Petrobras)"
+setor: "Petróleo, Gás e Biocombustíveis"
+periodo: "2016 a 2025 (frequência: diária/trimestral)"
 
 # Local e ano
 local: "Brasília – DF"

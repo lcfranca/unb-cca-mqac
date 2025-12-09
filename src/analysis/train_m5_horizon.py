@@ -47,7 +47,6 @@ def load_data_horizon():
     df_macro['date'] = pd.to_datetime(df_macro['date'])
     
     # Merge Retornos + Macro
-    # Precisamos de ret_petr4 (Total) para o target, e excess_ret para features se quisermos
     df = pd.merge(
         df_ret[['date', 'ret_petr4', 'excess_ret_petr4', 'excess_ret_ibov', 'cdi_daily']],
         df_macro[['date', 'ret_brent', 'ret_fx', 'delta_embi']],
@@ -136,7 +135,7 @@ def load_data_horizon():
     return df_model.set_index('date'), cols_features
 
 def train_horizon_models():
-    print(f"🚀 Iniciando treinamento M5 Horizon (H={HORIZON} dias)...")
+    print(f"Iniciando treinamento M5 Horizon (H={HORIZON} dias)...")
     
     df, features = load_data_horizon()
     

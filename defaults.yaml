@@ -14,7 +14,7 @@ metadata-files:
   - metadata.yaml
 
 # Template LaTeX personalizado
-template: template.tex
+template: templates/template.tex
 
 # Variáveis globais
 variables:
@@ -33,4 +33,5 @@ toc-depth: 3
 
 # Bibliografia
 citeproc: true
-csl: associacao-brasileira-de-normas-tecnicas.csl
+csl: templates/associacao-brasileira-de-normas-tecnicas.csl
+bibliography: references.bib

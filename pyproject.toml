@@ -31,6 +31,9 @@ dependencies = [
     "requests>=2.31.0",
     "python-dotenv>=1.0.0",
     "pyarrow>=14.0.0",
+    "xgboost>=2.0.0",
+    "scikit-learn>=1.3.0",
+    "yfinance>=0.2.0",
 ]
 
 [project.optional-dependencies]
@@ -41,6 +44,8 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
     "jupytext>=1.15.0",
+    "nbconvert>=7.0.0",
+    "ipykernel>=6.0.0",
 ]
 all = [
     "unb-cca-mqac[dev]",

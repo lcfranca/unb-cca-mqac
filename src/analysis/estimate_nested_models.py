@@ -1,7 +1,7 @@
 """
 Estimativa de Modelos Aninhados de Eficiência Informacional (M0-M5).
 
-Este módulo implementa a estratégia de "Comparação Progressiva e Aninhada" definida no Roadmap.
+Este módulo implementa a estratégia de "Comparação Progressiva e Aninhada".
 Calcula métricas de performance (MSE, R2, AIC, BIC) para uma hierarquia de modelos,
 partindo de benchmarks Naïve até modelos multifatoriais com scores fundamentalistas.
 
@@ -47,7 +47,6 @@ def load_and_prepare_data() -> pd.DataFrame:
     df_ret['date'] = pd.to_datetime(df_ret['date'])
     
     # 2. Macroeconomia (Diário)
-    # Note: macro_returns.parquet já contém retornos diários
     df_macro = pd.read_parquet(processed_dir / "macro_returns.parquet")
     df_macro['date'] = pd.to_datetime(df_macro['date'])
     
@@ -180,7 +179,6 @@ def run_estimation():
     # M2: CAPM Dinâmico (Rolling)
     # =========================================================================
     # Estimação Rolling em toda a base (para ter histórico no início do teste)
-    # Precisamos das betas no tempo t-1 para prever t?
     # Abordagem padrão: RollingOLS no tempo t usa janela [t-W, t].
     # O beta_t é o beta realizado naquele período.
     # Para previsão ex-ante: y_hat_t = alpha_{t-1} + beta_{t-1} * X_t
@@ -207,9 +205,6 @@ def run_estimation():
     
     # Salvar predição M2 para uso nos próximos modelos (Âncora)
     # Precisamos da predição M2 para TODO o dataset para treinar M3/M4/M5
-    # Mas M3/M4/M5 são regressões estáticas sobre o output do M2?
-    # Roadmap: "OLS: R_t = delta * R_M2_hat + ..."
-    # Então precisamos gerar R_M2_hat para Treino e Teste.
     
     # Gerar R_M2_hat para todo o dataset (com shift)
     all_pred_m2 = (lagged_params['const'] + lagged_params['excess_ret_ibov'] * df['excess_ret_ibov'])
@@ -255,8 +250,8 @@ def run_estimation():
     # =========================================================================
     # M5-New: Granular Meta-Models (Linear & ML)
     # =========================================================================
-    # Carregar predições geradas pelo train_m5_models.py (Stacked/Residual Learning)
-    m5_preds_path = PROJECT_ROOT / "data" / "outputs" / "m5_predictions.parquet"
+    # Carregar predições geradas pelo train_m5_horizon.py (Stacked/Residual Learning)
+    m5_preds_path = PROJECT_ROOT / "data" / "outputs" / "m5_horizon_predictions.parquet"
     
     if m5_preds_path.exists():
         print(f"Carregando predições M5 Granular de: {m5_preds_path}")
@@ -280,7 +275,7 @@ def run_estimation():
         else:
             print("AVISO: Sem interseção de datas entre Test Set e M5 Predictions.")
     else:
-        print("AVISO: Arquivo m5_predictions.parquet não encontrado. Execute train_m5_models.py primeiro.")
+        print("AVISO: Arquivo m5_horizon_predictions.parquet não encontrado. Execute train_m5_horizon.py primeiro.")
     
     # =========================================================================
     # Salvar Resultados

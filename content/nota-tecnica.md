@@ -86,7 +86,7 @@ O terceiro argumento é particularmente relevante para o presente trabalho. Se o
 
 @famaCommonRiskFactors1993 propuseram modelo trifatorial, adicionando ao fator de mercado dois fatores empiricamente motivados: SMB (*Small Minus Big*), capturando o prêmio de tamanho — empresas pequenas tendem a gerar retornos superiores —, e HML (*High Minus Low*), capturando o prêmio de valor — empresas com alto índice book-to-market tendem a superar aquelas com baixo índice. O modelo explica parcela substancial da variação transversal de retornos que o CAPM deixava inexplicada. 
 
-Extensões subsequentes adicionaram fatores de momentum [@jegadeeshReturnsBuyingWinners1993], lucratividade e investimento [@famaFivefactorAssetPricing2015], e qualidade [@asnessSizeValueQuality2014]. O modelo de cinco fatores de Fama-French representa, atualmente, especificação padrão para controle de risco em estudos de anomalias:
+Extensões subsequentes adicionaram fatores de momentum [@jegadeeshReturnsBuyingWinners1993], lucratividade e investimento [@famaFivefactorAssetPricing2015], e qualidade [@asnessSizeValueQuality2019]. O modelo de cinco fatores de Fama-French representa, atualmente, especificação padrão para controle de risco em estudos de anomalias:
 
 $$R_{i,t} - R_{f,t} = \alpha_i + \beta_{i,MKT}(R_{m,t} - R_{f,t}) + \beta_{i,SMB}SMB_t + \beta_{i,HML}HML_t + \beta_{i,RMW}RMW_t + \beta_{i,CMA}CMA_t + \varepsilon_{i,t}$$
 

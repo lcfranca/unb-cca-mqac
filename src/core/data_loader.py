@@ -5,8 +5,7 @@ Este módulo é responsável por toda a coleta de dados de fontes externas:
   - Yahoo Finance (preços de ações)
   - BCB SGS (taxas de juros e indicadores macroeconômicos)
 
-IMPORTANTE: Este módulo é um PIPELINE - não deve conter configurações hardcoded.
-Todas as variáveis devem vir do módulo config.py que é configurado via notebook.
+Todas as variáveis devem vir do módulo config.py.
 """
 
 import logging

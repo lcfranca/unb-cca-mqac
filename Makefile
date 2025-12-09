@@ -28,12 +28,17 @@ RETURNS_PARQUET := $(PROCESSED_DIR)/returns/returns.parquet
 QVAL_PARQUET := $(PROCESSED_DIR)/qval/qval_timeseries.parquet
 METRICS_PARQUET := $(PROCESSED_DIR)/metrics/metrics.parquet
 NESTED_RESULTS := $(OUTPUT_DIR)/nested_models_results.json
-M5_PREDICTIONS := $(OUTPUT_DIR)/m5_predictions.parquet
-BACKTEST_RESULTS := $(OUTPUT_DIR)/backtest_results.json
+M5_PREDICTIONS := $(OUTPUT_DIR)/m5_horizon_predictions.parquet
+BACKTEST_RESULTS := $(TABLES_DIR)/backtest_fair_value_all.csv
+BACKTEST_CURVES := $(OUTPUT_DIR)/backtest_equity_curves.parquet
 
 # Arquivos de saída (Assets)
 FIGURES := $(FIGURES_DIR)/r2_evolution.pdf \
-           $(FIGURES_DIR)/backtest_equity_curve.pdf
+           $(FIGURES_DIR)/backtest_equity_all.pdf \
+           $(FIGURES_DIR)/zscore_correlation.pdf \
+           $(FIGURES_DIR)/feature_importance_m5b.pdf \
+           $(FIGURES_DIR)/rolling_r2_comparison.pdf \
+           $(FIGURES_DIR)/qval_radar.pdf
 
 TABLES := $(TABLES_DIR)/tabela_performance_modelos.tex
 
@@ -51,10 +56,12 @@ all: pdf
 	@echo "✓ Pipeline completo executado com sucesso!"
 	@echo "  PDF gerado em: output/nota-tecnica.pdf"
 
-## data: Verifica existência dos dados processados
+## data: Executa ingestão de dados (via Notebook)
 data:
-	@if [ ! -f $(RETURNS_PARQUET) ]; then echo "Erro: $(RETURNS_PARQUET) não encontrado. Execute os notebooks de ingestão."; exit 1; fi
-	@echo "✓ Dados processados encontrados."
+	@if [ ! -f .env ]; then echo "Erro: Arquivo .env não encontrado. Copie .env.example para .env e configure as chaves."; exit 1; fi
+	@echo "Executando ingestão de dados (notebooks/01_data_ingestion.ipynb)..."
+	$(PYTHON) -m jupyter nbconvert --to notebook --execute notebooks/01_data_ingestion.ipynb --output notebooks/01_data_ingestion_executed.ipynb
+	@echo "✓ Ingestão concluída."
 
 ## analysis: Executa scripts de análise (se necessário)
 analysis: $(NESTED_RESULTS) $(M5_PREDICTIONS) $(BACKTEST_RESULTS)
@@ -82,11 +89,11 @@ $(NESTED_RESULTS):
 
 $(M5_PREDICTIONS):
 	@echo "Treinando modelos M5 (Linear e ML)..."
-	$(PYTHON) -m src.analysis.train_m5_models
+	$(PYTHON) -m src.analysis.train_m5_horizon
 
-$(BACKTEST_RESULTS): $(M5_PREDICTIONS)
+$(BACKTEST_RESULTS) $(BACKTEST_CURVES): $(M5_PREDICTIONS)
 	@echo "Executando backtest M5..."
-	$(PYTHON) -m src.analysis.backtest_m5
+	$(PYTHON) -m src.assets.gen_backtest_comparison
 
 # ==============================================================================
 # GERADORES DE FIGURAS
@@ -96,8 +103,25 @@ $(FIGURES_DIR)/r2_evolution.pdf: $(NESTED_RESULTS)
 	@echo "Gerando gráfico de evolução do R2..."
 	$(PYTHON) -m src.assets.gen_fig_r2_evolution
 
-$(FIGURES_DIR)/backtest_equity_curve.pdf: $(BACKTEST_RESULTS)
+$(FIGURES_DIR)/backtest_equity_all.pdf: $(BACKTEST_CURVES) $(BACKTEST_RESULTS)
 	@echo "Gerando gráfico de backtest..."
+	$(PYTHON) -m src.assets.gen_fig_backtest_all
+
+$(FIGURES_DIR)/zscore_correlation.pdf:
+	@echo "Gerando matriz de correlação..."
+	$(PYTHON) -m src.assets.gen_fig_correlation
+
+$(FIGURES_DIR)/feature_importance_m5b.pdf: $(M5_PREDICTIONS)
+	@echo "Gerando feature importance..."
+	$(PYTHON) -m src.assets.gen_fig_feature_importance
+
+$(FIGURES_DIR)/rolling_r2_comparison.pdf: $(M5_PREDICTIONS)
+	@echo "Gerando rolling R2..."
+	$(PYTHON) -m src.assets.gen_fig_rolling_r2
+
+$(FIGURES_DIR)/qval_radar.pdf:
+	@echo "Gerando radar Q-VAL..."
+	$(PYTHON) -m src.assets.gen_fig_radar
 	# O script backtest_m5 já gera a figura, mas definimos a dependência aqui
 	@echo "Figura de backtest atualizada."
 

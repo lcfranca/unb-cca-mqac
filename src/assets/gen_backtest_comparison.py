@@ -176,7 +176,7 @@ def run_fair_value_backtest(df_preds, model_col, horizon=21, entry_threshold=0.0
     return strat_ret_net, trades.sum()
 
 def run():
-    print("🚀 Iniciando Backtest Unificado (M0-M5) - Estratégia Fair Value...")
+    print("Iniciando Backtest Unificado (M0-M5) - Estratégia Fair Value...")
     df, z_cols = load_data_backtest()
     
     # 1. Gerar Predições Horizon para M0-M4

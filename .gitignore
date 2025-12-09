@@ -1,17 +1,125 @@
 # ==============================================================================
-# Documentação Interna (não versionar)
+# Python & Build Artifacts
 # ==============================================================================
 docs/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # ==============================================================================
-# Arquivos Gerados
+# Virtual Environments
 # ==============================================================================
-
-# PDFs gerados (manter em output/)
-output/*.pdf
+.venv/
+venv/
+env/
+ENV/
+.env/
+.virtualenv/
+.conda/
 
 # ==============================================================================
-# Credenciais e Configurações Sensíveis
+# Testing & Coverage
+# ==============================================================================
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ==============================================================================
+# Jupyter Notebooks
+# ==============================================================================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# ==============================================================================
+# Data & Large Files (Data as Interface)
+# ==============================================================================
+# Ignore all data by default, but keep structure via .gitkeep
+data/external/*
+!data/external/.gitkeep
+
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+data/outputs/*
+!data/outputs/.gitkeep
+
+# Specific extensions to ensure are ignored if they leak elsewhere
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.csv
+*.xlsx
+*.xls
+*.json
+*.zip
+*.gz
+*.tar
+
+# Exceptions: Keep specific configuration JSONs or small CSVs if needed
+# !data/outputs/some_config.json
+
+# ==============================================================================
+# LaTeX & PDF Generation
+# ==============================================================================
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.nav
+*.snm
+*.vrb
+_minted-*/
+
+# Final PDF output (generated)
+!output/*.pdf
+!output/.gitkeep
+
+# ==============================================================================
+# Environment Variables & Secrets
 # ==============================================================================
 .env
 .env.local
@@ -19,63 +127,25 @@ output/*.pdf
 *.env
 
 # ==============================================================================
-# Arquivos Auxiliares LaTeX
+# IDE & OS Files
 # ==============================================================================
-*.aux
-*.log
-*.out
-*.toc
-*.lof
-*.lot
-*.fls
-*.fdb_latexmk
-*.synctex.gz
-*.bbl
-*.blg
-*.bcf
-*.run.xml
-*.nav
-*.snm
-*.vrb
-
-# ==============================================================================
-# Jupyter Notebooks - Arquivos temporários
-# ==============================================================================
-.ipynb_checkpoints/
-*/.ipynb_checkpoints/
-*.py[cod]
-__pycache__/
-*.so
-
-# ==============================================================================
-# Dados - Cache e arquivos grandes
-# ==============================================================================
-data/external/
-data/processed/*.csv
-data/processed/*.json
-!data/processed/.gitkeep
-data/raw/
-!data/raw/.gitkeep
-assets/data/*.csv
-assets/data/*.xlsx
-assets/data/*.json
-!assets/data/.gitkeep
-
-# ==============================================================================
-# Editor e Sistema
-# ==============================================================================
+.idea/
+.vscode/
 *.swp
 *.swo
 *~
 .DS_Store
 Thumbs.db
-.vscode/
-*.code-workspace
+ehthumbs.db
+Desktop.ini
 
 # ==============================================================================
-# Ambiente Virtual Python
+# Logs
 # ==============================================================================
-.venv/
-venv/
-env/
-.conda/
+*.log
+logs/
+
+# ==============================================================================
+# Legacy (Optional: Uncomment to ignore legacy files if not wanted in repo)
+# ==============================================================================
+# legacy/
