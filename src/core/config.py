@@ -24,7 +24,12 @@ from dotenv import load_dotenv
 # =============================================================================
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.resolve()
-load_dotenv(PROJECT_ROOT / ".env")
+env_path = PROJECT_ROOT / ".env"
+if not env_path.exists():
+    import warnings
+    warnings.warn(f"Arquivo .env não encontrado em {env_path}. Usando valores padrão/ambiente.", UserWarning)
+
+load_dotenv(env_path)
 ANALYSIS_OVERRIDE_PATH = PROJECT_ROOT / "configs" / "analysis_overrides.json"
 
 
@@ -65,6 +70,13 @@ class EnvConfig:
             environment=os.getenv("ENVIRONMENT", "development"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
         )
+
+    def validate(self):
+        """Valida configurações críticas."""
+        if not self.brapi_token:
+            import warnings
+            warnings.warn("BRAPI_TOKEN não configurado. Acesso à API Brapi pode ser limitado.", UserWarning)
+        return self
 
 
 # =============================================================================
@@ -283,7 +295,7 @@ class Config:
     
     def _initialize(self) -> None:
         """Inicializa configurações."""
-        self._env = EnvConfig.from_env()
+        self._env = EnvConfig.from_env().validate()
         self._paths = ProjectPaths()
         self._analysis = AnalysisConfig()
         self._paths.ensure_dirs()
